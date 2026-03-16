@@ -1,0 +1,3207 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Hibernate Demo — Документация</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>mermaid.initialize({startOnLoad: true, theme: 'default'});</script>
+  <style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 20px;
+        line-height: 1.7;
+        color: #333;
+        background: #fafafa;
+    }
+    h1 {
+        color: #2c3e50;
+        border-bottom: 3px solid #3498db;
+        padding-bottom: 10px;
+    }
+    h2 {
+        color: #2980b9;
+        margin-top: 50px;
+        border-left: 4px solid #3498db;
+        padding-left: 12px;
+    }
+    h3 {
+        color: #27ae60;
+        margin-top: 28px;
+    }
+    h4 {
+        color: #8e44ad;
+        margin-top: 20px;
+    }
+    pre {
+        background: #2d2d2d;
+        color: #f8f8f2;
+        padding: 16px;
+        border-radius: 6px;
+        overflow-x: auto;
+        font-size: 14px;
+    }
+    code {
+        background: #ecf0f1;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 14px;
+    }
+    pre code {
+        background: none;
+        padding: 0;
+    }
+    .mermaid {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        margin: 16px 0;
+        overflow-x: auto;
+    }
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 12px 0;
+        background: white;
+    }
+    th, td {
+        border: 1px solid #bdc3c7;
+        padding: 10px;
+        text-align: left;
+        vertical-align: top;
+    }
+    th {
+        background: #3498db;
+        color: white;
+    }
+    a {
+        color: #2980b9;
+    }
+    .file-link {
+        background: #e8f6f3;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 13px;
+        display: inline-block;
+        margin: 2px 0;
+    }
+    .note {
+        background: #fef9e7;
+        border-left: 4px solid #f1c40f;
+        padding: 12px;
+        margin: 12px 0;
+        border-radius: 4px;
+    }
+    .good, .ok {
+        background: #eafaf1;
+        border-left: 4px solid #27ae60;
+        padding: 12px;
+        margin: 12px 0;
+        border-radius: 4px;
+    }
+    .bad {
+        background: #fdedec;
+        border-left: 4px solid #e74c3c;
+        padding: 12px;
+        margin: 12px 0;
+        border-radius: 4px;
+    }
+    .warn {
+        background: #fffbeb;
+        border-left: 4px solid #d97706;
+        padding: 12px;
+        margin: 12px 0;
+        border-radius: 4px;
+    }
+    .violet {
+        background: #f5f3ff;
+        border-left: 4px solid #7c3aed;
+        padding: 12px;
+        margin: 12px 0;
+        border-radius: 4px;
+    }
+    .toc {
+        background: white;
+        border: 1px solid #dcdcdc;
+        border-radius: 8px;
+        padding: 18px;
+        margin: 20px 0 30px 0;
+    }
+    .toc ul {
+        margin: 0;
+        padding-left: 20px;
+    }
+    .endpoint {
+        background: #eef6ff;
+        border: 1px solid #d6eaff;
+        border-radius: 6px;
+        padding: 10px 12px;
+        margin: 6px 0;
+        font-family: monospace;
+        font-size: 13px;
+    }
+    .section-divider {
+        margin: 35px 0;
+        border: none;
+        border-top: 1px solid #ddd;
+    }
+    .card {
+        background: white;
+        border: 1px solid #dcdcdc;
+        border-radius: 12px;
+        padding: 18px 18px 16px;
+        margin: 16px 0;
+    }
+    .grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    @media (min-width: 980px) {
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+    }
+    .tag {
+        display: inline-block;
+        padding: 4px 8px;
+        margin: 0 8px 8px 0;
+        border-radius: 999px;
+        background: #f1f5f9;
+        border: 1px solid #cbd5e1;
+        color: #334155;
+        font-size: 12px;
+    }
+    .summary-box {
+        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+        border: 1px solid #cbd5e1;
+        border-radius: 12px;
+        padding: 20px;
+        margin: 18px 0 30px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Hibernate Demo</h1>
+<p>Теория, схемы, работающий код, тесты и HTTP endpoint'ы для демонстрации поведения Hibernate.</p>
+
+<div class="good">
+  <strong>Документация:</strong> <code>http://localhost:8888/</code><br/>
+  <strong>H2 Console:</strong> <a href="/h2-console">/h2-console</a><br/>
+  <strong>JDBC URL:</strong> <code>jdbc:h2:mem:demodb</code><br/>
+  <strong>User:</strong> <code>sa</code><br/>
+  <strong>Password:</strong> пустой
+</div>
+
+<div class="toc">
+  <h3>Содержание</h3>
+  <ul>
+    <li><a href="#section1">1. Что такое Hibernate и зачем он нужен</a></li>
+    <li><a href="#section2">2. Жизненный цикл сущности</a></li>
+    <li><a href="#section3">3. Связи между сущностями</a></li>
+    <li><a href="#section4">4. Стратегии загрузки: LAZY vs EAGER</a></li>
+    <li><a href="#section5">5. Проблема N+1 и способы её решения</a></li>
+    <li><a href="#section6">6. Кэширование в Hibernate</a></li>
+    <li><a href="#section7">7. Spring Data JPA как абстракция над Hibernate</a></li>
+    <li><a href="#section8">8. Advanced scenarios</a></li>
+    <li><a href="#section9">9. Типовые SQL-паттерны</a></li>
+    <li><a href="#section10">10. Концепции и паттерны</a></li>
+    <li><a href="#section11">11. Критика Hibernate в вопросах и ответах</a></li>
+    <li><a href="#section12">12. Глоссарий терминов</a></li>
+    <li><a href="#section13">13. Структура проекта</a></li>
+    <li><a href="#section14">14. Endpoint'ы</a></li>
+  </ul>
+</div>
+
+<hr class="section-divider"/>
+
+<h2 id="section1">1. Что такое Hibernate и зачем он нужен</h2>
+
+<h3>JPA и Hibernate: разграничение</h3>
+<div class="note">
+  <strong>JPA (Jakarta Persistence)</strong> — спецификация, описывающая стандартный API для ORM в Java.<br/>
+  <strong>Hibernate ORM</strong> — наиболее распространённая реализация JPA.<br/>
+  Hibernate также предоставляет собственные расширения поверх стандарта: <code>@BatchSize</code>, <code>@Fetch</code>, <code>@Cache</code>, <code>@NaturalId</code>, <code>@DynamicUpdate</code> и др.
+  В этом проекте используются как стандартные JPA-аннотации, так и Hibernate-специфичные расширения. Где это принципиально, указано явно.
+</div>
+
+<p>Hibernate как ORM-фреймворк позволяет работать с реляционной БД через Java-объекты. Он уменьшает объём шаблонного JDBC-кода и решает проблему несоответствия объектной и реляционной моделей (object-relational impedance mismatch).</p>
+
+<h3>Какие проблемы решает Hibernate</h3>
+<table>
+  <tr><th>Без ORM / JDBC</th><th>С Hibernate</th></tr>
+  <tr><td>Ручное написание SQL</td><td>JPQL, Criteria API, SQL generation</td></tr>
+  <tr><td>Ручной маппинг ResultSet → Object</td><td>Автоматический entity mapping</td></tr>
+  <tr><td>Ручное отслеживание изменений</td><td>Dirty checking</td></tr>
+  <tr><td>Ручное управление графом объектов</td><td>Связи, каскады, persistence context</td></tr>
+  <tr><td>Много повторных обращений к БД</td><td>Кэширование и оптимизация загрузки</td></tr>
+</table>
+
+<h3>Соответствие абстракций: JDBC → Hibernate / JPA</h3>
+<table>
+  <tr>
+    <th>Категория</th>
+    <th>JDBC (низкий уровень)</th>
+    <th>Hibernate / JPA (высокий уровень)</th>
+    <th>Что изменилось</th>
+  </tr>
+  <tr>
+    <td><strong>Фабрика</strong></td>
+    <td><code>DriverManager</code> / <code>DataSource</code></td>
+    <td><code>SessionFactory</code> / <code>EntityManagerFactory</code></td>
+    <td>Тяжёлый потокобезопасный объект; создаётся один раз при старте приложения.
+      Внутри хранит метаданные маппинга, настройки кэшей, пул соединений.</td>
+  </tr>
+  <tr>
+    <td><strong>Единица работы</strong></td>
+    <td><code>Connection</code></td>
+    <td><code>Session</code> / <code>EntityManager</code></td>
+    <td><code>Connection</code> — физическое соединение с БД.<br/>
+      <code>Session</code> — Unit of Work: оборачивает Connection (получает его лениво),
+      управляет Persistence Context (L1 cache) и обеспечивает identity guarantee.</td>
+  </tr>
+  <tr>
+    <td><strong>Запросы</strong></td>
+    <td><code>Statement</code> / <code>PreparedStatement</code></td>
+    <td><code>Query</code> / <code>TypedQuery</code><br/>
+      <small>(формируются через JPQL, Criteria API или native SQL)</small></td>
+    <td>Вместо написания SQL вручную — объектно-ориентированные запросы.
+      Hibernate сам генерирует SQL под конкретный диалект БД.</td>
+  </tr>
+  <tr>
+    <td><strong>Результат</strong></td>
+    <td><code>ResultSet</code> + ручной маппинг</td>
+    <td><code>List&lt;Entity&gt;</code> / DTO / projection</td>
+    <td>Hibernate автоматически маппит строки БД в Java-объекты
+      на основе метаданных (<code>@Entity</code>, <code>@Column</code>, связи).</td>
+  </tr>
+  <tr>
+    <td><strong>Маппинг</strong></td>
+    <td>Ручной код: <code>rs.getString("name")</code>, …</td>
+    <td>Декларативный: <code>@Entity</code>, <code>@Embeddable</code>,
+      <code>@OneToMany</code>, …</td>
+    <td>Маппинг описывается аннотациями один раз.
+      Hibernate выполняет его автоматически при каждом запросе.</td>
+  </tr>
+  <tr>
+    <td><strong>Транзакции</strong></td>
+    <td><code>con.setAutoCommit(false)</code><br/>
+      <code>con.commit()</code> / <code>rollback()</code></td>
+    <td><code>EntityTransaction</code> (JPA)<br/>
+      <code>Transaction</code> (Hibernate)<br/>
+      <small>В Spring — <code>@Transactional</code></small></td>
+    <td>Программное или декларативное управление границами транзакции.</td>
+  </tr>
+  <tr>
+    <td><strong>Обработка ошибок</strong></td>
+    <td><code>SQLException</code> (checked)</td>
+    <td><code>PersistenceException</code> (JPA)<br/>
+      <code>HibernateException</code> (Hibernate)<br/>
+      <small>Оба — unchecked (RuntimeException)</small></td>
+    <td>Нет необходимости оборачивать каждый вызов в try-catch.
+      Spring дополнительно транслирует в свою иерархию <code>DataAccessException</code>.</td>
+  </tr>
+  <tr>
+    <td><strong>Отслеживание изменений</strong></td>
+    <td>Ручной <code>UPDATE</code> для каждого изменённого поля</td>
+    <td>Dirty checking</td>
+    <td>Hibernate сравнивает состояние managed-сущности с её snapshot
+      и генерирует UPDATE автоматически при flush.</td>
+  </tr>
+  <tr>
+    <td><strong>Кэширование</strong></td>
+    <td>Нет встроенного механизма</td>
+    <td>Persistence Context (L1 cache)<br/>
+      Second Level Cache (L2, опционально)</td>
+    <td>L1 — в рамках Session, гарантирует identity.<br/>
+      L2 — разделяется между Session'ами, снижает нагрузку на БД.</td>
+  </tr>
+</table>
+
+<div class="mermaid">
+  graph LR
+  A[Java code] --> B[JDBC API]
+  B --> C[Connection]
+  C --> D[PreparedStatement]
+  D --> E[ResultSet]
+  E --> F[Manual mapping]
+
+  A2[Java code] --> H[Hibernate]
+  H --> I[Session / EntityManager]
+  I --> J[Persistence Context]
+  H --> K[JPQL / Criteria]
+  H --> L[Dirty Checking]
+  H --> M[Entity State Management]
+  H --> N[SQL Generator]
+  N --> O[JDBC]
+</div>
+
+<div class="mermaid">
+  graph TB
+  APP[Application] --> JPA[JPA API — стандарт]
+  JPA --> HIB[Hibernate — реализация JPA]
+  HIB --> JDBC[JDBC]
+  JDBC --> DB[(H2 Database)]
+
+  HIB --> EM[EntityManager / Session]
+  EM --> PC[Persistence Context]
+  HIB --> CACHE[Cache layers]
+  HIB --> QUERY[JPQL / HQL / Criteria / Native SQL]
+</div>
+
+<h3>Как это работает внутри</h3>
+<p>Hibernate анализирует entity-классы, строит метамодель, отслеживает состояние объектов в persistence context, синхронизирует их с БД через JDBC и генерирует SQL на основе действий с сущностями и запросами.</p>
+
+<h3>Гидратация и дегидратация</h3>
+<p>Эти два термина полезны для понимания того, что Hibernate на самом деле делает между БД и объектами.</p>
+
+<table>
+  <tr>
+    <th>Термин</th>
+    <th>Что означает</th>
+    <th>Где происходит</th>
+  </tr>
+  <tr>
+    <td><strong>Hydration / гидратация</strong></td>
+    <td>Преобразование строки результата SQL в состояние entity в памяти</td>
+    <td>При чтении из БД или L2 cache</td>
+  </tr>
+  <tr>
+    <td><strong>Dehydration / дегидратация</strong></td>
+    <td>Преобразование состояния entity в набор значений колонок для SQL или для L2 cache</td>
+    <td>При INSERT/UPDATE, flush и при записи в L2 cache</td>
+  </tr>
+</table>
+
+<div class="mermaid">
+  flowchart LR
+  DB[(DB row)] --> H1[Hydration]
+  H1 --> E[Managed Entity in Persistence Context]
+  E --> D1[Dehydration]
+  D1 --> SQL[INSERT / UPDATE params]
+</div>
+
+<div class="note">
+  <strong>Важно:</strong> гидратация — это не просто “создать Java-объект”.
+  Hibernate обычно:
+  <ul>
+    <li>читает значения колонок из <code>ResultSet</code>;</li>
+    <li>собирает из них внутреннее состояние сущности;</li>
+    <li>помещает объект в persistence context;</li>
+    <li>создаёт snapshot для dirty checking;</li>
+    <li>для ассоциаций может создавать proxy или persistent collection вместо полной немедленной загрузки.</li>
+  </ul>
+</div>
+
+<div class="note">
+  <strong>Дегидратация</strong> особенно полезна для понимания L2 cache:
+  second-level cache хранит не “живые Java-объекты”, а именно <strong>dehydrated state</strong> — условно набор значений полей.
+  При чтении из L2 Hibernate снова выполняет гидратацию и создаёт новый entity-instance для текущего persistence context.
+</div>
+
+<h3>📁 Связанный код</h3>
+<ul>
+  <li><span class="file-link">Product.java</span> — базовая сущность (JPA-аннотации + Hibernate <code>@Cache</code>)</li>
+  <li><span class="file-link">Category.java</span> — сущность со связями (JPA + Hibernate <code>@BatchSize</code>, <code>@Fetch</code>)</li>
+  <li><span class="file-link">ProductDetails.java</span> — embeddable value object (JPA <code>@Embeddable</code>)</li>
+  <li><span class="file-link">application.yaml</span> — конфигурация Hibernate, SQL logging, cache, statistics</li>
+  <li><span class="file-link">HibernateApplication.java</span> — старт приложения</li>
+</ul>
+
+<div class="note">
+  <strong>Тест:</strong> <span class="file-link">Section1_BasicMappingTest</span>
+</div>
+
+<hr class="section-divider"/>
+
+<h2 id="section2">2. Жизненный цикл сущности</h2>
+
+<p>Жизненный цикл сущности — центральная тема JPA/Hibernate. Именно он объясняет, как работают persist, merge, detach, remove, flush, clear и dirty checking.</p>
+
+<table>
+  <tr><th>Состояние</th><th>Описание</th><th>В persistence context</th></tr>
+  <tr><td><strong>Transient</strong></td><td>Создан через <code>new</code>, не связан с БД, не имеет identity в контексте</td><td>Нет</td></tr>
+  <tr><td><strong>Managed</strong></td><td>Отслеживается текущей сессией, изменения будут синхронизированы с БД</td><td>Да</td></tr>
+  <tr><td><strong>Detached</strong></td><td>Был managed, но уже не управляется текущим контекстом</td><td>Нет</td></tr>
+  <tr><td><strong>Removed</strong></td><td>Помечен на удаление, DELETE будет выполнен при flush; сама сущность до commit остаётся в persistence context и может быть возвращена в managed через <code>persist()</code> в рамках той же сессии</td><td>Да, до завершения транзакции</td></tr>
+</table>
+
+<div class="mermaid">
+  stateDiagram-v2
+  [*] --> Transient: new Entity()
+  Transient --> Managed: persist()
+  Managed --> Detached: detach() / clear() / close()
+  Detached --> Managed: merge() *
+  Managed --> Removed: remove()
+  Removed --> [*]: flush + commit
+  Managed --> Managed: dirty checking
+</div>
+
+<div class="note">
+  * Стрелка <code>Detached → Managed</code> на диаграмме отражает переход <strong>сущности как бизнес-единицы</strong>. На уровне Java-объектов <code>merge()</code> возвращает <strong>другой</strong> managed-экземпляр. Переданный detached-объект остаётся detached. См. пояснение ниже.
+</div>
+
+<div class="mermaid">
+  sequenceDiagram
+  participant App
+  participant EM as EntityManager
+  participant PC as PersistenceContext
+  participant DB
+
+  App->>EM: persist(entity)
+  EM->>PC: entity becomes managed
+  App->>EM: flush / commit
+  EM->>DB: INSERT
+
+  App->>EM: detach(entity)
+  EM->>PC: remove from context
+
+  App->>EM: merge(detachedEntity)
+  EM->>PC: copy state into managed instance
+  Note over EM,PC: returns NEW managed copy
+  Note over App: detachedEntity remains detached
+  App->>EM: flush / commit
+  EM->>DB: UPDATE
+</div>
+
+<h3>Как работает merge()</h3>
+<div class="note">
+  <code>merge()</code> <strong>не делает</strong> detached-объект managed. Hibernate находит или создаёт managed-экземпляр с тем же ID, копирует в него состояние из detached-объекта и возвращает этот managed-экземпляр. Переданный detached-объект остаётся detached — дальнейшие изменения в нём <strong>не отслеживаются</strong>. Работать нужно с возвращённым экземпляром.
+</div>
+
+<h3>flush() и clear()</h3>
+<table>
+  <tr><th>Операция</th><th>Эффект</th></tr>
+  <tr><td><code>flush()</code></td><td>Отправляет накопленные SQL-операции (INSERT, UPDATE, DELETE) в БД <strong>в рамках текущей транзакции</strong>. Это <strong>не commit</strong> — при rollback изменения будут откачены. Может быть вызван автоматически (auto-flush) перед выполнением JPQL/HQL-запроса.</td></tr>
+  <tr><td><code>clear()</code></td><td>Очищает persistence context. Все managed-сущности становятся detached. Identity guarantee теряется: повторная загрузка вернёт новый Java-экземпляр.</td></tr>
+</table>
+
+<h3>Dirty checking</h3>
+<p>Hibernate хранит snapshot (копию начального состояния) каждой managed-сущности. При flush сравнивает текущие значения полей со snapshot'ом. Если есть изменения — автоматически генерирует <code>UPDATE</code>. Явный вызов <code>save()</code> или <code>update()</code> для managed-сущности <strong>не требуется</strong>.</p>
+
+<div class="warn">
+  <strong>Bulk update/delete — отдельный случай:</strong> JPQL bulk-операции (<code>update ...</code>, <code>delete ...</code>) обходят dirty checking и не синхронизируют уже загруженные managed-сущности. После таких запросов persistence context может содержать устаревшие данные, поэтому часто нужен <code>clear()</code> или аккуратное управление границами контекста.
+</div>
+
+<h3>📁 Связанный код</h3>
+<ul>
+  <li><span class="file-link">EntityLifecycleRepository.java</span></li>
+  <li><span class="file-link">EntityLifecycleDemoService.java</span></li>
+  <li><span class="file-link">FlushClearRepository.java</span></li>
+  <li><span class="file-link">FlushClearDemoService.java</span></li>
+</ul>
+
+<div class="note">
+  <strong>Тесты:</strong> <span class="file-link">Section2_EntityLifecycleTest</span>, <span class="file-link">Section9_FlushClearTest</span>
+</div>
+
+<hr class="section-divider"/>
+
+<h2 id="section3">3. Связи между сущностями</h2>
+
+<p>JPA отражает связи между таблицами как отношения между объектами. Это позволяет работать с графом сущностей, а не с отдельными строками.</p>
+
+<table>
+  <tr><th>Тип связи</th><th>Аннотация (JPA)</th><th>Пример в проекте</th></tr>
+  <tr><td>Многие к одному</td><td><code>@ManyToOne</code></td><td>Product → Category</td></tr>
+  <tr><td>Один ко многим</td><td><code>@OneToMany</code></td><td>Category → Products</td></tr>
+  <tr><td>Многие ко многим</td><td><code>@ManyToMany</code></td><td>Product ↔ Tag</td></tr>
+</table>
+
+<div class="mermaid">
+  erDiagram
+  CATEGORY ||--o{ PRODUCT : "has many"
+  CUSTOMER ||--o{ CUSTOMER_ORDER : "places"
+  PRODUCT }o--o{ TAG : "tagged with"
+</div>
+
+<div class="mermaid">
+  graph LR
+  subgraph "Owning side"
+  P["@ManyToOne Product.category"]
+  end
+  subgraph "Inverse side"
+  C["@OneToMany(mappedBy='category') Category.products"]
+  end
+  P -->|FK in products.category_id| C
+</div>
+
+<h3>Ключевые концепции</h3>
+<ul>
+  <li><strong>Owning side</strong> — сторона, которая реально управляет FK. Только изменения на owning side приводят к SQL-операциям.</li>
+  <li><strong>mappedBy</strong> — обратная (inverse) сторона двунаправленной связи. Hibernate игнорирует изменения на этой стороне при генерации SQL.</li>
+  <li><strong>Cascade</strong> — каскадное распространение операций (persist, merge, remove и др.) от родителя к дочерним сущностям.</li>
+  <li><strong>orphanRemoval</strong> — автоматическое удаление дочерних записей, которые были удалены из коллекции родителя.</li>
+</ul>
+
+<h3>Практические замечания</h3>
+<div class="warn">
+  <strong>Практичное правило по умолчанию:</strong> начинайте с <code>@ManyToOne</code> на стороне child и добавляйте коллекцию на parent только при явной необходимости. Коллекция на parent бывает вполне уместна — например, для aggregate root, bounded collection, cascade-операций или <code>orphanRemoval</code>.
+</div>
+
+<div class="warn">
+  Не включайте lazy-ассоциации в <code>equals()</code>, <code>hashCode()</code>, <code>toString()</code> и JSON-сериализацию. Это частый источник лишних SQL, рекурсии и <code>LazyInitializationException</code>.
+</div>
+
+<h3>equals/hashCode для entity</h3>
+<div class="note">
+  Для entity это отдельная зона риска:
+  <ul>
+    <li>не включайте в <code>equals/hashCode</code> все поля сущности и тем более lazy-ассоциации;</li>
+    <li>осторожно с equality только по ID: у новых сущностей ID ещё нет;</li>
+    <li>работа с <code>Set</code> может ломаться, если hashCode меняется после persist;</li>
+    <li>Hibernate proxy добавляют нюансы к сравнению классов (<code>getClass()</code> vs <code>instanceof</code>).</li>
+  </ul>
+  Универсального рецепта для всех моделей нет, но главное правило — делать реализацию максимально консервативной и не трогать ассоциации.
+</div>
+
+<h3>toString()/JSON serialization</h3>
+<div class="bad">
+  Не отдавайте JPA entity напрямую в REST API. Для внешних ответов лучше DTO/projection.
+  Jackson и другие сериализаторы могут:
+  <ul>
+    <li>случайно инициализировать lazy-связи;</li>
+    <li>породить N+1;</li>
+    <li>зациклиться на двунаправленном графе;</li>
+    <li>упасть с <code>LazyInitializationException</code>.</li>
+  </ul>
+</div>
+
+<h3>📁 Связанный код</h3>
+<ul>
+  <li><span class="file-link">Category.java</span></li>
+  <li><span class="file-link">Product.java</span></li>
+  <li><span class="file-link">Customer.java</span></li>
+  <li><span class="file-link">CustomerOrder.java</span></li>
+  <li><span class="file-link">Tag.java</span></li>
+  <li><span class="file-link">RelationshipRepository.java</span></li>
+</ul>
+
+<div class="note">
+  <strong>Тест:</strong> <span class="file-link">Section3_RelationshipsTest</span>
+</div>
+
+<hr class="section-divider"/>
+
+<h2 id="section4">4. Стратегии загрузки: LAZY vs EAGER</h2>
+
+<p>Стратегия загрузки определяет, когда Hibernate выполняет запрос к БД за связанными данными.</p>
+
+<table>
+  <tr><th>Стратегия</th><th>Когда загружает</th><th>По умолчанию (JPA spec)</th><th>Эффект</th></tr>
+  <tr><td><strong>LAZY</strong></td><td>При первом обращении к коллекции/proxy</td><td><code>@OneToMany</code>, <code>@ManyToMany</code></td><td>Экономит ресурсы, но может привести к N+1</td></tr>
+  <tr><td><strong>EAGER</strong></td><td>Должна быть доступна к моменту использования/возврата сущности</td><td><code>@ManyToOne</code>, <code>@OneToOne</code></td><td>Проще в использовании, но часто загружает лишние данные и тоже может привести к N+1</td></tr>
+</table>
+
+<div class="note">
+  <strong>Важно:</strong> <code>FetchType.EAGER</code> <strong>не гарантирует</strong> один SQL с <code>JOIN</code>.
+  Это требование к моменту доступности данных, а не к форме SQL. Hibernate может реализовать EAGER:
+  через <code>JOIN</code>, через дополнительные <code>SELECT</code>, через batch/subselect — в зависимости от запроса, провайдера и версии.
+</div>
+
+<div class="warn">
+  <strong>Практика:</strong> хотя по JPA spec <code>@ManyToOne</code> и <code>@OneToOne</code> по умолчанию EAGER,
+  в реальных проектах обычно рекомендуется явно ставить <code>fetch = LAZY</code> и управлять загрузкой через запросы/fetch plan.
+</div>
+
+<div class="mermaid">
+  sequenceDiagram
+  participant App
+  participant Hibernate
+  participant DB
+
+  Note over App,DB: LAZY loading
+  App->>Hibernate: find(Category, id)
+  Hibernate->>DB: SELECT category
+  DB-->>Hibernate: category row
+  Hibernate-->>App: Category with lazy proxy for products
+  App->>Hibernate: category.getProducts().size()
+  Hibernate->>DB: SELECT products WHERE category_id = ?
+  DB-->>Hibernate: product rows
+  Hibernate-->>App: initialized collection
+</div>
+
+<div class="mermaid">
+  sequenceDiagram
+  participant App
+  participant Hibernate
+  participant DB
+
+  Note over App,DB: EAGER loading
+  App->>Hibernate: find(Category, id)
+  Hibernate->>DB: SELECT category + maybe JOIN or extra SELECTs
+  DB-->>Hibernate: rows
+  Hibernate-->>App: Category with association already available
+</div>
+
+<h3>LazyInitializationException</h3>
+<div class="bad">
+  Если обратиться к ленивой коллекции или proxy после закрытия persistence context (сессия закрыта, транзакция завершена), Hibernate выбросит <strong>LazyInitializationException</strong> — у него нет активного соединения для выполнения запроса.
+</div>
+
+<h3>Open Session in View (OSIV)</h3>
+<div class="warn">
+  В Spring Boot по умолчанию часто включён <code>Open Session in View</code> (<code>spring.jpa.open-in-view=true</code>).
+  Это позволяет lazy loading уже в web-слое, после выхода из сервисной транзакции.
+  Для демо это удобно, но в продакшене считается спорной практикой, потому что:
+  <ul>
+    <li>маскирует проблемы fetch plan;</li>
+    <li>переносит I/O в слой представления;</li>
+    <li>затрудняет контроль запросов и поиск N+1.</li>
+  </ul>
+</div>
+
+<h3>📁 Связанный код</h3>
+<ul>
+  <li><span class="file-link">FetchingRepository.java</span></li>
+  <li><span class="file-link">FetchingDemoService.java</span></li>
+  <li><span class="file-link">LazyExceptionRepository.java</span></li>
+  <li><span class="file-link">LazyExceptionDemoService.java</span></li>
+</ul>
+
+<div class="note">
+  <strong>Тесты:</strong> <span class="file-link">Section4_FetchingStrategiesTest</span>, <span class="file-link">Section10_LazyInitializationExceptionTest</span>
+</div>
+
+<hr class="section-divider"/>
+
+<h2 id="section5">5. Проблема N+1 и способы её решения</h2>
+
+<p>N+1 — одна из самых частых проблем производительности в ORM. Один запрос загружает N родительских сущностей, затем для каждой выполняется отдельный запрос на связанную ассоциацию — итого N+1 запросов.</p>
+
+<div class="note">
+  <strong>Главная идея:</strong> проблему N+1 обычно решают не сменой аннотации <code>LAZY/EAGER</code>, а проектированием <strong>fetch plan под конкретный use case</strong>.
+  Один сценарий чтения требует <code>JOIN FETCH</code>, другой — DTO projection, третий — batch fetching.
+</div>
+
+<div class="warn">
+  <strong>Важно:</strong> N+1 возникает не только на <code>@OneToMany</code>, но и на <code>@ManyToOne</code> / <code>@OneToOne</code>.
+  Это не “проблема коллекций” и не “проблема LAZY”. Это проблема серии дополнительных запросов на ассоциации.
+  Даже <code>EAGER</code> сам по себе не гарантирует отсутствие N+1.
+</div>
+
+<div class="mermaid">
+  graph TB
+  Q1["1: SELECT * FROM categories"] --> C["N categories"]
+  C --> Q2["2: SELECT * FROM products WHERE category_id=1"]
+  C --> Q3["3: SELECT * FROM products WHERE category_id=2"]
+  C --> Q4["N+1: SELECT * FROM products WHERE category_id=N"]
+</div>
+
+<div class="mermaid">
+  graph TB
+  J1["JOIN FETCH: 1 запрос"] --> R1["Categories + products в одном SQL"]
+</div>
+
+<h3>N+1 «в действии»: код до и после</h3>
+
+<h4>Пример 1: коллекция <code>@OneToMany</code></h4>
+<pre><code>// ❌ N+1: 1 запрос за категориями + N запросов за продуктами
+List&lt;Category&gt; categories = em.createQuery(
+    "SELECT c FROM Category c", Category.class
+).getResultList(); // 1 запрос
+
+for (Category c : categories) {
+    c.getProducts().size(); // N запросов: по одному на category
+}</code></pre>
+
+<pre><code>// ✅ JOIN FETCH: 1 запрос
+List&lt;Category&gt; categories = em.createQuery(
+    "SELECT c FROM Category c JOIN FETCH c.products", Category.class
+).getResultList();</code></pre>
+
+<h4>Пример 2: <code>@ManyToOne</code> тоже может породить N+1</h4>
+<pre><code>// ❌ N+1 на @ManyToOne: 1 запрос за комментариями + N запросов за post
+List&lt;PostComment&gt; comments = em.createQuery(
+    "SELECT pc FROM PostComment pc", PostComment.class
+).getResultList();
+
+for (PostComment pc : comments) {
+    pc.getPost().getTitle(); // дополнительные SELECT по post
+}</code></pre>
+
+<pre><code>// ✅ Правильный fetch plan под use case
+List&lt;PostComment&gt; comments = em.createQuery(
+    "SELECT pc FROM PostComment pc JOIN FETCH pc.post", PostComment.class
+).getResultList();</code></pre>
+
+<h3>Способы решения</h3>
+<table>
+  <tr><th>Подход</th><th>Спецификация</th><th>Идея</th><th>Когда применять</th></tr>
+  <tr><td><strong>JOIN FETCH</strong></td><td>JPA (JPQL)</td><td>Подгрузить связи в JPQL через <code>JOIN FETCH</code></td><td>Когда точно известно, что связи нужны</td></tr>
+  <tr><td><strong>EntityGraph</strong></td><td>JPA 2.1+</td><td>Декларативно описать fetch plan</td><td>Когда не хочется менять текст запроса</td></tr>
+  <tr><td><strong>@BatchSize</strong></td><td>Hibernate</td><td>Пакетно загружать lazy-ассоциации через <code>IN (...)</code></td><td>Когда связь нужна не всегда, но нужно смягчить N+1</td></tr>
+  <tr><td><strong>@Fetch(SUBSELECT)</strong></td><td>Hibernate</td><td>При инициализации коллекций сделать один дополнительный SQL для уже загруженного набора родителей</td><td>Когда загружается список родителей и затем нужны их коллекции</td></tr>
+  <tr><td><strong>DTO / Projection</strong></td><td>JPA / Spring Data</td><td>Сразу выбрать только нужные поля без materialization полного entity graph</td><td>Для read-only API, списков, пагинации</td></tr>
+</table>
+
+<div class="note">
+  <strong>JOIN FETCH и Hibernate 6+:</strong> в Hibernate 6 дедупликация результатов при <code>JOIN FETCH</code> коллекций выполняется автоматически. Указывать <code>DISTINCT</code> в JPQL больше не обязательно (в отличие от Hibernate 5).
+</div>
+
+<h3>EntityGraph: fetch graph vs load graph</h3>
+<div class="note">
+  <strong>EntityGraph</strong> бывает в двух режимах:
+  <ul>
+    <li><strong>fetch graph</strong> — атрибуты, указанные в графе, считаются eager для этого запроса; остальные рассматриваются как lazy, даже если в маппинге часть из них eager;</li>
+    <li><strong>load graph</strong> — атрибуты из графа тоже подгружаются eagerly, а остальные следуют своим настройкам из маппинга.</li>
+  </ul>
+  На практике это тонкое, но важное различие: <code>fetch graph</code> агрессивнее ограничивает загрузку, <code>load graph</code> скорее дополняет обычный fetch plan.
+</div>
+
+<h3><code>@BatchSize</code> и global batch fetching</h3>
+<div class="note">
+  <code>@BatchSize</code> работает не только для коллекций, но и для lazy <code>@ManyToOne</code> / <code>@OneToOne</code>.
+  Если в persistence context есть несколько незагруженных proxy, Hibernate может инициализировать их пачкой.
+</div>
+
+<div class="note">
+  Кроме <code>@BatchSize</code> на конкретных ассоциациях, Hibernate поддерживает глобальную настройку:
+  <pre><code>spring:
+  jpa:
+    properties:
+      hibernate:
+        default_batch_fetch_size: 32</code></pre>
+  Это practical tool, который позволяет пакетно инициализировать lazy-association без аннотации на каждой связи.
+</div>
+
+<div class="warn">
+  <strong>Важно:</strong> <code>@BatchSize</code> обычно не устраняет N+1 полностью, а <strong>смягчает</strong> его:
+  вместо <code>1 + N</code> запросов получается примерно <code>1 + ceil(N / batchSize)</code>.
+</div>
+
+<h3>Как это выглядит в SQL</h3>
+
+<h4>JOIN FETCH</h4>
+<pre><code>SELECT c.id, c.title, p.category_id, p.id, p.name, p.price, p.version
+FROM categories c
+JOIN products p ON c.id = p.category_id</code></pre>
+
+<h4><code>@BatchSize(size = 5)</code></h4>
+<pre><code>-- Hibernate загружает коллекции/ассоциации пачками
+SELECT p.*
+FROM products p
+WHERE p.category_id IN (?, ?, ?, ?, ?)</code></pre>
+
+<h4><code>@Fetch(SUBSELECT)</code></h4>
+<pre><code>-- Сначала загружаются родители
+SELECT c.id, c.title
+FROM categories c
+
+-- Затем при первой инициализации коллекции Hibernate делает один дополнительный SQL
+SELECT p.*
+FROM products p
+WHERE p.category_id IN (
+    SELECT c.id
+    FROM categories c
+)</code></pre>
+
+<div class="note">
+  Формулировка про <code>@Fetch(SUBSELECT)</code> точнее такая: Hibernate сначала загружает набор родителей, а затем при инициализации коллекций для этого набора может выполнить <strong>один дополнительный select</strong> вместо N отдельных запросов.
+</div>
+
+<h3>Ограничения и анти-иллюзии</h3>
+
+<div class="warn">
+  <strong>JOIN FETCH не серебряная пуля:</strong> он убирает N+1 ценой расширения result set.
+  Если подгружать несколько коллекций, возможен <strong>cartesian product explosion</strong>:
+  число строк начинает расти как произведение размеров коллекций.
+</div>
+
+<div class="bad">
+  <strong>Multiple bag fetch problem:</strong> Hibernate не любит бездумный <code>JOIN FETCH</code> нескольких bag-коллекций
+  (<code>List</code> без index/order semantics) в одном запросе. Это может привести к
+  <code>MultipleBagFetchException</code> или взрывному росту числа строк.
+</div>
+
+<div class="note">
+  Что делать в таких сценариях:
+  <ul>
+    <li>использовать <code>Set</code> вместо bag там, где это уместно;</li>
+    <li>загружать коллекции несколькими отдельными запросами;</li>
+    <li>использовать DTO projection;</li>
+    <li>использовать batch fetching.</li>
+  </ul>
+</div>
+
+<div class="bad">
+  <strong>Ограничение pagination:</strong> fetch join коллекции обычно плохо совместим с pagination (<code>Pageable</code>, <code>LIMIT/OFFSET</code>).
+  Причина: SQL-пагинация применяется к строкам результата, а не к уникальным parent-entity.
+</div>
+
+<div class="note">
+  Для paged-списков чаще используют:
+  <ul>
+    <li>сначала выбрать ID родителей страницей;</li>
+    <li>затем вторым запросом загрузить нужный graph через <code>IN (...)</code>;</li>
+    <li>или DTO projection;</li>
+    <li>или batch fetching.</li>
+  </ul>
+</div>
+
+<h3>Как распознать N+1</h3>
+<div class="note">
+  N+1 лучше ловить не “на глаз”, а через наблюдаемость:
+  <ul>
+    <li>включить SQL logging;</li>
+    <li>включить Hibernate statistics;</li>
+    <li>смотреть количество запросов в интеграционных тестах;</li>
+    <li>профилировать реальный use case, а не только unit test;</li>
+    <li>помнить, что на маленьких данных проблема может быть незаметна.</li>
+  </ul>
+</div>
+
+<h3>Однонаправленная vs двунаправленная связь и влияние на N+1</h3>
+
+<p>Выбор между однонаправленной и двунаправленной связью напрямую влияет на то,
+  как Hibernate генерирует SQL, и может быть как источником, так и средством профилактики проблемы N+1.</p>
+
+<h4>Три варианта маппинга @ManyToOne / @OneToMany</h4>
+
+<div class="mermaid">
+  graph TD
+  subgraph V1["Вариант 1: Только @ManyToOne в Child"]
+  direction LR
+  PC1["PostComment"] -->|"@ManyToOne"| P1["Post"]
+  end
+
+  subgraph V2["Вариант 2: Только @OneToMany в Parent"]
+  direction LR
+  P2["Post"] -->|"@OneToMany"| PC2["PostComment"]
+  end
+
+  subgraph V3["Вариант 3: Двунаправленная"]
+  direction LR
+  PC3["PostComment"] -->|"@ManyToOne"| P3["Post"]
+  P3 -->|"@OneToMany mappedBy"| PC3
+  end
+
+  style V1 fill:#eafaf1,stroke:#27ae60,color:#333
+  style V2 fill:#fdedec,stroke:#e74c3c,color:#333
+  style V3 fill:#fef9e7,stroke:#f39c12,color:#333
+</div>
+
+<h4>Вариант 1: Только <code>@ManyToOne</code> (рекомендуется по умолчанию)</h4>
+
+<div class="mermaid">
+  classDiagram
+  class Post {
+  @Id Long id
+  String title
+  }
+  class PostComment {
+  @Id Long id
+  @ManyToOne(fetch = LAZY) Post post
+  String review
+  }
+  PostComment --> Post : post_id FK
+</div>
+
+<div class="good">
+  <strong>Почему это лучший вариант по умолчанию:</strong>
+  <ul>
+    <li>FK (<code>post_id</code>) физически лежит в таблице <code>post_comment</code> — маппинг отражает реальную структуру БД</li>
+    <li>Нет коллекции на стороне родителя — невозможно случайно загрузить огромный child-граф</li>
+    <li>SQL более предсказуем</li>
+    <li>N+1 контролируется через явный fetch plan под нужный use case</li>
+  </ul>
+</div>
+
+<h4>Вариант 2: Только <code>@OneToMany</code> без <code>@ManyToOne</code> (антипаттерн)</h4>
+
+<div class="mermaid">
+  classDiagram
+  class Post {
+  @Id Long id
+  String title
+  @OneToMany List~PostComment~ comments
+  }
+  class PostComment {
+  @Id Long id
+  String review
+  }
+  Post --> PostComment
+</div>
+
+<div class="bad">
+  <strong>Антипаттерн.</strong> Hibernate создаёт <strong>промежуточную join-таблицу</strong> <code>post_post_comment</code>
+  (как для <code>@ManyToMany</code>), даже если связь логически one-to-many.
+  Это приводит к лишним JOIN, неэффективным INSERT/DELETE и неожиданной структуре БД.
+</div>
+
+<div class="mermaid">
+  erDiagram
+  POST {
+  Long id PK
+  String title
+  }
+  POST_COMMENT {
+  Long id PK
+  String review
+  }
+  POST_POST_COMMENT {
+  Long post_id FK
+  Long comments_id FK
+  }
+  POST ||--o{ POST_POST_COMMENT : ""
+  POST_POST_COMMENT }o--|| POST_COMMENT : ""
+</div>
+
+<div class="note">
+  Даже если использовать однонаправленный <code>@OneToMany</code> с <code>@JoinColumn</code>,
+  такой маппинг обычно менее предсказуем и часто приводит к менее эффективному SQL
+  по сравнению с нормальным <code>@ManyToOne</code> на стороне child.
+</div>
+
+<h4>Вариант 3: Двунаправленная связь (<code>@ManyToOne</code> + <code>@OneToMany(mappedBy)</code>)</h4>
+
+<div class="mermaid">
+  classDiagram
+  class Post {
+  @Id Long id
+  String title
+  @OneToMany(mappedBy="post", cascade=ALL, orphanRemoval=true) List~PostComment~ comments
+  +addComment(PostComment)
+  +removeComment(PostComment)
+  }
+  class PostComment {
+  @Id Long id
+  @ManyToOne(fetch=LAZY) Post post
+  String review
+  }
+  Post "1" <--> "*" PostComment : mappedBy="post"
+</div>
+
+<div class="note">
+  <strong>Ключевое:</strong> <code>mappedBy = "post"</code> указывает Hibernate, что FK управляется
+  полем <code>PostComment.post</code> (owning side). Коллекция <code>Post.comments</code> — только
+  зеркало для навигации (inverse side). Без <code>mappedBy</code> Hibernate считает это двумя
+  независимыми связями и снова создаёт join-таблицу.
+</div>
+
+<div class="mermaid">
+  graph LR
+  subgraph "Owning side (управляет FK)"
+  PC["PostComment.post<br/>@ManyToOne"]
+  end
+  subgraph "Inverse side (зеркало)"
+  P["Post.comments<br/>@OneToMany(mappedBy='post')"]
+  end
+  PC -->|"post_id в таблице post_comment"| P
+</div>
+
+<h4>Обязательная синхронизация обеих сторон</h4>
+
+<div class="bad">
+  В двунаправленной связи необходимо синхронизировать обе стороны вручную.
+  Если добавить комментарий только через <code>post.getComments().add(comment)</code>,
+  но не вызвать <code>comment.setPost(post)</code>, то поле <code>post_id</code> в БД
+  останется <code>NULL</code> — Hibernate генерирует SQL только на основании owning side.
+</div>
+
+<div class="mermaid">
+  sequenceDiagram
+  participant App
+  participant Post
+  participant Comment as PostComment
+
+  Note over App,Comment: Только inverse side — FK не заполнится
+  App->>Post: post.getComments().add(comment)
+  Note over Comment: comment.post == null, INSERT с post_id = NULL
+
+  Note over App,Comment: Синхронизация обеих сторон — корректно
+  App->>Post: post.addComment(comment)
+  Post->>Post: comments.add(comment)
+  Post->>Comment: comment.setPost(this)
+  Note over Comment: comment.post == post, INSERT с корректным post_id
+</div>
+
+<h4>Связь с проблемой N+1</h4>
+
+<p>Выбор направления связи влияет на то, <strong>где</strong> и <strong>как</strong> возникает N+1:</p>
+
+<div class="mermaid">
+  graph TD
+  UNI["Только @ManyToOne<br/>(однонаправленная)"] --> UNI_R["N+1 возможен при<br/>обращении к parent в цикле"]
+  UNI --> UNI_FIX["Решение: JOIN FETCH pc.post<br/>или batch fetching"]
+
+  BI["@ManyToOne + @OneToMany(mappedBy)<br/>(двунаправленная)"] --> BI_R["N+1 возможен при<br/>обращении к коллекции children"]
+  BI --> BI_FIX["Решение: JOIN FETCH p.comments<br/>или @BatchSize / SUBSELECT"]
+
+  ONLY_OTM["Только @OneToMany<br/>(антипаттерн)"] --> OTM_R["N+1 + лишняя таблица +<br/>неэффективный SQL"]
+  ONLY_OTM --> OTM_FIX["Решение: не использовать"]
+
+  style UNI fill:#eafaf1,stroke:#27ae60
+  style BI fill:#fef9e7,stroke:#f39c12
+  style ONLY_OTM fill:#fdedec,stroke:#e74c3c
+</div>
+
+<h4>Когда что использовать — дерево решений</h4>
+
+<div class="mermaid">
+  flowchart TD
+  START["Есть связь один-ко-многим?"] --> Q1{"Нужна навигация<br/>от Parent к Child?"}
+  Q1 -->|"Нет"| R1["Только @ManyToOne в Child"]
+  Q1 -->|"Да"| Q2{"Коллекция может быть<br/>большой (100+ записей)?"}
+  Q2 -->|"Да"| R2["Только @ManyToOne<br/>+ явный JPQL для выборки children"]
+  Q2 -->|"Нет"| Q3{"Нужен cascade<br/>или orphanRemoval?"}
+  Q3 -->|"Нет"| R1
+  Q3 -->|"Да"| R3["Двунаправленная<br/>@ManyToOne + @OneToMany(mappedBy)"]
+
+  style R1 fill:#eafaf1,stroke:#27ae60
+  style R2 fill:#eafaf1,stroke:#27ae60
+  style R3 fill:#fef9e7,stroke:#f39c12
+</div>
+
+<h4>Сводная таблица</h4>
+
+<table>
+  <tr>
+    <th>Вариант маппинга</th>
+    <th>SQL-эффективность</th>
+    <th>Риск N+1</th>
+    <th>Когда использовать</th>
+  </tr>
+  <tr>
+    <td>Только <code>@ManyToOne</code></td>
+    <td>Отличная</td>
+    <td>Минимальный (контролируется через fetch plan)</td>
+    <td><strong>Практичное правило по умолчанию</strong></td>
+  </tr>
+  <tr>
+    <td>Только <code>@OneToMany</code> (без mappedBy)</td>
+    <td>Плохая (join-таблица, лишний overhead)</td>
+    <td>Высокий + структурные проблемы</td>
+    <td><strong>Не использовать</strong></td>
+  </tr>
+  <tr>
+    <td><code>@ManyToOne</code> + <code>@OneToMany(mappedBy)</code></td>
+    <td>Хорошая</td>
+    <td>Средний (при обращении к коллекции в цикле)</td>
+    <td>Когда нужен cascade, orphanRemoval или удобная навигация к ограниченной коллекции</td>
+  </tr>
+</table>
+
+<div class="good">
+  <strong>Золотое правило:</strong> начинайте с <code>@ManyToOne</code> на стороне child.
+  Добавляйте <code>@OneToMany(mappedBy)</code> на стороне parent <strong>только когда есть конкретная причина</strong>
+  (каскадные операции, orphanRemoval, удобство доменного API).
+  Не используйте <code>@OneToMany</code> без <code>mappedBy</code> и без <code>@ManyToOne</code> на другой стороне.
+</div>
+
+<div class="endpoint">GET /api/demo/n-plus-one/lazy</div>
+<div class="endpoint">GET /api/demo/n-plus-one/join-fetch</div>
+<div class="endpoint">GET /api/demo/n-plus-one/entity-graph</div>
+<div class="endpoint">GET /api/demo/n-plus-one/subselect</div>
+
+<h3>📁 Связанный код</h3>
+<ul>
+  <li><span class="file-link">NPlusOneRepository.java</span></li>
+  <li><span class="file-link">NPlusOneDemoService.java</span></li>
+  <li><span class="file-link">Category.java</span> — Hibernate-аннотации <code>@BatchSize</code>, <code>@Fetch(SUBSELECT)</code>; JPA <code>@NamedEntityGraph</code></li>
+  <li><span class="file-link">DemoController.java</span></li>
+  <li><span class="file-link">application.yaml</span> — <code>hibernate.default_batch_fetch_size</code>, SQL logging, statistics</li>
+</ul>
+
+<div class="note">
+  <strong>Тест:</strong> <span class="file-link">Section5_NPlusOneTest</span>
+</div>
+
+<hr class="section-divider"/>
+
+<h2 id="section6">6. Кэширование в Hibernate</h2>
+
+<p>Hibernate использует несколько механизмов кэширования с разной областью жизни и назначением.</p>
+
+<div class="mermaid">
+  graph TB
+  App[Application] --> EM[EntityManager / Session]
+  EM --> L1[L1 Cache<br/>per Session]
+  L1 -->|miss| L2[L2 Cache<br/>SessionFactory level]
+  L2 -->|miss| DB[(Database)]
+
+  App --> QR[Cacheable Query]
+  QR --> QC[Query Cache<br/>caches query → IDs]
+  QC -->|entity lookup by ID| L2
+  QC -->|miss| DB
+</div>
+
+<table>
+  <tr><th>Механизм</th><th>Где живёт</th><th>Область</th><th>Особенности</th></tr>
+  <tr><td><strong>L1 cache</strong></td><td>EntityManager / Session</td><td>Одна сессия / транзакция</td><td>Всегда включён, не отключается. Гарантирует identity: <code>em.find(X, id) == em.find(X, id)</code></td></tr>
+  <tr><td><strong>L2 cache</strong></td><td>SessionFactory</td><td>Все сессии приложения</td><td>Требует провайдера (EhCache, Caffeine и др.). Кэширует состояние сущностей в dehydrated-форме (не Java-объекты). <code>@Cacheable</code> (JPA) включает/выключает кэширование, а <code>@Cache(usage=...)</code> (Hibernate) задаёт стратегию конкурентного доступа</td></tr>
+  <tr><td><strong>Query Cache</strong></td><td>SessionFactory</td><td>Результаты JPQL/HQL-запросов</td><td>Кэширует маппинг <code>(запрос + параметры) → список ID</code> (или скалярные значения). Сущности затем извлекаются через L2 cache</td></tr>
+</table>
+
+<h3>L2 cache: почему он не ломает identity guarantee</h3>
+<div class="note">
+  L2 cache хранит данные в <strong>dehydrated-форме</strong> — условно как набор значений полей, а не как готовый Java-объект.
+  При чтении из L2 Hibernate создаёт новый экземпляр сущности и помещает его в текущий persistence context.
+  Поэтому:
+  <ul>
+    <li>внутри одной Session identity guarantee сохраняется;</li>
+    <li>между разными Session один и тот же ID не обязан быть тем же Java-объектом.</li>
+  </ul>
+</div>
+
+<h3>Hydration/dehydration в кэше</h3>
+<div class="note">
+  В терминах внутренней механики Hibernate:
+  <ul>
+    <li><strong>dehydration</strong> — когда состояние entity раскладывается в кэшируемый набор значений;</li>
+    <li><strong>hydration</strong> — когда из этого набора значений снова собирается managed entity для текущей Session.</li>
+  </ul>
+  Именно поэтому L2 cache не нарушает identity map текущего persistence context: объект всё равно создаётся заново и регистрируется в текущей Session.
+</div>
+
+<h3>Query Cache: важные детали</h3>
+<div class="note">
+  Query Cache хранит <strong>не сами сущности</strong>, а идентификаторы (или скалярные результаты). При повторном выполнении запроса Hibernate берёт ID из Query Cache, а затем загружает состояние сущностей из L2 Cache.
+</div>
+<div class="bad">
+  <strong>Без настроенного L2 Cache</strong> использование Query Cache может <strong>ухудшить</strong> производительность: каждый ID из кэша запроса приведёт к отдельному обращению в БД — это фактически N+1.
+</div>
+<div class="warn">
+  Query Cache эффективен только для действительно <strong>повторяющихся запросов с одинаковыми параметрами</strong> и высокой долей чтения.
+  Это не универсальный ускоритель и не “дефолтная оптимизация на каждый случай”.
+</div>
+
+<div class="mermaid">
+  sequenceDiagram
+  participant S1 as Session 1
+  participant S2 as Session 2
+  participant L2 as L2 Cache
+  participant QC as Query Cache
+  participant DB
+
+  S1->>DB: execute query (QC miss)
+  DB-->>S1: result rows
+  S1->>QC: store: query → [id1, id2, id3]
+  S1->>L2: store entity states by ID
+
+  S2->>QC: same query (QC hit)
+  QC-->>S2: [id1, id2, id3]
+  S2->>L2: get entity state by id1, id2, id3
+  L2-->>S2: cached entity states
+</div>
+
+<div class="endpoint">GET /api/demo/caching/l1/{id}</div>
+<div class="endpoint">GET /api/demo/caching/query/{type}</div>
+<div class="endpoint">GET /api/demo/caching/reset-stats</div>
+<div class="endpoint">GET /api/demo/stats</div>
+
+<h3>📁 Связанный код</h3>
+<ul>
+  <li><span class="file-link">Product.java</span> — JPA <code>@Cacheable</code>, Hibernate <code>@Cache</code>, JPA <code>@Version</code></li>
+  <li><span class="file-link">Category.java</span> — cache на коллекциях</li>
+  <li><span class="file-link">CachingRepository.java</span></li>
+  <li><span class="file-link">StatisticsRepository.java</span></li>
+  <li><span class="file-link">StatisticsService.java</span></li>
+  <li><span class="file-link">ehcache.xml</span></li>
+  <li><span class="file-link">application.yaml</span></li>
+</ul>
+
+<div class="note">
+  <strong>Тест:</strong> <span class="file-link">Section6_CachingTest</span>
+</div>
+
+<h3>Optimistic Locking</h3>
+<p>Через поле <code>@Version</code> (JPA-аннотация) Hibernate реализует optimistic locking. При UPDATE в WHERE добавляется условие <code>version = ?</code>. Если строка уже была изменена другой транзакцией, UPDATE затронет 0 строк, и Hibernate выбросит <code>OptimisticLockException</code>.</p>
+
+<div class="mermaid">
+  sequenceDiagram
+  participant Tx1
+  participant Tx2
+  participant DB
+
+  Tx1->>DB: SELECT Product (version=0)
+  Tx2->>DB: SELECT Product (version=0)
+  Tx1->>DB: UPDATE Product SET ... WHERE id=? AND version=0
+  DB-->>Tx1: 1 row updated, version → 1
+  Tx2->>DB: UPDATE Product SET ... WHERE id=? AND version=0
+  DB-->>Tx2: 0 rows updated → OptimisticLockException
+</div>
+
+<div class="endpoint">GET /api/demo/optimistic-locking/{id}</div>
+
+<h3>📁 Связанный код</h3>
+<ul>
+  <li><span class="file-link">Product.java</span></li>
+  <li><span class="file-link">OptimisticLockingDemoService.java</span></li>
+  <li><span class="file-link">Section8_OptimisticLockingTest</span></li>
+</ul>
+
+<hr class="section-divider"/>
+
+<h2 id="section7">7. Spring Data JPA как абстракция над Hibernate</h2>
+
+<p>Spring Data JPA строится поверх JPA API и чаще всего использует Hibernate как реализацию. Это даёт более высокий уровень абстракции для типовых задач доступа к данным.</p>
+
+<div class="mermaid">
+  graph TB
+  SD[Spring Data JPA] --> JPA[JPA API — стандарт]
+  JPA --> HIB[Hibernate — реализация]
+  HIB --> JDBC[JDBC]
+  JDBC --> DB[(Database)]
+</div>
+
+<div class="mermaid">
+  graph LR
+  JR[JpaRepository] --> QM["Query Methods"]
+  JR --> Q["@Query JPQL/Native"]
+  JR --> EG["@EntityGraph"]
+  JR --> PAG["Pagination / Sorting"]
+  JR --> SPEC["Specification"]
+  JR --> PROJ["DTO / Interface Projections"]
+</div>
+
+<h3>7.1 Способы выполнения запросов в Hibernate / JPA / Spring Data JPA</h3>
+
+<p>В Hibernate запросы можно выполнять на нескольких уровнях абстракции. Важно различать, что относится к стандарту JPA, что является Hibernate-specific API, а что предоставляет Spring Data JPA поверх JPA.</p>
+
+<table>
+  <tr>
+    <th>Подход</th>
+    <th>Уровень</th>
+    <th>Что это</th>
+    <th>Когда применять</th>
+  </tr>
+  <tr>
+    <td><strong>EntityManager.find()</strong></td>
+    <td>JPA</td>
+    <td>Загрузка сущности по primary key</td>
+    <td>Когда нужен объект по ID без явного запроса</td>
+  </tr>
+  <tr>
+    <td><strong>EntityManager.getReference()</strong></td>
+    <td>JPA</td>
+    <td>Получение proxy/reference по ID без немедленного SELECT</td>
+    <td>Когда нужна ссылка на сущность, а не её данные</td>
+  </tr>
+  <tr>
+    <td><strong>JPQL</strong></td>
+    <td>JPA</td>
+    <td>Объектно-ориентированный язык запросов по сущностям и их полям</td>
+    <td>Основной способ писать кастомные запросы в JPA</td>
+  </tr>
+  <tr>
+    <td><strong>Criteria API</strong></td>
+    <td>JPA</td>
+    <td>Типобезопасное программное построение запросов</td>
+    <td>Когда запрос собирается динамически в runtime</td>
+  </tr>
+  <tr>
+    <td><strong>Native Query</strong></td>
+    <td>JPA</td>
+    <td>Выполнение SQL напрямую</td>
+    <td>Когда нужен полный контроль над SQL или DB-specific возможности</td>
+  </tr>
+  <tr>
+    <td><strong>HQL</strong></td>
+    <td>Hibernate</td>
+    <td>Hibernate Query Language; исторически близок к JPQL, но может иметь Hibernate-расширения</td>
+    <td>Когда используется Hibernate API напрямую</td>
+  </tr>
+  <tr>
+    <td><strong>Session API</strong></td>
+    <td>Hibernate</td>
+    <td>Низкоуровневый доступ к возможностям Hibernate через <code>Session</code></td>
+    <td>Когда нужен Hibernate-specific control поверх JPA</td>
+  </tr>
+  <tr>
+    <td><strong>StatelessSession</strong></td>
+    <td>Hibernate</td>
+    <td>Упрощённая session без persistence context, dirty checking и L1 cache</td>
+    <td>Для streaming/bulk-сценариев, где ORM-механика не нужна</td>
+  </tr>
+  <tr>
+    <td><strong>Query Methods</strong></td>
+    <td>Spring Data JPA</td>
+    <td>Генерация запроса по имени метода, например <code>findByName</code></td>
+    <td>Для простых типовых выборок</td>
+  </tr>
+  <tr>
+    <td><strong>@Query</strong></td>
+    <td>Spring Data JPA</td>
+    <td>Явный JPQL или native SQL в репозитории</td>
+    <td>Когда query methods уже недостаточно</td>
+  </tr>
+  <tr>
+    <td><strong>Specification</strong></td>
+    <td>Spring Data JPA</td>
+    <td>Композиция динамических фильтров поверх Criteria API</td>
+    <td>Для сложных фильтров и поисковых API</td>
+  </tr>
+  <tr>
+    <td><strong>@EntityGraph</strong></td>
+    <td>JPA / Spring Data JPA</td>
+    <td>Декларативное управление fetch plan для конкретного запроса</td>
+    <td>Когда нужно решить N+1 без переписывания текста запроса</td>
+  </tr>
+  <tr>
+    <td><strong>DTO / Projection</strong></td>
+    <td>JPA / Spring Data JPA</td>
+    <td>Выборка только нужных полей вместо полного entity graph</td>
+    <td>Для read-only API, списков, пагинации</td>
+  </tr>
+</table>
+
+<div class="note">
+  <strong>Практика:</strong>
+  <ul>
+    <li>Для простого CRUD часто достаточно <strong>Spring Data query methods</strong>.</li>
+    <li>Для контролируемой выборки с fetch plan — <strong>JPQL + JOIN FETCH</strong> или <strong>EntityGraph</strong>.</li>
+    <li>Для сложных динамических фильтров — <strong>Specification / Criteria API</strong>.</li>
+    <li>Для read-only списков и API-ответов — часто лучше <strong>DTO / projection</strong>, а не entity.</li>
+    <li>Для сложного SQL, отчётов и DB-specific оптимизаций — <strong>native SQL</strong> или вообще SQL-first подход.</li>
+  </ul>
+</div>
+
+<h3>EntityManager API vs Spring Data JPA</h3>
+<table>
+  <tr><th>Подход</th><th>Плюс</th><th>Где полезен</th></tr>
+  <tr><td>EntityManager API</td><td>Максимальный контроль над persistence context</td><td>Сложная логика, batch-обработка, нестандартные сценарии</td></tr>
+  <tr><td>Spring Data JPA</td><td>Минимум шаблонного кода, автогенерация реализации</td><td>Типовые CRUD-операции и бизнес-сервисы</td></tr>
+</table>
+
+<h3>Specification</h3>
+<p><code>Specification&lt;T&gt;</code> позволяет собирать динамические фильтры декларативно и композиционно через <code>and()</code> / <code>or()</code>. Под капотом использует JPA Criteria API.</p>
+
+<h3>DTO / interface projections</h3>
+<p>Когда не нужен полный entity graph, projection позволяет выбирать только необходимые поля. Это снижает объём передаваемых данных, исключает lazy-прокси в API-слое и часто является лучшим способом избежать N+1 в read-only сценариях.</p>
+
+<h3>📁 Связанный код</h3>
+<ul>
+  <li><span class="file-link">ProductSpringDataRepository.java</span></li>
+  <li><span class="file-link">CategorySpringDataRepository.java</span></li>
+  <li><span class="file-link">SpringDataService.java</span></li>
+  <li><span class="file-link">ProductSpecification.java</span></li>
+  <li><span class="file-link">ProductView.java</span></li>
+  <li><span class="file-link">AdvancedSpringDataService.java</span></li>
+</ul>
+
+<div class="note">
+  <strong>Тесты:</strong> <span class="file-link">Section7_SpringDataTest</span>, <span class="file-link">Section12_SpecificationAndProjectionTest</span>
+</div>
+
+<hr class="section-divider"/>
+
+<h2 id="section8">8. Advanced scenarios</h2>
+
+<h3>8.1 Native Query vs JPQL vs Criteria API</h3>
+
+<div class="note">
+  Это три базовых способа написания кастомных запросов на уровне JPA/Hibernate.
+  Полный список способов выполнения запросов, включая Spring Data JPA, см. в разделе <a href="#section7">7</a>.
+</div>
+
+<table>
+  <tr><th>Подход</th><th>Спецификация</th><th>Плюсы</th><th>Минусы</th></tr>
+  <tr><td>Native SQL</td><td>JPA</td><td>Полный контроль над SQL, DB-специфичные функции</td><td>Привязка к конкретной СУБД, нет автоматического маппинга связей</td></tr>
+  <tr><td>JPQL</td><td>JPA</td><td>Работа через сущности и их поля, переносимость</td><td>Статический текст запроса, меньше гибкости</td></tr>
+  <tr><td>Criteria API</td><td>JPA</td><td>Типобезопасное динамическое построение запроса в runtime</td><td>Более многословный код</td></tr>
+</table>
+
+<div class="mermaid">
+  graph LR
+  SQL[Native Query] --> DB[(Table-oriented)]
+  JPQL[JPQL] --> ENT[Entity-oriented]
+  CRI[Criteria API] --> DYN[Dynamic type-safe query]
+</div>
+
+<div class="endpoint">GET /api/demo/advanced/query-comparison</div>
+
+<h4>📁 Код</h4>
+<ul>
+  <li><span class="file-link">QueryComparisonRepository.java</span></li>
+  <li><span class="file-link">QueryComparisonService.java</span></li>
+</ul>
+
+<h3>8.2 Batch Inserts</h3>
+<p>Hibernate может группировать INSERT/UPDATE операции в батчи через настройку <code>hibernate.jdbc.batch_size</code>. При массовых вставках важно периодически делать <code>flush()</code> и <code>clear()</code>, чтобы не раздувать persistence context.</p>
+
+<div class="bad">
+  <strong>Ограничение:</strong> со стратегией генерации ID <code>GenerationType.IDENTITY</code> Hibernate <strong>не может</strong> выполнять batch insert. Причина: Hibernate должен выполнить каждый INSERT отдельно, чтобы получить сгенерированный ID через <code>Statement.getGeneratedKeys()</code>. Это архитектурное ограничение.
+  Для batch insert используйте <code>GenerationType.SEQUENCE</code>.
+</div>
+
+<div class="note">
+  Для Hibernate 6+ типичная рекомендация — использовать <code>GenerationType.SEQUENCE</code> вместе с <code>@SequenceGenerator(allocationSize = 50)</code>.
+  <code>allocationSize</code> позволяет Hibernate забирать диапазон ID за один round-trip к sequence, что критично для batch performance.
+</div>
+
+<div class="endpoint">GET /api/demo/advanced/batch-insert/{count}</div>
+
+<h4>📁 Код</h4>
+<ul>
+  <li><span class="file-link">BatchInsertRepository.java</span></li>
+  <li><span class="file-link">BatchInsertService.java</span></li>
+</ul>
+
+<h3>8.3 @Transactional(readOnly = true)</h3>
+<p><code>readOnly = true</code> — это подсказка инфраструктуре Spring и ORM-провайдеру. Конкретное поведение зависит от провайдера, версии и конфигурации, но при типичной конфигурации Spring + Hibernate происходит следующее:</p>
+<ul>
+  <li>Spring часто устанавливает <code>FlushMode.MANUAL</code> на Hibernate Session — автоматический flush обычно <strong>не выполняется</strong></li>
+  <li>Hibernate может оптимизировать работу persistence context и в некоторых конфигурациях не создавать snapshot'ы managed-сущностей</li>
+  <li>На уровне JDBC Spring может вызвать <code>Connection.setReadOnly(true)</code> — это подсказка для драйвера/БД, а не универсальный запрет</li>
+</ul>
+
+<div class="note">
+  В <strong>typical Spring + Hibernate</strong> <code>readOnly = true</code> обычно отключает auto-flush и может оптимизировать работу persistence context,
+  но это <strong>не строгий запрет на изменения</strong> и не универсальная гарантия одинакового поведения во всех конфигурациях.
+  Явный <code>flush()</code> или native update всё равно могут изменить БД.
+</div>
+
+<div class="endpoint">GET /api/demo/advanced/read-only/{id}</div>
+
+<h4>📁 Код</h4>
+<ul>
+  <li><span class="file-link">ReadOnlyDemoService.java</span></li>
+</ul>
+
+<h3>8.4 flush() / clear() demo</h3>
+<p>Наглядный сценарий для понимания persistence context: записали сущность, сделали <code>flush()</code> (SQL отправлен в БД), затем <code>clear()</code> (контекст очищен) — повторно загруженный объект является <strong>другим Java-экземпляром</strong>, т.к. identity guarantee потеряна после clear.</p>
+
+<div class="endpoint">GET /api/demo/advanced/flush-clear</div>
+
+<h4>📁 Код</h4>
+<ul>
+  <li><span class="file-link">FlushClearRepository.java</span></li>
+  <li><span class="file-link">FlushClearDemoService.java</span></li>
+</ul>
+
+<h3>8.5 Controlled LazyInitializationException</h3>
+<p>Сценарий, который намеренно читает ленивую коллекцию после завершения транзакции, демонстрируя исключение.</p>
+
+<div class="endpoint">GET /api/demo/advanced/lazy-exception/{id}</div>
+
+<h4>📁 Код</h4>
+<ul>
+  <li><span class="file-link">LazyExceptionRepository.java</span></li>
+  <li><span class="file-link">LazyExceptionDemoService.java</span></li>
+</ul>
+
+<h3>8.6 Embeddables / Value Objects</h3>
+<p>Через <code>@Embeddable</code> (JPA) можно моделировать value object, поля которого хранятся в той же таблице, что и сущность-владелец. Embeddable <strong>не имеет собственного identity</strong> и жизненного цикла — он полностью принадлежит содержащей его сущности.</p>
+
+<div class="mermaid">
+  graph LR
+  P[Product] --> D["@Embedded ProductDetails"]
+  D --> M[manufacturer]
+  D --> S[sku]
+</div>
+
+<h4>📁 Код</h4>
+<ul>
+  <li><span class="file-link">ProductDetails.java</span></li>
+  <li><span class="file-link">Product.java</span></li>
+</ul>
+
+<h3>8.7 Inheritance Mapping</h3>
+<p>JPA поддерживает несколько стратегий наследования. В проекте показаны две:</p>
+
+<table>
+  <tr><th>Стратегия</th><th>Структура таблиц</th><th>Плюсы</th><th>Минусы</th></tr>
+  <tr><td><strong>SINGLE_TABLE</strong></td><td>Одна таблица, discriminator column</td><td>Быстрые запросы, без JOIN</td><td>Nullable-столбцы для полей подклассов, нет constraint'ов на уровне БД</td></tr>
+  <tr><td><strong>JOINED</strong></td><td>Базовая таблица + таблица на каждый подкласс</td><td>Нормализованная структура, constraint'ы</td><td>JOIN при каждом запросе к подклассу</td></tr>
+</table>
+
+<div class="mermaid">
+  graph TB
+  BASE1[PaymentSingleTable] --> CARD[CardPaymentSingleTable]
+  BASE1 --> CASH[CashPaymentSingleTable]
+
+  BASE2[PersonJoined] --> EMP[EmployeeJoined]
+  BASE2 --> CUST[CustomerJoined]
+</div>
+
+<h4>📁 Код</h4>
+<ul>
+  <li><span class="file-link">PaymentSingleTable.java</span></li>
+  <li><span class="file-link">CardPaymentSingleTable.java</span></li>
+  <li><span class="file-link">CashPaymentSingleTable.java</span></li>
+  <li><span class="file-link">PersonJoined.java</span></li>
+  <li><span class="file-link">EmployeeJoined.java</span></li>
+  <li><span class="file-link">CustomerJoined.java</span></li>
+</ul>
+
+<h3>8.8 Hibernate-specific extensions</h3>
+<div class="note">
+  Несколько полезных Hibernate-расширений, которые часто встречаются в реальных проектах:
+  <ul>
+    <li><code>@DynamicUpdate</code> — генерировать <code>UPDATE</code> только по изменённым полям; полезно для широких таблиц и некоторых конкурентных сценариев;</li>
+    <li><code>@NaturalId</code> — бизнес-ключи вроде email, sku, code; поддерживает lookup и интеграцию с кэшем;</li>
+    <li><code>Session.byNaturalId()</code> — удобный API для поиска по natural key.</li>
+  </ul>
+</div>
+
+<div class="note">
+  <strong>Тесты advanced-блока:</strong> <span class="file-link">Section11_QueryComparisonTest</span>, <span class="file-link">Section13_BatchInsertTest</span>, <span class="file-link">Section14_EmbeddableAndInheritanceTest</span>
+</div>
+
+<hr class="section-divider"/>
+
+<h2 id="section9">9. Типовые SQL-паттерны</h2>
+
+<p>Примерные SQL-паттерны, генерируемые Hibernate. Точный SQL зависит от версии Hibernate, диалекта БД и набора полей в маппинге.</p>
+
+<h3>9.1 Lazy loading (два отдельных запроса)</h3>
+<pre><code>-- 1. Загрузка категории
+SELECT c.id, c.title FROM categories c WHERE c.id = ?
+
+-- 2. Догрузка коллекции при первом обращении
+SELECT p.category_id, p.id, p.name, p.price, p.version
+FROM products p WHERE p.category_id = ?</code></pre>
+
+<h3>9.2 Join fetch (один запрос)</h3>
+<pre><code>SELECT c.id, c.title, p.category_id, p.id, p.name, p.price, p.version
+FROM categories c
+JOIN products p ON c.id = p.category_id</code></pre>
+
+<h3>9.3 Batch fetching</h3>
+<pre><code>-- @BatchSize / default_batch_fetch_size
+SELECT p.category_id, p.id, p.name, p.price, p.version
+FROM products p
+WHERE p.category_id IN (?, ?, ?, ?, ?)</code></pre>
+
+<h3>9.4 SUBSELECT fetching</h3>
+<pre><code>-- После загрузки набора родителей
+SELECT p.category_id, p.id, p.name, p.price, p.version
+FROM products p
+WHERE p.category_id IN (
+    SELECT c.id FROM categories c
+)</code></pre>
+
+<h3>9.5 Dirty checking (автоматический UPDATE при flush)</h3>
+<pre><code>-- 1. Загрузка (Hibernate сохраняет snapshot)
+SELECT p.id, p.category_id, p.name, p.price, p.version
+FROM products p WHERE p.id = ?
+
+-- 2. При flush/commit — если поля изменились по сравнению со snapshot
+UPDATE products
+SET category_id=?, name=?, price=?, version=?
+WHERE id=? AND version=?</code></pre>
+
+<h3>9.6 Optimistic locking (конкурентное обновление)</h3>
+<pre><code>-- Обе транзакции загрузили version=0
+-- Tx1:
+UPDATE products SET name=?, price=?, version=1
+WHERE id=? AND version=0
+-- OK: 1 row updated
+
+-- Tx2:
+UPDATE products SET name=?, price=?, version=1
+WHERE id=? AND version=0
+-- FAIL: 0 rows updated → OptimisticLockException</code></pre>
+
+<h3>9.7 Batch inserts (при GenerationType.SEQUENCE)</h3>
+<pre><code>-- Hibernate группирует INSERT'ы по batch_size
+INSERT INTO products (category_id, name, price, version, id) VALUES (?, ?, ?, ?, ?)
+INSERT INTO products (category_id, name, price, version, id) VALUES (?, ?, ?, ?, ?)
+-- ... (batch_size штук за один round-trip)</code></pre>
+
+<h3>9.8 Hydration и dehydration в SQL-жизни сущности</h3>
+<pre><code>-- Hydration: читаем строку из БД
+SELECT id, name, price, version
+FROM products
+WHERE id = ?
+
+-- Hibernate создаёт entity, заполняет поля, кладёт в persistence context,
+-- сохраняет snapshot для dirty checking
+
+-- Dehydration: при flush Hibernate превращает текущее состояние entity
+-- обратно в SQL-параметры
+UPDATE products
+SET name = ?, price = ?, version = ?
+WHERE id = ? AND version = ?</code></pre>
+
+<hr class="section-divider"/>
+
+<h2 id="section10">10. Концепции и паттерны</h2>
+
+<div class="card">
+  <h3>10.1 ORM</h3>
+  <p>
+    ORM, Object-Relational Mapping — подход, при котором объекты приложения сопоставляются строкам таблиц в реляционной базе данных.
+    Цель — уменьшить объем ручного кода по загрузке, сохранению и обновлению данных.
+  </p>
+
+  <div class="mermaid">
+    flowchart LR
+    A[Java/Kotlin объекты] --> B[ORM слой]
+    B --> C[SQL]
+    C --> D[(RDBMS)]
+  </div>
+
+  <div class="grid-2">
+    <div class="ok">
+      <h4>Преимущества</h4>
+      <ul>
+        <li>Ускоряет разработку типового CRUD.</li>
+        <li>Снижает объем шаблонного JDBC-кода.</li>
+        <li>Позволяет работать на уровне сущностей и репозиториев.</li>
+        <li>Может упрощать переносимость между СУБД в простых сценариях.</li>
+      </ul>
+    </div>
+    <div class="bad">
+      <h4>Недостатки</h4>
+      <ul>
+        <li>Скрывает SQL и стоимость операций.</li>
+        <li>Плохо выражает сложные выборки и аналитические запросы.</li>
+        <li>Создает риск N+1, lazy-ловушек, неочевидных flush/update.</li>
+        <li>Есть фундаментальный разрыв между объектной и реляционной моделями.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="warn">
+    <h4>Когда использовать</h4>
+    <p>
+      Для типовых бизнес-приложений, CRUD-сервисов, административных систем, где важна скорость разработки и нет экстремальных требований к SQL-контролю.
+    </p>
+  </div>
+</div>
+
+<div class="card">
+  <h3>10.2 Object-Relational Impedance Mismatch</h3>
+  <p>
+    Это фундаментальная проблема несовпадения объектной модели и реляционной модели.
+    В объектном мире есть ссылки, наследование, вложенные графы объектов и инкапсуляция.
+    В реляционном мире есть таблицы, строки, внешние ключи, join-ы и нормализация.
+  </p>
+
+  <div class="mermaid">
+    flowchart LR
+    A[Объектная модель] --> C[Несовпадение моделей]
+    B[Реляционная модель] --> C
+    C --> D[ORM complexity]
+  </div>
+
+  <div class="bad">
+    <h4>Практическое следствие</h4>
+    <p>
+      Многие проблемы ORM — не баги конкретной библиотеки, а проявление фундаментального несоответствия двух разных моделей данных.
+    </p>
+  </div>
+</div>
+
+<div class="card">
+  <h3>10.3 JPA</h3>
+  <p>
+    JPA, Java Persistence API — спецификация Java для работы с persistence-слоем. Она определяет сущности, EntityManager, жизненный цикл объектов,
+    запросы, транзакционную модель и правила отображения классов на таблицы. Hibernate — популярная реализация JPA, но не единственная.
+  </p>
+
+  <div class="mermaid">
+    flowchart LR
+    A[JPA API] --> B[Hibernate]
+    A --> C[EclipseLink]
+    A --> D[Другие реализации]
+  </div>
+
+  <div class="note">
+    <h4>Важно</h4>
+    <p>
+      JPA — это не Hibernate. Hibernate — это одна из реализаций JPA, хотя в реальных проектах слова часто используют почти как синонимы.
+    </p>
+  </div>
+
+  <div class="grid-2">
+    <div class="ok">
+      <h4>Преимущества</h4>
+      <ul>
+        <li>Стандарт де-факто в Java-экосистеме.</li>
+        <li>Много материалов, вакансий и готовых интеграций.</li>
+        <li>Богатый функционал: entity lifecycle, JPQL, criteria, caching, cascades.</li>
+      </ul>
+    </div>
+    <div class="bad">
+      <h4>Недостатки</h4>
+      <ul>
+        <li>Требует глубокого понимания жизненного цикла сущностей.</li>
+        <li>Может провоцировать неявный SQL и проблемную производительность.</li>
+        <li>Не всегда хорошо сочетается с иммутабельностью и строгими инвариантами.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h3>10.4 Hibernate</h3>
+  <p>
+    Hibernate — зрелая ORM-библиотека для Java. Может работать как реализация JPA и как более низкоуровневый API через Session.
+    Предоставляет lazy loading, dirty checking, first-level cache, batch updates, HQL/JPQL, native query и множество настроек.
+  </p>
+
+  <div class="grid-2">
+    <div>
+      <span class="tag">Session</span>
+      <span class="tag">EntityManager</span>
+      <span class="tag">dirty checking</span>
+      <span class="tag">lazy loading</span>
+      <span class="tag">proxy</span>
+      <span class="tag">flush</span>
+      <span class="tag">hydration</span>
+      <span class="tag">dehydration</span>
+    </div>
+  </div>
+
+  <div class="warn">
+    <h4>Когда использовать</h4>
+    <p>
+      Когда нужен полный ORM-функционал, команда уже знакома с Hibernate и готова контролировать SQL, fetch strategy, транзакции и состояние сущностей.
+    </p>
+  </div>
+</div>
+
+<div class="card">
+  <h3>10.5 Data Mapper</h3>
+  <p>
+    Data Mapper — паттерн, при котором объектная модель отделена от механизма хранения.
+    Объекты не обязаны сами знать, как себя сохранить. Этим занимается mapper, repository, entity manager.
+  </p>
+
+  <div class="mermaid">
+    flowchart LR
+    A[Domain/Entity Objects] --> B[Mapper / Repository / EntityManager]
+    B --> C[(Database)]
+  </div>
+
+  <div class="ok">
+    <h4>Преимущества</h4>
+    <ul>
+      <li>Разделение ответственности между моделью и persistence-слоем.</li>
+      <li>Лучше подходит для сложных приложений, чем Active Record.</li>
+    </ul>
+  </div>
+
+  <div class="warn">
+    <h4>Нюанс</h4>
+    <p>
+      Hibernate не является чистым Data Mapper в академическом смысле:
+      JPA-сущности осведомлены о persistence через аннотации, proxy-механику и ограничения ORM.
+      Но по архитектурной модели Hibernate всё же намного ближе к Data Mapper, чем к Active Record.
+    </p>
+  </div>
+</div>
+
+<div class="card">
+  <h3>10.6 Active Record</h3>
+  <p>
+    Active Record — паттерн, в котором объект сам хранит данные и сам умеет себя сохранять, обновлять и удалять.
+    Обычно одна модель тесно соответствует одной таблице.
+  </p>
+
+  <div class="mermaid">
+    flowchart LR
+    A[Active Record object] --> B[save/update/delete]
+    B --> C[(Database)]
+  </div>
+
+  <div class="grid-2">
+    <div class="ok">
+      <h4>Преимущества</h4>
+      <ul>
+        <li>Очень простая модель для небольших приложений.</li>
+        <li>Порог входа ниже.</li>
+        <li>Удобно для быстрых CRUD-задач.</li>
+      </ul>
+    </div>
+    <div class="bad">
+      <h4>Недостатки</h4>
+      <ul>
+        <li>Плохо масштабируется на сложную доменную модель.</li>
+        <li>Смешивает бизнес-логику и persistence.</li>
+        <li>Усложняет тестирование и разделение ответственности.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="note">
+    <h4>Связь с JPA</h4>
+    <p>
+      JPA обычно не считается Active Record, потому что сущность не обязана сама себя сохранять.
+      За это отвечает EntityManager или repository.
+    </p>
+  </div>
+</div>
+
+<div class="card">
+  <h3>10.7 Unit of Work</h3>
+  <p>
+    Unit of Work — паттерн, при котором изменения объектов отслеживаются в рамках некоторого рабочего контекста,
+    а затем синхронизируются с базой данных единым шагом на flush/commit.
+  </p>
+
+  <div class="mermaid">
+    sequenceDiagram
+    participant App as Приложение
+    participant EM as EntityManager/Session
+    participant DB as База данных
+
+    App->>EM: begin transaction
+    App->>EM: find(User, 1)
+    EM->>DB: SELECT ...
+    DB-->>EM: row
+    EM-->>App: managed User
+    App->>App: user.setName("Bob")
+    App->>EM: commit
+    EM->>EM: dirty checking
+    EM->>DB: UPDATE user SET name='Bob' ...
+    DB-->>EM: ok
+  </div>
+
+  <div class="grid-2">
+    <div class="ok">
+      <h4>Плюсы</h4>
+      <ul>
+        <li>Удобно обновлять несколько связанных объектов в одной транзакции.</li>
+        <li>Меньше ручного кода на UPDATE/INSERT.</li>
+        <li>Можно мыслить в терминах изменений объекта.</li>
+      </ul>
+    </div>
+    <div class="bad">
+      <h4>Минусы</h4>
+      <ul>
+        <li>Неочевидно, когда именно полетит SQL.</li>
+        <li>Сложнее reasoning о побочных эффектах.</li>
+        <li>Контекст легко “разрастается”, ухудшая предсказуемость и память.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="warn">
+    <h4>Когда использовать</h4>
+    <p>
+      Когда бизнес-операция действительно выражается как “загрузить агрегат, изменить, сохранить”, а не как точечный SQL patch/bulk update.
+    </p>
+  </div>
+</div>
+
+<div class="card">
+  <h3>10.8 Identity Map</h3>
+  <p>
+    Identity Map — паттерн, при котором в рамках одного persistence context одна и та же строка БД с конкретным PK
+    представлена одним и тем же объектом в памяти.
+  </p>
+
+  <div class="mermaid">
+    flowchart TD
+    A[find User#1] --> B[Persistence Context]
+    C[find User#1 еще раз] --> B
+    B --> D[тот же Java-объект User#1]
+  </div>
+
+  <div class="ok">
+    <h4>Преимущества</h4>
+    <ul>
+      <li>Согласованность изменений внутри транзакции.</li>
+      <li>Нет дублирования одного и того же объекта в одном контексте.</li>
+    </ul>
+  </div>
+
+  <div class="bad">
+    <h4>Недостатки</h4>
+    <ul>
+      <li>Жизненный цикл объекта привязан к persistence context.</li>
+      <li>Труднее держать в голове managed/detached состояния.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="card">
+  <h3>10.9 Active Object</h3>
+  <p>
+    Active Object — паттерн из мира concurrency и асинхронного выполнения, где вызовы методов отделяются от исполнения,
+    обычно через очередь и отдельный поток работы.
+  </p>
+
+  <div class="mermaid">
+    flowchart LR
+    A[Client] --> B[Proxy]
+    B --> C[Queue]
+    C --> D[Worker Thread]
+    D --> E[Real Object]
+  </div>
+
+  <div class="bad">
+    <h4>Важно</h4>
+    <p>
+      К JPA этот паттерн напрямую не относится. Использовать его как определение внутренней модели JPA некорректно.
+    </p>
+  </div>
+</div>
+
+<div class="card">
+  <h3>10.10 Dirty Checking</h3>
+  <p>
+    Dirty checking — механизм, при котором ORM отслеживает изменения managed-сущности
+    и на flush/commit автоматически генерирует SQL для обновления данных.
+  </p>
+
+  <div class="mermaid">
+    flowchart LR
+    A[managed entity] --> B[изменение поля]
+    B --> C[ORM помечает как dirty]
+    C --> D[flush/commit]
+    D --> E[UPDATE в БД]
+  </div>
+
+  <div class="grid-2">
+    <div class="ok">
+      <h4>Плюсы</h4>
+      <ul>
+        <li>Меньше ручных update-операций.</li>
+        <li>Удобно для сценария “загрузил, изменил, сохранил”.</li>
+      </ul>
+    </div>
+    <div class="bad">
+      <h4>Минусы</h4>
+      <ul>
+        <li>Скрытые побочные эффекты.</li>
+        <li>Сложнее увидеть, что именно и когда обновится.</li>
+        <li>Может создавать лишние update и неожиданный flush.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h3>10.11 Lazy Loading</h3>
+  <p>
+    Lazy loading — стратегия, при которой связанные данные или поля не загружаются сразу,
+    а подгружаются только в момент обращения к ним.
+  </p>
+
+  <div class="mermaid">
+    sequenceDiagram
+    participant App
+    participant Entity as Order entity
+    participant ORM
+    participant DB
+
+    App->>Entity: getItems()
+    Entity->>ORM: нужно загрузить items
+    ORM->>DB: SELECT items ...
+    DB-->>ORM: rows
+    ORM-->>Entity: items loaded
+    Entity-->>App: List of Items
+  </div>
+
+  <div class="grid-2">
+    <div class="ok">
+      <h4>Плюсы</h4>
+      <ul>
+        <li>Не загружает лишние данные, если они реально не нужны.</li>
+        <li>Полезно для редких, тяжелых связей.</li>
+      </ul>
+    </div>
+    <div class="bad">
+      <h4>Минусы</h4>
+      <ul>
+        <li>N+1 запросы.</li>
+        <li>Неявный I/O прямо в геттере.</li>
+        <li>LazyInitializationException вне контекста.</li>
+        <li>Высокая когнитивная нагрузка на команду.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="warn">
+    <h4>Когда использовать</h4>
+    <p>
+      Осторожно и выборочно. Не как бездумную стратегию “по умолчанию везде”, а там, где команда умеет управлять fetch plan и видеть SQL.
+    </p>
+  </div>
+</div>
+
+<div class="card">
+  <h3>10.12 Persistence Context, managed и detached</h3>
+  <p>
+    Persistence Context — область, в которой ORM управляет сущностями. Пока сущность managed, ORM отслеживает изменения,
+    может лениво догружать данные и включать объект в flush. После выхода из контекста объект становится detached.
+  </p>
+
+  <div class="mermaid">
+    stateDiagram-v2
+    [*] --> New
+    New --> Managed: persist/find/load
+    Managed --> Detached: context closed / detach
+    Managed --> Removed: remove
+    Detached --> Managed: merge
+    Removed --> [*]
+  </div>
+
+  <div class="grid-2">
+    <div class="ok">
+      <h4>Managed</h4>
+      <ul>
+        <li>ORM следит за изменениями.</li>
+        <li>Lazy-связи могут догружаться.</li>
+        <li>Изменения могут попасть в БД на flush/commit.</li>
+      </ul>
+    </div>
+    <div class="bad">
+      <h4>Detached</h4>
+      <ul>
+        <li>ORM больше не отслеживает изменения.</li>
+        <li>Изменения сами в БД не попадут.</li>
+        <li>Неинициализированные lazy-поля часто уже нельзя читать.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="note">
+    <h4>Точность формулировки</h4>
+    <p>
+      Detached-сущность имеет детерминированное состояние только для уже загруженных полей.
+      Для lazy-частей поведение зависит от того, были ли они инициализированы до detach.
+    </p>
+  </div>
+</div>
+
+<div class="card">
+  <h3>10.13 Flush</h3>
+  <p>
+    Flush — синхронизация состояния persistence context с БД. Не обязательно означает завершение транзакции.
+    Может происходить на commit, перед запросами или явно через вызов flush.
+  </p>
+
+  <div class="warn">
+    <h4>Почему это важно</h4>
+    <p>
+      Если разработчик не понимает, когда происходит flush, SQL становится плохо предсказуемым. Это одна из причин ощущения “магии”.
+    </p>
+  </div>
+</div>
+
+<div class="card">
+  <h3>10.14 N+1 problem</h3>
+  <p>
+    N+1 — ситуация, когда сначала выполняется 1 запрос за списком родительских объектов,
+    а затем еще N запросов по одному на дочерние данные для каждого объекта.
+  </p>
+
+  <div class="mermaid">
+    flowchart TD
+    A[SELECT orders] --> B[Order1.getItems -> SELECT]
+    A --> C[Order2.getItems -> SELECT]
+    A --> D[Order3.getItems -> SELECT]
+    A --> E[...]
+  </div>
+
+  <div class="bad">
+    <h4>Почему это опасно</h4>
+    <ul>
+      <li>Легко не заметить на маленьких данных.</li>
+      <li>Сильно бьет по latency и нагрузке на БД.</li>
+      <li>Возникает из-за неверного fetch plan, а не просто из-за LAZY.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="card">
+  <h3>10.15 getReference</h3>
+  <p>
+    <code>EntityManager.getReference(...)</code> позволяет получить прокси-ссылку на сущность по известному ID
+    без немедленного SELECT, если нужен только внешний ключ или ссылка.
+  </p>
+
+  <pre>Order order = new Order();
+order.setCustomer(entityManager.getReference(Customer.class, customerId));
+entityManager.persist(order);</pre>
+
+  <div class="ok">
+    <h4>Когда полезно</h4>
+    <p>
+      Когда нужно создать новую сущность, ссылающуюся на уже существующую запись по известному ID,
+      и не хочется делать лишний SELECT.
+    </p>
+  </div>
+
+  <div class="note">
+    <strong>Нюанс:</strong> <code>getReference()</code> не проверяет существование строки немедленно.
+    <code>EntityNotFoundException</code> может возникнуть позже — в момент фактического обращения к данным прокси.
+  </div>
+</div>
+
+<div class="card">
+  <h3>10.16 merge</h3>
+  <p>
+    <code>merge</code> — операция, которая берет detached-объект и синхронизирует его состояние обратно в persistence context.
+    Это не просто “подцепить тот же объект обратно”; ORM обычно возвращает другой managed-экземпляр.
+  </p>
+
+  <div class="warn">
+    <h4>Осторожно</h4>
+    <p>
+      <code>merge</code> часто понимают неправильно. Он не делает detached-объект magically managed. Нужно работать с тем экземпляром, который вернул merge.
+    </p>
+  </div>
+</div>
+
+<div class="card">
+  <h3>10.17 Hydration и Dehydration</h3>
+  <p>
+    Hydration — это материализация состояния объекта из строки БД или из кэшированного состояния.
+    Dehydration — обратный процесс: преобразование состояния entity в набор значений колонок и параметров SQL.
+  </p>
+
+  <div class="mermaid">
+    flowchart LR
+    A[(DB row / cache state)] --> B[Hydration]
+    B --> C[Entity in memory]
+    C --> D[Dehydration]
+    D --> E[SQL params / cache state]
+  </div>
+
+  <div class="grid-2">
+    <div class="ok">
+      <h4>Почему это полезно понимать</h4>
+      <ul>
+        <li>Становится яснее, что ORM не “хранит объекты в БД”, а постоянно переводит состояние между двумя моделями.</li>
+        <li>Проще понять работу L2 cache, snapshot и dirty checking.</li>
+        <li>Проще reasoning о том, почему detached-объект и cached-state — не одно и то же.</li>
+      </ul>
+    </div>
+    <div class="bad">
+      <h4>Частая ошибка мышления</h4>
+      <ul>
+        <li>Думать, что Hibernate просто “достает тот же объект” из БД или из кэша.</li>
+        <li>На самом деле он заново гидратирует состояние в контексте текущей Session.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h3>10.18 First-Level Cache и Second-Level Cache</h3>
+  <h4>First-Level Cache</h4>
+  <p>
+    Это кэш в рамках persistence context/session. Он тесно связан с identity map.
+  </p>
+
+  <h4>Second-Level Cache</h4>
+  <p>
+    Это кэш, общий между несколькими persistence context/session, обычно на уровне SessionFactory/EntityManagerFactory.
+  </p>
+
+  <div class="grid-2">
+    <div class="ok">
+      <h4>Плюсы</h4>
+      <ul>
+        <li>Может уменьшать количество чтений из БД.</li>
+        <li>Хорошо работает в повторяющихся read-heavy сценариях.</li>
+      </ul>
+    </div>
+    <div class="bad">
+      <h4>Минусы</h4>
+      <ul>
+        <li>Сложность инвалидации и согласованности.</li>
+        <li>Не решает автоматически проблемы lazy loading в прикладном кэше.</li>
+        <li>Требует аккуратной настройки и понимания стратегии кэширования.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="note">
+    <h4>Практический вывод</h4>
+    <p>
+      Кэшировать ORM-сущности напрямую в прикладном коде обычно плохая идея. Чаще лучше кэшировать DTO, проекции или значения.
+    </p>
+  </div>
+</div>
+
+<div class="card">
+  <h3>10.19 Spring Data JDBC и jOOQ как альтернативы</h3>
+  <h4>Spring Data JDBC</h4>
+  <p>
+    Более простой persistence-подход без session, dirty checking и lazy loading в классическом JPA-стиле.
+    Модель прозрачнее, но возможностей меньше.
+  </p>
+
+  <h4>jOOQ</h4>
+  <p>
+    Type-safe DSL над SQL. Лучше подходит, если нужен контроль над запросами, сложные выборки, аналитика и прозрачность SQL.
+  </p>
+
+  <div class="grid-2">
+    <div class="ok">
+      <h4>Когда смотреть в сторону альтернатив</h4>
+      <ul>
+        <li>Сложные SQL-запросы и отчеты.</li>
+        <li>Высокие требования к производительности.</li>
+        <li>Нужен явный контроль над SQL.</li>
+        <li>Команда не хочет тащить весь жизненный цикл JPA-сущностей.</li>
+      </ul>
+    </div>
+    <div class="warn">
+      <h4>Когда JPA все еще ок</h4>
+      <ul>
+        <li>Типовой CRUD.</li>
+        <li>Невысокая сложность доменной модели.</li>
+        <li>Команда уже уверенно знает Hibernate.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<hr class="section-divider"/>
+
+<h2 id="section11">11. Критика Hibernate в вопросах и ответах</h2>
+
+<div class="card">
+  <h3>11.1 «JPA использует паттерн Active Object»</h3>
+  <div class="bad">
+    <h4>Оценка</h4>
+    <p>Терминологически неверно.</p>
+  </div>
+  <p>
+    Для JPA/Hibernate корректнее говорить про:
+  </p>
+  <ul>
+    <li>Unit of Work</li>
+    <li>Identity Map</li>
+    <li>Data Mapper</li>
+    <li>dirty checking</li>
+    <li>lazy loading</li>
+    <li>hydration/dehydration</li>
+  </ul>
+  <p>
+    Active Object — паттерн из области concurrency и асинхронного выполнения (очереди команд, отложенное исполнение). К ORM и persistence-модели JPA он отношения не имеет.
+  </p>
+</div>
+
+<div class="card">
+  <h3>11.2 «Вся работа с объектами заключена внутри текущего Unit of Work»</h3>
+  <div class="ok">
+    <h4>Оценка</h4>
+    <p>По существу верно.</p>
+  </div>
+  <p>
+    В рамках persistence context ORM действительно управляет сущностями, отслеживает изменения и синхронизирует их с БД при flush/commit.
+    Это корректное описание центральной механики JPA.
+  </p>
+</div>
+
+<div class="card">
+  <h3>11.3 «После detach объекты имеют вполне детерминированное состояние»</h3>
+  <div class="warn">
+    <h4>Оценка</h4>
+    <p>Частично верно, но формулировка неполна.</p>
+  </div>
+  <p>
+    После detach объект сохраняет определённое состояние только в части уже загруженных данных.
+    Неинициализированные lazy-поля и коллекции вне persistence context становятся недоступны и при обращении к ним
+    обычно приводят к <code>LazyInitializationException</code>.
+  </p>
+  <div class="note">
+    <h4>Точная формулировка</h4>
+    <p>
+      Detached-сущность детерминирована только в уже материализованной части. Для неинициализированных lazy-ассоциаций детерминированности нет — поведение зависит от того, были ли они загружены до выхода из контекста.
+    </p>
+  </div>
+</div>
+
+<div class="card">
+  <h3>11.4 «JPA пытается создать иллюзию отсутствия БД»</h3>
+  <div class="ok">
+    <h4>Оценка</h4>
+    <p>По существу верно.</p>
+  </div>
+  <p>
+    Одна из базовых целей ORM — предоставить объектную модель поверх реляционного хранилища и скрыть детали SQL-взаимодействия.
+    Проблема в том, что реляционная БД принципиально отличается от графа объектов в памяти, и эта абстракция регулярно протекает.
+  </p>
+  <div class="warn">
+    <h4>Уточнение</h4>
+    <p>
+      Это не специфический дефект Hibernate, а общее свойство ORM-подхода. Однако в JPA/Hibernate разрыв между абстракцией и реальностью проявляется особенно заметно.
+    </p>
+  </div>
+</div>
+
+<div class="card">
+  <h3>11.5 «Требования JPA к entity (конструктор по умолчанию, non-final, mutability) ухудшают объектный дизайн»</h3>
+  <div class="warn">
+    <h4>Оценка</h4>
+    <p>Во многом справедливо, но зависит от роли entity в архитектуре.</p>
+  </div>
+  <p>
+    Если JPA entity используется как полноценный rich domain object, требования спецификации действительно создают конфликт:
+    инварианты ослабляются, иммутабельность невозможна, proxy и наследование усложняют модель.
+  </p>
+  <p>
+    Если entity рассматривается как persistence-структура, а доменная модель выделена отдельно, конфликт значительно менее острый.
+  </p>
+  <div class="note">
+    <h4>Практический вывод</h4>
+    <p>
+      Для сценария «JPA entity = ядро доменной модели» критика сильна. Для сценария «entity как persistence-слой» — значительно слабее.
+    </p>
+  </div>
+</div>
+
+<div class="card">
+  <h3>11.6 «Код, работающий с managed entities, пронизан неявными побочными эффектами»</h3>
+  <div class="warn">
+    <h4>Оценка</h4>
+    <p>Преувеличение в абсолютной формулировке, но в основе — реальная проблема.</p>
+  </div>
+  <p>
+    Не весь код приложения, но код, оперирующий managed-сущностями внутри persistence context, действительно может иметь неочевидные побочные эффекты:
+  </p>
+  <ul>
+    <li>обращение к геттеру может инициировать SQL-запрос через lazy loading;</li>
+    <li>изменение поля managed-сущности может привести к автоматическому UPDATE при flush;</li>
+    <li>flush может произойти в неожиданный момент (auto-flush перед JPQL-запросом).</li>
+  </ul>
+  <p>
+    Это снижает предсказуемость и локальность рассуждений о коде.
+  </p>
+</div>
+
+<div class="card">
+  <h3>11.7 «Lazy loading — источник большинства проблем производительности»</h3>
+  <div class="ok">
+    <h4>Оценка</h4>
+    <p>Практически очень близко к истине.</p>
+  </div>
+  <p>
+    В реальных проектах именно lazy loading является наиболее частым источником:
+  </p>
+  <ul>
+    <li>N+1 запросов;</li>
+    <li>неявного I/O в бизнес-логике;</li>
+    <li><code>LazyInitializationException</code>;</li>
+    <li>деградации производительности, заметной только под реальной нагрузкой.</li>
+  </ul>
+  <div class="warn">
+    <h4>Уточнение</h4>
+    <p>
+      Lazy loading не является проблемой по определению, но представляет собой инструмент повышенного риска.
+      Для большинства команд безопаснее относиться к нему как к зоне, требующей явного контроля и дисциплины.
+    </p>
+  </div>
+</div>
+
+<div class="card">
+  <h3>11.8 «Для обновления по DTO необходим лишний SELECT»</h3>
+  <div class="ok">
+    <h4>Оценка</h4>
+    <p>Да, это реальная особенность JPA-модели.</p>
+  </div>
+  <p>
+    Идиоматический сценарий JPA — загрузить entity, изменить её состояние и позволить dirty checking сгенерировать UPDATE.
+    Если задача выражается как точечный UPDATE без предварительной загрузки строки, JPA-модель оказывается менее естественной.
+  </p>
+  <p>
+    Обходные пути существуют:
+  </p>
+  <ul>
+    <li><code>@Modifying</code> с явным update-запросом;</li>
+    <li>JPQL bulk update;</li>
+    <li>native SQL;</li>
+    <li><code>merge()</code> в определённых сценариях.</li>
+  </ul>
+  <p>
+    Однако использование этих подходов означает выход за пределы основного happy path модели JPA.
+  </p>
+</div>
+
+<div class="card">
+  <h3>11.9 «Для вставки ссылки на существующую сущность требуется лишний SELECT»</h3>
+  <div class="warn">
+    <h4>Оценка</h4>
+    <p>В общей формулировке неверно.</p>
+  </div>
+  <p>
+    <code>EntityManager.getReference()</code> позволяет получить proxy-ссылку по известному ID без немедленного SELECT.
+    Это штатный механизм JPA для установки FK-ссылок без загрузки данных связанной сущности.
+  </p>
+  <div class="note">
+    <h4>Баланс</h4>
+    <p>
+      Технически проблема решаема. Однако общий тезис о том, что эффективная работа с JPA требует знания специальных приёмов и неочевидных API, остаётся справедливым.
+    </p>
+  </div>
+</div>
+
+<div class="card">
+  <h3>11.10 «Кэшировать JPA-сущности нельзя»</h3>
+  <div class="warn">
+    <h4>Оценка</h4>
+    <p>В такой формулировке неверно, но практический смысл за ней есть.</p>
+  </div>
+  <p>
+    Бездумно помещать managed/lazy/proxy-обогащённые сущности в прикладной кэш действительно опасно — это может привести к
+    <code>LazyInitializationException</code>, устаревшим данным или непредсказуемому поведению.
+  </p>
+  <p>
+    Однако JPA и Hibernate предоставляют специализированные механизмы:
+  </p>
+  <ul>
+    <li>Second-Level Cache (L2) — хранит dehydrated state, а не живые объекты;</li>
+    <li>Query Cache — кэширует результаты запросов;</li>
+    <li>DTO/projection cache — безопасное кэширование на прикладном уровне.</li>
+  </ul>
+  <div class="note">
+    <h4>Корректная формулировка</h4>
+    <p>
+      В прикладном коде рекомендуется кэшировать не ORM-сущности, а DTO, проекции или immutable value objects.
+    </p>
+  </div>
+</div>
+
+<div class="card">
+  <h3>11.11 «Из Hibernate можно спуститься до JDBC, значит претензии к ORM несостоятельны»</h3>
+  <div class="bad">
+    <h4>Оценка</h4>
+    <p>Слабый аргумент.</p>
+  </div>
+  <p>
+    Возможность обойти ORM через низкоуровневый доступ не устраняет проблем самой ORM-модели.
+    По аналогичной логике любой недостаток инструмента можно отклонить фразой «не используйте эту часть».
+  </p>
+  <p>
+    Корректный вопрос: если для достижения предсказуемости и производительности приходится регулярно обходить ORM вручную, насколько этот ORM оправдан для данного проекта.
+  </p>
+</div>
+
+<div class="card">
+  <h3>11.12 «Проблемы возникают от неумения пользоваться инструментом»</h3>
+  <div class="warn">
+    <h4>Оценка</h4>
+    <p>Формально верно, но как аргумент недостаточно.</p>
+  </div>
+  <p>
+    Любой инструмент требует компетенции. Однако качество инструмента определяется ещё и тем, насколько он:
+  </p>
+  <ul>
+    <li>делает правильный путь естественным и очевидным;</li>
+    <li>делает ошибочный путь сложным или заметным;</li>
+    <li>сохраняет предсказуемость поведения.</li>
+  </ul>
+  <p>
+    В JPA/Hibernate нередко наоборот: написать код, который работает «быстро и случайно неэффективно», очень легко,
+    а добиться прозрачного, предсказуемого и производительного поведения — заметно сложнее.
+  </p>
+</div>
+
+<div class="card">
+  <h3>11.13 «Entity — это persistence-структуры, а не полноценные доменные объекты»</h3>
+  <div class="ok">
+    <h4>Оценка</h4>
+    <p>Практически полезный тезис.</p>
+  </div>
+  <p>
+    Если воспринимать JPA entity как persistence-структуру, а не как идеальную доменную модель, значительная часть архитектурных противоречий снимается:
+  </p>
+  <ul>
+    <li>меньше ожиданий от инвариантов и иммутабельности;</li>
+    <li>проще разделять API/DTO/domain model и entity;</li>
+    <li>проще принять, что сущность живёт по правилам ORM.</li>
+  </ul>
+  <div class="warn">
+    <h4>Обратная сторона</h4>
+    <p>
+      Такой подход фактически признаёт, что ORM не решает задачу чистого объектного моделирования,
+      а предоставляет удобный, но ограниченный persistence-слой.
+    </p>
+  </div>
+</div>
+
+<div class="card">
+  <h3>11.14 «Поведение одного и того же кода зависит от контекста вызова»</h3>
+  <div class="ok">
+    <h4>Оценка</h4>
+    <p>Верно и является одной из ключевых практических проблем.</p>
+  </div>
+  <p>
+    Один и тот же фрагмент кода, работающий с JPA-сущностью, может вести себя принципиально по-разному в зависимости от:
+  </p>
+  <ul>
+    <li>находится ли сущность в состоянии managed или detached;</li>
+    <li>открыта ли транзакция в точке вызова;</li>
+    <li>настроены ли связи как LAZY или EAGER;</li>
+    <li>был ли выполнен fetch для конкретных ассоциаций;</li>
+    <li>активен ли OSIV (Open Session in View).</li>
+  </ul>
+  <p>
+    Эта контекстная зависимость делает результат выполнения кода неочевидным при чтении и увеличивает когнитивную нагрузку.
+    Типичный пример: обращение к lazy-коллекции может выполнить SQL, вернуть кэшированные данные или выбросить <code>LazyInitializationException</code> — в зависимости от состояния persistence context.
+  </p>
+</div>
+
+<div class="card">
+  <h3>11.15 «<code>equals()</code>, <code>hashCode()</code> и <code>toString()</code> для entity — отдельная зона сложности»</h3>
+  <div class="ok">
+    <h4>Оценка</h4>
+    <p>Верно. Стандартные генераторы IDE создают опасный код для JPA-сущностей.</p>
+  </div>
+  <p>
+    Стандартная генерация <code>equals()</code>, <code>hashCode()</code> и <code>toString()</code> (через IDE или Lombok) для JPA entity
+    часто приводит к проблемам:
+  </p>
+  <ul>
+    <li>включение lazy-ассоциаций в <code>toString()</code> или <code>equals()</code> вызывает непредвиденные SQL или <code>LazyInitializationException</code>;</li>
+    <li>Hibernate proxy требуют аккуратного сравнения классов (<code>instanceof</code> вместо <code>getClass()</code>);</li>
+    <li>использование всех полей в <code>equals()</code>/<code>hashCode()</code> нарушает контракт при работе с <code>Set</code> и после persist (когда ID меняется с null на сгенерированное значение).</li>
+  </ul>
+  <p>
+    Корректная реализация требует специализированного подхода с учётом особенностей ORM, что добавляет когнитивную нагрузку и создаёт зону неочевидных ошибок.
+  </p>
+</div>
+
+<div class="card">
+  <h3>11.16 «ManyToMany-связи порождают неэффективный SQL»</h3>
+  <div class="warn">
+    <h4>Оценка</h4>
+    <p>Верно для типичных конфигураций с <code>List</code>.</p>
+  </div>
+  <p>
+    При стандартном маппинге <code>@ManyToMany</code> с коллекцией типа <code>List</code> (bag semantics)
+    добавление или удаление одного элемента может приводить к тому, что Hibernate удаляет все записи из join-таблицы
+    для данного родителя и вставляет их заново. Это происходит потому, что bag-коллекция не имеет семантики уникальности
+    или порядка, и Hibernate не может определить, какие именно строки изменились.
+  </p>
+  <p>
+    Проблема решается использованием <code>Set</code> вместо <code>List</code> или явным маппингом join-таблицы как отдельной entity.
+    Однако такое поведение по умолчанию является источником неочевидных проблем производительности.
+  </p>
+</div>
+
+<div class="card">
+  <h3>11.17 «Pagination с JOIN FETCH выполняется в памяти приложения»</h3>
+  <div class="ok">
+    <h4>Оценка</h4>
+    <p>Верно. Это документированное, но неочевидное ограничение.</p>
+  </div>
+  <p>
+    При использовании <code>JOIN FETCH</code> коллекции совместно с <code>Pageable</code> (LIMIT/OFFSET)
+    Hibernate не может корректно применить пагинацию на уровне SQL, поскольку число строк результата
+    не соответствует числу уникальных родительских сущностей. В этом случае Hibernate загружает весь result set
+    и применяет пагинацию в памяти, выводя предупреждение:
+  </p>
+  <pre><code>HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory</code></pre>
+  <p>
+    Это может привести к серьёзным проблемам производительности и памяти на больших объёмах данных.
+    Стандартные решения: пагинация по ID родителей отдельным запросом с последующей загрузкой графа, использование batch fetching или DTO projection.
+  </p>
+</div>
+
+<div class="card">
+  <h3>11.18 «MultipleBagFetchException при JOIN FETCH нескольких коллекций»</h3>
+  <div class="ok">
+    <h4>Оценка</h4>
+    <p>Реальное и часто встречаемое ограничение.</p>
+  </div>
+  <p>
+    Hibernate запрещает одновременный <code>JOIN FETCH</code> нескольких bag-коллекций (<code>List</code> без order/index semantics) в одном запросе,
+    выбрасывая <code>MultipleBagFetchException</code>. Причина: результирующий cartesian product делает невозможным корректное восстановление
+    содержимого нескольких неупорядоченных коллекций из одного result set.
+  </p>
+  <p>
+    Решения:
+  </p>
+  <ul>
+    <li>использовать <code>Set</code> вместо <code>List</code> для коллекций;</li>
+    <li>загружать коллекции отдельными запросами;</li>
+    <li>использовать batch fetching или <code>@Fetch(SUBSELECT)</code>;</li>
+    <li>использовать DTO projection.</li>
+  </ul>
+  <p>
+    Проблема усугубляется тем, что разработчик часто приходит к <code>JOIN FETCH</code> как к решению N+1,
+    а затем обнаруживает, что это решение не масштабируется на несколько коллекций.
+  </p>
+</div>
+
+<div class="card">
+  <h3>11.19 «Маппинг Entity ↔ DTO — нетривиальная задача с неочевидными границами»</h3>
+  <div class="ok">
+    <h4>Оценка</h4>
+    <p>Верно. Вопрос «где делать маппинг» в JPA-проектах возникает системно.</p>
+  </div>
+  <p>
+    При наличии lazy-ассоциаций маппинг entity в DTO привязан к состоянию persistence context:
+  </p>
+  <ul>
+    <li>если маппинг происходит внутри транзакции — lazy-поля могут быть инициализированы, но это создаёт неявные SQL-запросы;</li>
+    <li>если маппинг происходит за пределами транзакции — обращение к неинициализированным lazy-полям приводит к <code>LazyInitializationException</code>.</li>
+  </ul>
+  <p>
+    В результате знание о том, какие данные понадобятся для формирования DTO, неявно проникает на уровень работы с entity и формирования запросов.
+    Это размывает границы между слоями и усложняет сопровождение.
+  </p>
+</div>
+
+<div class="card">
+  <h3>11.20 Общий итог по тезисам</h3>
+  <div class="violet">
+    <h4>Вывод</h4>
+    <ul>
+      <li>Значительная часть критики JPA отражает реальные проблемы, встречающиеся в продакшен-системах.</li>
+      <li>Отдельные формулировки категоричны или гиперболизированы, но указывают на реальные зоны риска.</li>
+      <li>Технические контраргументы существуют, но зачастую не устраняют фундаментальной сложности модели.</li>
+      <li>Решение об использовании JPA должно основываться на характеристиках системы и зрелости команды, а не на идеологических предпочтениях.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="card">
+  <h3>11.21 Когда JPA/Hibernate подходит, а когда нет</h3>
+
+  <table>
+    <thead>
+    <tr>
+      <th>Сценарий</th>
+      <th>JPA/Hibernate</th>
+      <th>Комментарий</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td>Типовой CRUD</td>
+      <td>Подходит</td>
+      <td>Особенно при наличии опыта работы с Spring Data JPA и отсутствии экстремальных требований к нагрузке.</td>
+    </tr>
+    <tr>
+      <td>Сложные SQL-запросы, аналитика, агрегации</td>
+      <td>Сомнительно</td>
+      <td>Часто эффективнее jOOQ, SQL-first подходы или специализированные query-слои.</td>
+    </tr>
+    <tr>
+      <td>Высокие требования к предсказуемости SQL</td>
+      <td>Скорее нет</td>
+      <td>Неявность lazy loading, auto-flush и dirty checking затрудняют контроль.</td>
+    </tr>
+    <tr>
+      <td>Rich Domain Model, строгий DDD</td>
+      <td>Сложно</td>
+      <td>Требования JPA к entity плохо сочетаются с иммутабельностью и строгими инвариантами.</td>
+    </tr>
+    <tr>
+      <td>Bulk update / patch-heavy сервис</td>
+      <td>Неидеально</td>
+      <td>Паттерн «загрузить-изменить-сохранить» может быть избыточно тяжёлым для массовых точечных обновлений.</td>
+    </tr>
+    <tr>
+      <td>Команда с малым опытом ORM</td>
+      <td>Рискованно</td>
+      <td>Высокая вероятность N+1, неочевидной деградации производительности и ошибок состояния сущностей.</td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<hr class="section-divider"/>
+
+<h2 id="section12">12. Глоссарий терминов</h2>
+
+<div class="card">
+  <h3>12.1 Базовые понятия ORM и persistence</h3>
+  <table>
+    <thead>
+    <tr>
+      <th>Термин</th>
+      <th>Краткое описание</th>
+      <th>Примечание</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td>ORM</td>
+      <td>Object-Relational Mapping, сопоставление объектов и таблиц.</td>
+      <td>Упрощает CRUD, но скрывает SQL и стоимость операций.</td>
+    </tr>
+    <tr>
+      <td>JPA</td>
+      <td>Java Persistence API, спецификация persistence-слоя в Java.</td>
+      <td>Не реализация, а стандарт API и модели.</td>
+    </tr>
+    <tr>
+      <td>Hibernate</td>
+      <td>Популярная ORM-реализация, часто используемая как реализация JPA.</td>
+      <td>Имеет и собственный API через Session.</td>
+    </tr>
+    <tr>
+      <td>Entity</td>
+      <td>Класс, отображаемый на таблицу или набор таблиц.</td>
+      <td>В JPA обычно живет по правилам ORM, а не “чистой доменной модели”.</td>
+    </tr>
+    <tr>
+      <td>Persistence Context</td>
+      <td>Контекст, внутри которого ORM управляет сущностями.</td>
+      <td>Включает first-level cache и отслеживание состояния.</td>
+    </tr>
+    <tr>
+      <td>EntityManager</td>
+      <td>Основная точка входа JPA для работы с сущностями.</td>
+      <td>Аналог Session в JPA-терминах.</td>
+    </tr>
+    <tr>
+      <td>Session</td>
+      <td>Hibernate API для работы с persistence context и сущностями.</td>
+      <td>Часто лежит под EntityManager.</td>
+    </tr>
+    <tr>
+      <td>Impedance Mismatch</td>
+      <td>Несовпадение объектной и реляционной моделей данных.</td>
+      <td>Фундаментальная причина многих проблем ORM.</td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h3>12.2 Паттерны и архитектурные концепции</h3>
+  <table>
+    <thead>
+    <tr>
+      <th>Термин</th>
+      <th>Краткое описание</th>
+      <th>Примечание</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td>Data Mapper</td>
+      <td>Паттерн отделения объектной модели от механизма сохранения.</td>
+      <td>JPA ближе к нему, чем к Active Record, хотя и не является идеально “чистым” Data Mapper.</td>
+    </tr>
+    <tr>
+      <td>Active Record</td>
+      <td>Паттерн, где объект сам сохраняет и загружает себя.</td>
+      <td>Подходит для простых систем, но хуже масштабируется на сложную доменную логику.</td>
+    </tr>
+    <tr>
+      <td>Active Object</td>
+      <td>Concurrency-паттерн с очередью вызовов и асинхронным исполнением.</td>
+      <td>К JPA напрямую не относится.</td>
+    </tr>
+    <tr>
+      <td>Unit of Work</td>
+      <td>Паттерн накопления изменений объектов и последующей синхронизации с БД.</td>
+      <td>Один из ключевых паттернов JPA/Hibernate.</td>
+    </tr>
+    <tr>
+      <td>Identity Map</td>
+      <td>Один и тот же PK в одном контексте соответствует одному объекту.</td>
+      <td>Улучшает согласованность внутри транзакции.</td>
+    </tr>
+    <tr>
+      <td>Repository</td>
+      <td>Абстракция над доступом к данным для сущностей или агрегатов.</td>
+      <td>Часто используется вместе с JPA и Spring Data.</td>
+    </tr>
+    <tr>
+      <td>Aggregate</td>
+      <td>DDD-понятие: группа объектов с aggregate root и границей согласованности.</td>
+      <td>Полезно для ограничения связности модели.</td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h3>12.3 Состояния сущностей и жизненный цикл</h3>
+  <table>
+    <thead>
+    <tr>
+      <th>Термин</th>
+      <th>Краткое описание</th>
+      <th>Примечание</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td>Managed entity</td>
+      <td>Сущность, находящаяся под управлением ORM.</td>
+      <td>Изменения отслеживаются, lazy может работать.</td>
+    </tr>
+    <tr>
+      <td>Detached entity</td>
+      <td>Сущность вне persistence context.</td>
+      <td>Изменения больше не отслеживаются, lazy может не работать.</td>
+    </tr>
+    <tr>
+      <td>persist</td>
+      <td>Операция добавления новой сущности в persistence context.</td>
+      <td>Обычно используется для новых объектов.</td>
+    </tr>
+    <tr>
+      <td>merge</td>
+      <td>Операция повторной синхронизации detached-сущности с контекстом.</td>
+      <td>Возвращает managed-экземпляр, не “оживляет” старый объект буквально.</td>
+    </tr>
+    <tr>
+      <td>remove</td>
+      <td>Операция удаления сущности.</td>
+      <td>После flush/commit превращается в DELETE.</td>
+    </tr>
+    <tr>
+      <td>getReference</td>
+      <td>Получение ссылки на сущность по ID без немедленного SELECT.</td>
+      <td>Полезно для FK-ссылок на уже существующую запись.</td>
+    </tr>
+    <tr>
+      <td>Proxy</td>
+      <td>Прокси-объект, через который ORM реализует lazy loading и перехват доступа.</td>
+      <td>Требует открытых классов или методов в некоторых сценариях.</td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h3>12.4 Выполнение SQL, загрузка и типовые проблемы</h3>
+  <table>
+    <thead>
+    <tr>
+      <th>Термин</th>
+      <th>Краткое описание</th>
+      <th>Примечание</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td>Dirty Checking</td>
+      <td>Автоматическое отслеживание изменений managed-сущностей.</td>
+      <td>На flush/commit превращается в SQL update/insert.</td>
+    </tr>
+    <tr>
+      <td>Flush</td>
+      <td>Синхронизация изменений persistence context с БД.</td>
+      <td>Не обязательно означает commit.</td>
+    </tr>
+    <tr>
+      <td>Commit</td>
+      <td>Завершение транзакции с фиксацией изменений.</td>
+      <td>Обычно включает flush.</td>
+    </tr>
+    <tr>
+      <td>Lazy Loading</td>
+      <td>Отложенная загрузка данных по обращению.</td>
+      <td>Удобно, но часто приводит к N+1 и LazyInitializationException.</td>
+    </tr>
+    <tr>
+      <td>Eager Loading</td>
+      <td>Немедленная доступность связанных данных.</td>
+      <td>Не означает автоматически один JOIN и тоже может привести к дополнительным SELECT.</td>
+    </tr>
+    <tr>
+      <td>N+1 problem</td>
+      <td>1 запрос за родителями и еще N запросов за ассоциациями.</td>
+      <td>Проблема fetch plan, а не только LAZY-коллекций.</td>
+    </tr>
+    <tr>
+      <td>LazyInitializationException</td>
+      <td>Ошибка при попытке обратиться к lazy-данным вне активного контекста.</td>
+      <td>Типичный симптом неверной boundary-модели.</td>
+    </tr>
+    <tr>
+      <td>Hydration</td>
+      <td>Материализация entity из строки БД или кэшированного состояния.</td>
+      <td>Чтение из БД — это не “вернуть старый объект”, а собрать состояние заново.</td>
+    </tr>
+    <tr>
+      <td>Dehydration</td>
+      <td>Преобразование entity в набор значений колонок/параметров.</td>
+      <td>Используется при flush, SQL generation и записи в L2 cache.</td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h3>12.5 Кэширование и запросы</h3>
+  <table>
+    <thead>
+    <tr>
+      <th>Термин</th>
+      <th>Краткое описание</th>
+      <th>Примечание</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td>First-Level Cache</td>
+      <td>Кэш в рамках persistence context/session.</td>
+      <td>Фактически часть identity map.</td>
+    </tr>
+    <tr>
+      <td>Second-Level Cache</td>
+      <td>Кэш между несколькими сессиями или контекстами.</td>
+      <td>Хранит dehydrated-state, а не “живые Java-объекты”.</td>
+    </tr>
+    <tr>
+      <td>JPQL</td>
+      <td>Язык запросов поверх сущностей JPA.</td>
+      <td>Опирается на модель сущностей, а не на таблицы напрямую.</td>
+    </tr>
+    <tr>
+      <td>Criteria API</td>
+      <td>API для построения запросов в JPA.</td>
+      <td>Часто считается многословным и неудобным.</td>
+    </tr>
+    <tr>
+      <td>Native Query</td>
+      <td>Запрос на чистом SQL в обход JPQL и ORM-абстракции.</td>
+      <td>Дает контроль, но снижает переносимость.</td>
+    </tr>
+    <tr>
+      <td>Projection</td>
+      <td>Частичное представление данных, например только нужные поля.</td>
+      <td>Удобно для чтения и оптимизации запросов.</td>
+    </tr>
+    <tr>
+      <td>DTO</td>
+      <td>Data Transfer Object, объект для переноса данных между слоями.</td>
+      <td>Часто лучше кэшировать и отдавать наружу именно DTO, а не entity.</td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h3>12.6 Экосистема и альтернативы</h3>
+  <table>
+    <thead>
+    <tr>
+      <th>Термин</th>
+      <th>Краткое описание</th>
+      <th>Примечание</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td>Spring Data JPA</td>
+      <td>Интеграция Spring Data с JPA-репозиториями.</td>
+      <td>Ускоряет CRUD, но не убирает базовые сложности JPA.</td>
+    </tr>
+    <tr>
+      <td>Spring Data JDBC</td>
+      <td>Более прямолинейный persistence-подход без сессии и dirty checking как в JPA.</td>
+      <td>Проще и прозрачнее, но менее магический и менее всеядный.</td>
+    </tr>
+    <tr>
+      <td>jOOQ</td>
+      <td>Type-safe DSL для SQL и работы с БД.</td>
+      <td>Подходит, когда нужен контроль и прозрачность запросов.</td>
+    </tr>
+    <tr>
+      <td>JDBC</td>
+      <td>Низкоуровневый Java API для работы с реляционными базами данных.</td>
+      <td>Максимум контроля, но больше шаблонного кода.</td>
+    </tr>
+    <tr>
+      <td>SQL-first подход</td>
+      <td>Подход, где запросы и модель работы с БД явно строятся вокруг SQL.</td>
+      <td>Чаще лучше для сложной аналитики, отчетов и performance-critical частей.</td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="summary-box">
+  <h3>Финальное резюме</h3>
+  <p>
+    JPA/Hibernate не является ни универсальным злом, ни серебряной пулей.
+    Это инструмент, который хорошо работает на типовом CRUD и плохо переносит бездумное применение в сложных сценариях.
+  </p>
+  <p>
+    Главное, что нужно понимать:
+  </p>
+  <ul>
+    <li>JPA скрывает часть реальности БД, и это создает как удобство, так и ловушки.</li>
+    <li>Проблемы JPA — не только от плохих разработчиков, но от самой модели абстракции.</li>
+    <li>Многие проблемы лечатся, но лечение требует дисциплины и компетенции команды.</li>
+    <li>Ключевой practical skill — не “какую аннотацию поставить”, а “какие данные нужны в этом use case и каким запросом их лучше получить”.</li>
+    <li>Полезно понимать, что Hibernate постоянно делает <strong>hydration</strong> и <strong>dehydration</strong>, а не просто “хранит объекты в БД”.</li>
+    <li>Если приоритеты — прозрачность SQL, предсказуемость и производительность, то SQL-first подходы часто выигрывают.</li>
+    <li>Если приоритет — быстро и удобно делать типовой CRUD, JPA/Hibernate остается сильным выбором.</li>
+  </ul>
+</div>
+
+<hr class="section-divider"/>
+
+<h2 id="section13">13. Структура проекта</h2>
+
+<pre><code>src/main/java/com/example/hibernate/
+├── config/
+│   ├── DemoDataInitializer.java
+│   └── EhcacheConfig.java
+├── controller/
+│   ├── DemoController.java
+│   ├── DocumentationController.java
+│   └── GlobalExceptionHandler.java
+├── entity/
+│   ├── Product.java
+│   ├── ProductDetails.java
+│   ├── Category.java
+│   ├── Tag.java
+│   ├── Customer.java
+│   ├── CustomerOrder.java
+│   ├── PaymentSingleTable.java
+│   ├── CardPaymentSingleTable.java
+│   ├── CashPaymentSingleTable.java
+│   ├── PersonJoined.java
+│   ├── EmployeeJoined.java
+│   └── CustomerJoined.java
+├── exception/
+│   ├── CategoryNotFoundException.java
+│   └── ProductNotFoundException.java
+├── model/
+│   └── ApiModels.java
+├── repository/
+│   ├── BatchInsertRepository.java
+│   ├── CachingRepository.java
+│   ├── EntityLifecycleRepository.java
+│   ├── FetchingRepository.java
+│   ├── FlushClearRepository.java
+│   ├── LazyExceptionRepository.java
+│   ├── NPlusOneRepository.java
+│   ├── QueryComparisonRepository.java
+│   ├── RelationshipRepository.java
+│   └── StatisticsRepository.java
+├── service/
+│   ├── AdvancedSpringDataService.java
+│   ├── BatchInsertService.java
+│   ├── CachingDemoService.java
+│   ├── EntityLifecycleDemoService.java
+│   ├── FetchingDemoService.java
+│   ├── FlushClearDemoService.java
+│   ├── LazyExceptionDemoService.java
+│   ├── NPlusOneDemoService.java
+│   ├── OptimisticLockingDemoService.java
+│   ├── QueryComparisonService.java
+│   ├── ReadOnlyDemoService.java
+│   ├── RelationshipDemoService.java
+│   └── StatisticsService.java
+├── springdata/
+│   ├── CategorySpringDataRepository.java
+│   ├── ProductSpecification.java
+│   ├── ProductSpringDataRepository.java
+│   ├── ProductView.java
+│   └── SpringDataService.java
+└── HibernateApplication.java
+
+src/test/java/com/example/hibernate/
+├── Section1_BasicMappingTest.java
+├── Section2_EntityLifecycleTest.java
+├── Section3_RelationshipsTest.java
+├── Section4_FetchingStrategiesTest.java
+├── Section5_NPlusOneTest.java
+├── Section6_CachingTest.java
+├── Section7_SpringDataTest.java
+├── Section8_OptimisticLockingTest.java
+├── Section9_FlushClearTest.java
+├── Section10_LazyInitializationExceptionTest.java
+├── Section11_QueryComparisonTest.java
+├── Section12_SpecificationAndProjectionTest.java
+├── Section13_BatchInsertTest.java
+└── Section14_EmbeddableAndInheritanceTest.java
+
+src/main/resources/
+├── application.yaml
+├── ehcache.xml
+└── static/
+    └── index.html</code></pre>
+
+<hr class="section-divider"/>
+
+<h2 id="section14">14. Endpoint'ы</h2>
+
+<h3>Документация и база</h3>
+<div class="endpoint">GET /</div>
+<div class="endpoint">GET /h2-console</div>
+
+<h3>Базовые демо-сценарии</h3>
+<div class="endpoint">GET /api/demo/lifecycle</div>
+<div class="endpoint">GET /api/demo/relationships</div>
+<div class="endpoint">GET /api/demo/fetching/category/{id}</div>
+<div class="endpoint">GET /api/demo/fetching/product/{id}</div>
+
+<h3>N+1 и fetch plan</h3>
+<div class="endpoint">GET /api/demo/n-plus-one/lazy</div>
+<div class="endpoint">GET /api/demo/n-plus-one/join-fetch</div>
+<div class="endpoint">GET /api/demo/n-plus-one/entity-graph</div>
+<div class="endpoint">GET /api/demo/n-plus-one/subselect</div>
+
+<h3>Кэширование и статистика Hibernate</h3>
+<div class="endpoint">GET /api/demo/caching/l1/{id}</div>
+<div class="endpoint">GET /api/demo/caching/query/{type}</div>
+<div class="endpoint">GET /api/demo/caching/reset-stats</div>
+<div class="endpoint">GET /api/demo/stats</div>
+
+<h3>Spring Data JPA</h3>
+<div class="endpoint">GET /api/demo/spring-data/query-methods</div>
+<div class="endpoint">GET /api/demo/spring-data/entity-graph</div>
+<div class="endpoint">GET /api/demo/spring-data/pagination</div>
+
+<h3>Advanced</h3>
+<div class="endpoint">GET /api/demo/optimistic-locking/{id}</div>
+<div class="endpoint">GET /api/demo/advanced/query-comparison</div>
+<div class="endpoint">GET /api/demo/advanced/batch-insert/{count}</div>
+<div class="endpoint">GET /api/demo/advanced/flush-clear</div>
+<div class="endpoint">GET /api/demo/advanced/lazy-exception/{id}</div>
+<div class="endpoint">GET /api/demo/advanced/read-only/{id}</div>
+<div class="endpoint">GET /api/demo/advanced/specification</div>
+<div class="endpoint">GET /api/demo/advanced/projections</div>
+
+<h3>Формат ответов API</h3>
+<div class="good">
+  Успешные ответы возвращаются в формате <code>ApiResponse&lt;T&gt;</code>:
+  <pre><code>{
+  "success": true,
+  "data": { ... }
+}</code></pre>
+</div>
+
+<div class="bad">
+  Ошибки обрабатываются через <code>GlobalExceptionHandler</code> и возвращаются в формате
+  <code>ApiErrorResponse</code>:
+  <pre><code>{
+  "success": false,
+  "errorCode": "PRODUCT_NOT_FOUND",
+  "message": "Product not found: 999"
+}</code></pre>
+</div>
+
+<h3>Примеры доменных ошибок</h3>
+<table>
+  <tr>
+    <th>Сценарий</th>
+    <th>HTTP статус</th>
+    <th>errorCode</th>
+  </tr>
+  <tr>
+    <td>Продукт не найден</td>
+    <td><code>404 Not Found</code></td>
+    <td><code>PRODUCT_NOT_FOUND</code></td>
+  </tr>
+  <tr>
+    <td>Сущность не найдена через JPA</td>
+    <td><code>404 Not Found</code></td>
+    <td><code>NOT_FOUND</code></td>
+  </tr>
+  <tr>
+    <td>Некорректный аргумент запроса</td>
+    <td><code>400 Bad Request</code></td>
+    <td><code>BAD_REQUEST</code></td>
+  </tr>
+  <tr>
+    <td>Непредвиденная ошибка</td>
+    <td><code>500 Internal Server Error</code></td>
+    <td><code>INTERNAL_ERROR</code></td>
+  </tr>
+</table>
+
+</body>
+</html>
