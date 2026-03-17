@@ -1,47 +1,962 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Модуль в разработке</title>
+  <meta charset="UTF-8">
+  <title>Spring Data JPA Demo — Документация</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>mermaid.initialize({startOnLoad: true, theme: 'default'});</script>
   <style>
     body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f7f7f8;
-      color: #222;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 20px;
+        line-height: 1.7;
+        color: #333;
+        background: #fafafa;
     }
-
-    .container {
-      text-align: center;
-      background: white;
-      padding: 40px 32px;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-      max-width: 500px;
-      width: 90%;
-    }
-
     h1 {
-      margin: 0 0 12px;
-      font-size: 28px;
+        color: #2c3e50;
+        border-bottom: 3px solid #3498db;
+        padding-bottom: 10px;
     }
-
-    p {
-      margin: 0;
-      font-size: 16px;
-      color: #555;
+    h2 {
+        color: #2980b9;
+        margin-top: 50px;
+        border-left: 4px solid #3498db;
+        padding-left: 12px;
+    }
+    h3 {
+        color: #27ae60;
+        margin-top: 28px;
+    }
+    h4 {
+        color: #8e44ad;
+        margin-top: 20px;
+    }
+    pre {
+        background: #2d2d2d;
+        color: #f8f8f2;
+        padding: 16px;
+        border-radius: 6px;
+        overflow-x: auto;
+        font-size: 14px;
+    }
+    code {
+        background: #ecf0f1;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 14px;
+    }
+    pre code {
+        background: none;
+        padding: 0;
+    }
+    .mermaid {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        margin: 16px 0;
+        overflow-x: auto;
+    }
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 12px 0;
+        background: white;
+    }
+    th, td {
+        border: 1px solid #bdc3c7;
+        padding: 10px;
+        text-align: left;
+        vertical-align: top;
+    }
+    th {
+        background: #3498db;
+        color: white;
+    }
+    a {
+        color: #2980b9;
+    }
+    .file-link {
+        background: #e8f6f3;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 13px;
+        display: inline-block;
+        margin: 2px 0;
+    }
+    .note {
+        background: #fef9e7;
+        border-left: 4px solid #f1c40f;
+        padding: 12px;
+        margin: 12px 0;
+        border-radius: 4px;
+    }
+    .good {
+        background: #eafaf1;
+        border-left: 4px solid #27ae60;
+        padding: 12px;
+        margin: 12px 0;
+        border-radius: 4px;
+    }
+    .warn {
+        background: #fffbeb;
+        border-left: 4px solid #d97706;
+        padding: 12px;
+        margin: 12px 0;
+        border-radius: 4px;
+    }
+    .toc {
+        background: white;
+        border: 1px solid #dcdcdc;
+        border-radius: 8px;
+        padding: 18px;
+        margin: 20px 0 30px 0;
+    }
+    .toc ul {
+        margin: 0;
+        padding-left: 20px;
+    }
+    .endpoint {
+        background: #eef6ff;
+        border: 1px solid #d6eaff;
+        border-radius: 6px;
+        padding: 10px 12px;
+        margin: 6px 0;
+        font-family: monospace;
+        font-size: 13px;
+    }
+    .section-divider {
+        margin: 35px 0;
+        border: none;
+        border-top: 1px solid #ddd;
+    }
+    .card {
+        background: white;
+        border: 1px solid #dcdcdc;
+        border-radius: 12px;
+        padding: 18px 18px 16px;
+        margin: 16px 0;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Модуль в разработке</h1>
-    <p>Материалы для этого раздела скоро появятся.</p>
-  </div>
+
+<h1>Spring Data JPA Demo</h1>
+<p>Теория, работающий код, тесты и HTTP endpoint'ы для демонстрации Spring Data JPA как удобной абстракции над JPA.</p>
+
+<div class="good">
+  <strong>Документация:</strong> <code>http://localhost:8889/</code><br/>
+  <strong>H2 Console:</strong> <a href="/h2-console">/h2-console</a><br/>
+  <strong>JDBC URL:</strong> <code>jdbc:h2:mem:springdatajpa</code><br/>
+  <strong>User:</strong> <code>sa</code><br/>
+  <strong>Password:</strong> пустой
+</div>
+
+<div class="toc">
+  <h3>Содержание</h3>
+  <ul>
+    <li><a href="#section1">1. Что такое Spring Data JPA</a></li>
+    <li><a href="#section2">2. Spring Data Repository: иерархия интерфейсов</a></li>
+    <li><a href="#section3">3. Query Methods</a></li>
+    <li><a href="#section4">4. @Query и native queries</a></li>
+    <li><a href="#section5">5. Пагинация и сортировка: Pageable, Page, Slice</a></li>
+    <li><a href="#section6">6. Projections</a></li>
+    <li><a href="#section7">7. Specifications</a></li>
+    <li><a href="#section8">8. Глоссарий терминов</a></li>
+    <li><a href="#section9">9. Структура проекта</a></li>
+    <li><a href="#section10">10. Endpoint'ы API</a></li>
+  </ul>
+</div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 1 ==================== -->
+<h2 id="section1">1. Что такое Spring Data JPA</h2>
+
+<p>Spring Data JPA — это уровень абстракции поверх JPA, который упрощает работу с репозиториями, генерацией запросов, пагинацией, сортировкой, проекциями и динамической фильтрацией.</p>
+
+<div class="note">
+  <strong>Важно:</strong><br/>
+  <strong>JPA</strong> — это спецификация.<br/>
+  <strong>Hibernate</strong> — наиболее популярная реализация JPA.<br/>
+  <strong>Spring Data JPA</strong> — это не замена JPA и не замена Hibernate, а удобная интеграция и абстракция поверх них.
+</div>
+
+<table>
+  <tr><th>Уровень</th><th>Что даёт</th></tr>
+  <tr><td>JPA</td><td>Стандартный API для ORM</td></tr>
+  <tr><td>Hibernate</td><td>Реализация JPA, SQL generation, dirty checking, persistence context</td></tr>
+  <tr><td>Spring Data JPA</td><td>Repository abstraction, query derivation, pagination, projections, specifications</td></tr>
+</table>
+
+<div class="mermaid">
+  graph TB
+  APP[Application code] --> SD[Spring Data JPA]
+  SD --> JPA[JPA API]
+  JPA --> HIB[Hibernate]
+  HIB --> JDBC[JDBC]
+  JDBC --> DB[(H2 Database)]
+</div>
+
+<h3>Проблема: boilerplate-код для каждой сущности</h3>
+
+<p>Без Spring Data для каждой сущности приходится вручную писать однотипный DAO:</p>
+
+<pre><code>@Repository
+public class ProductDao {
+
+    @PersistenceContext
+    private EntityManager em;
+
+    public Product save(Product p) {
+        em.persist(p);
+        return p;
+    }
+
+    public Product findById(Long id) {
+        return em.find(Product.class, id);
+    }
+
+    public List&lt;Product&gt; findAll() {
+        return em.createQuery("select p from Product p", Product.class)
+                 .getResultList();
+    }
+
+    public void delete(Product p) {
+        em.remove(p);
+    }
+
+    // ...и так для КАЖДОЙ сущности писать одно и то же
+}</code></pre>
+
+<h3>Решение: один интерфейс вместо целого класса</h3>
+
+<p>Со Spring Data ты пишешь <strong>только интерфейс</strong> — реализацию Spring создаёт сам:</p>
+
+<pre><code>public interface ProductRepository extends JpaRepository&lt;Product, Long&gt; {
+    // ВСЁ. Десятки методов уже доступны.
+}</code></pre>
+
+<table>
+  <tr><th>Без Spring Data JPA</th><th>Со Spring Data JPA</th></tr>
+  <tr><td>Boilerplate DAO-код для каждой сущности</td><td>Интерфейс — и реализация создаётся автоматически</td></tr>
+  <tr><td>Запросы писать вручную</td><td>Часть запросов выводится из имени метода</td></tr>
+  <tr><td>Пагинацию и сортировку настраивать вручную</td><td>Стандартные <code>Pageable</code>, <code>Page</code>, <code>Slice</code>, <code>Sort</code></td></tr>
+  <tr><td>DTO-выборки требуют отдельной ручной логики</td><td>Можно использовать projections</td></tr>
+  <tr><td>Динамические фильтры громоздки</td><td>Можно собирать <code>Specification</code> из условий</td></tr>
+</table>
+
+<div class="mermaid">
+  graph LR
+  A[Service layer] --> B[Repository interface]
+  B --> C[Spring Data proxy]
+  C --> D[EntityManager]
+  D --> E[Hibernate]
+  E --> F[SQL]
+</div>
+
+<h3>📁 Связанный код</h3>
+<ul>
+  <li><span class="file-link">SpringDataJpaApplication.java</span></li>
+  <li><span class="file-link">ProductRepository.java</span></li>
+  <li><span class="file-link">QueryProductRepository.java</span></li>
+  <li><span class="file-link">SpringDataDemoService.java</span></li>
+</ul>
+
+<div class="note">
+  <strong>Тема проекта:</strong> используются те же модели, что и в Hibernate-модуле: <span class="file-link">Product.java</span>, <span class="file-link">Category.java</span>, <span class="file-link">Tag.java</span>, <span class="file-link">Customer.java</span>, <span class="file-link">CustomerOrder.java</span>, <span class="file-link">ProductDetails.java</span>
+</div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 2 ==================== -->
+<h2 id="section2">2. Spring Data Repository: иерархия интерфейсов</h2>
+
+<p>Все готовые методы не свалены в один огромный интерфейс — они <strong>разложены по уровням</strong>. Каждый следующий уровень наследует предыдущий и добавляет своё.</p>
+
+<h3>Что даёт каждый уровень</h3>
+
+<table>
+  <tr><th>Интерфейс</th><th>Что добавляет</th></tr>
+  <tr><td><code>Repository</code></td><td>Пустой маркер — просто говорит «я репозиторий»</td></tr>
+  <tr><td><code>CrudRepository</code></td><td><code>save()</code>, <code>findById()</code>, <code>delete()</code>, <code>existsById()</code>, <code>count()</code>, <code>findAll()</code> → <code>Iterable</code></td></tr>
+  <tr><td><code>ListCrudRepository</code></td><td>Те же CRUD-методы, но <code>findAll()</code> возвращает <code>List</code> вместо <code>Iterable</code></td></tr>
+  <tr><td><code>PagingAndSortingRepository</code></td><td><code>findAll(Pageable)</code>, <code>findAll(Sort)</code> — пагинация и сортировка</td></tr>
+  <tr><td><code>ListPagingAndSortingRepository</code></td><td>Пагинация и сортировка с удобным <code>List</code></td></tr>
+  <tr><td><code>JpaRepository</code></td><td><strong>Объединяет обе ветки</strong> + JPA-специфика: <code>flush()</code>, <code>saveAndFlush()</code>, <code>deleteAllInBatch()</code>, <code>getReferenceById()</code></td></tr>
+</table>
+
+<h3>Две ветки сходятся в одну</h3>
+
+<p>Есть CRUD-ветка и ветка пагинации. <code>JpaRepository</code> наследует обе — поэтому от него обычно и наследуются:</p>
+
+<div class="mermaid">
+  graph TD
+  R["Repository — маркер"]
+  CR["CrudRepository — save, findById, delete..."]
+  LCR["ListCrudRepository — findAll() → List"]
+  PSR["PagingAndSortingRepository — findAll(Pageable)"]
+  LPSR["ListPagingAndSortingRepository — List + пагинация"]
+  JR["JpaRepository — flush, batch, всё вместе"]
+  PR["ProductRepository — твой интерфейс"]
+
+  R --> CR
+  CR --> LCR
+  R --> PSR
+  PSR --> LPSR
+  LCR --> JR
+  LPSR --> JR
+  JR --> PR
+</div>
+
+<h3>Что ты получаешь, наследуясь от JpaRepository</h3>
+
+<pre><code>// В сервисе — все эти методы уже есть, ни один не нужно писать:
+
+productRepository.save(product);              // из CrudRepository
+productRepository.findById(1L);               // из CrudRepository
+productRepository.findAll();                  // из ListCrudRepository (→ List)
+productRepository.deleteById(1L);             // из CrudRepository
+productRepository.count();                    // из CrudRepository
+productRepository.existsById(1L);             // из CrudRepository
+
+productRepository.findAll(pageable);          // из PagingAndSortingRepository
+productRepository.findAll(Sort.by("name"));   // из PagingAndSortingRepository
+
+productRepository.flush();                    // из JpaRepository
+productRepository.saveAndFlush(product);      // из JpaRepository
+productRepository.deleteAllInBatch();         // из JpaRepository</code></pre>
+
+<h3>Дополнительный интерфейс: JpaSpecificationExecutor</h3>
+
+<p><code>JpaSpecificationExecutor</code> — <strong>не часть основной иерархии</strong>, а отдельный интерфейс для динамической фильтрации. Подключается при необходимости:</p>
+
+<pre><code>public interface ProductRepository
+    extends JpaRepository&lt;Product, Long&gt;,          // CRUD + пагинация + JPA
+            JpaSpecificationExecutor&lt;Product&gt; {     // + динамические фильтры
+}</code></pre>
+
+<h3>Как это работает под капотом</h3>
+
+<p>Ты пишешь <strong>только интерфейс</strong> — реализации нет. При запуске приложения Spring сканирует интерфейсы, наследующие <code>Repository</code>, и для каждого создаёт <strong>proxy-объект</strong> — динамическую реализацию, которая внутри делегирует вызовы в <code>EntityManager</code>:</p>
+
+<div class="mermaid">
+  graph LR
+  A["ProductRepository<br/>(интерфейс)"] --> B["Spring при старте<br/>находит интерфейс"]
+  B --> C["Создаёт proxy-объект<br/>(динамическая реализация)"]
+  C --> D["Proxy внутри вызывает<br/>EntityManager"]
+  D --> E["Hibernate<br/>генерирует SQL"]
+  E --> F[("База данных")]
+</div>
+
+<p>Упрощённо, Spring создаёт за тебя что-то вроде:</p>
+
+<pre><code>// ЭТО Spring генерирует автоматически (ты этот код не пишешь):
+public class ProductRepositoryProxy implements ProductRepository {
+
+    private EntityManager em;
+
+    public Product save(Product entity) {
+        // внутри вызывает em.persist() или em.merge()
+    }
+
+    public Optional&lt;Product&gt; findById(Long id) {
+        // внутри вызывает em.find(Product.class, id)
+    }
+
+    public List&lt;Product&gt; findAll() {
+        // внутри создаёт JPQL: "select p from Product p"
+    }
+
+    public void deleteById(Long id) {
+        // внутри вызывает em.find() + em.remove()
+    }
+
+    // ... все остальные методы из иерархии
+}</code></pre>
+
+<h3>Шпаргалка: что от чего наследовать</h3>
+
+<table>
+  <tr><th>Что нужно</th><th>От чего наследоваться</th></tr>
+  <tr><td>Только базовый CRUD</td><td><code>CrudRepository</code></td></tr>
+  <tr><td>CRUD с удобными <code>List</code>-методами</td><td><code>ListCrudRepository</code></td></tr>
+  <tr><td>Всё + JPA-фишки + пагинация <strong>(99% случаев)</strong></td><td><code>JpaRepository</code></td></tr>
+  <tr><td>+ динамические фильтры</td><td><code>JpaRepository</code> + <code>JpaSpecificationExecutor</code></td></tr>
+</table>
+
+<div class="endpoint">GET /api/demo/repository-hierarchy</div>
+
+<h3>📁 Связанный код</h3>
+<ul>
+  <li><span class="file-link">ProductRepository.java</span></li>
+  <li><span class="file-link">SpringDataDemoService.java</span></li>
+  <li><span class="file-link">DemoController.java</span></li>
+</ul>
+
+<div class="note">
+  <strong>Тест:</strong> <span class="file-link">Section1_RepositoryHierarchyTest</span>
+</div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 3 ==================== -->
+<h2 id="section3">3. Query Methods</h2>
+
+<p>Одна из самых известных возможностей Spring Data JPA — вывод запроса из имени метода репозитория.</p>
+
+<table>
+  <tr><th>Пример метода</th><th>Идея</th></tr>
+  <tr><td><code>findByTypeOrderByName(String type)</code></td><td>Найти продукты по типу и отсортировать по имени</td></tr>
+  <tr><td><code>findByCategory_Title(String title)</code></td><td>Найти продукты по полю связанной сущности</td></tr>
+  <tr><td><code>findByPriceGreaterThanOrderByPriceDesc(BigDecimal price)</code></td><td>Фильтр по числовому условию и сортировка</td></tr>
+</table>
+
+<div class="mermaid">
+  flowchart LR
+  M[Method name] --> P[Spring Data parser]
+  P --> Q[Derived query]
+  Q --> JPA[JPA query execution]
+  JPA --> DB[(Database)]
+</div>
+
+<h3>Примеры из проекта</h3>
+<pre><code>List&lt;Product&gt; findByTypeOrderByName(String type);
+
+List&lt;Product&gt; findByCategory_Title(String title);
+
+List&lt;Product&gt; findByPriceGreaterThanOrderByPriceDesc(BigDecimal price);</code></pre>
+
+<h3>Что удобно</h3>
+<ul>
+  <li>не надо писать JPQL для простых сценариев;</li>
+  <li>можно идти по вложенным свойствам, например <code>Category_Title</code>;</li>
+  <li>можно добавлять сортировку прямо в имя метода.</li>
+</ul>
+
+<h3>Ограничения</h3>
+<div class="warn">
+  Чем сложнее условие, тем менее читаемым становится имя метода. Для сложных сценариев лучше использовать <code>@Query</code>, projections или specifications.
+</div>
+
+<div class="endpoint">GET /api/demo/query-methods</div>
+
+<h3>📁 Связанный код</h3>
+<ul>
+  <li><span class="file-link">ProductRepository.java</span></li>
+  <li><span class="file-link">SpringDataDemoService.java</span></li>
+</ul>
+
+<div class="note">
+  <strong>Тест:</strong> <span class="file-link">Section2_QueryMethodsTest</span>
+</div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 4 ==================== -->
+<h2 id="section4">4. @Query и native queries</h2>
+
+<p>Если query method уже не подходит по сложности или хочется явно контролировать текст запроса, используют <code>@Query</code>.</p>
+
+<table>
+  <tr><th>Подход</th><th>Когда использовать</th></tr>
+  <tr><td><code>@Query</code> с JPQL</td><td>Когда нужен читаемый объектно-ориентированный запрос</td></tr>
+  <tr><td><code>@Query(nativeQuery = true)</code></td><td>Когда нужен SQL конкретной БД или уже есть готовый SQL</td></tr>
+</table>
+
+<h3>Примеры</h3>
+<pre><code>@Query("select p from Product p where p.type = :type and p.price &gt; :price order by p.name")
+List&lt;Product&gt; findExpensiveByType(String type, BigDecimal price);
+
+@Query(value = "select * from products where type = :type order by name", nativeQuery = true)
+List&lt;Product&gt; findNativeByType(String type);</code></pre>
+
+<div class="note">
+  <strong>JPQL</strong> работает с entity и их полями, а не с таблицами и колонками.<br/>
+  <strong>native SQL</strong> работает напрямую с таблицами базы данных.
+</div>
+
+<div class="mermaid">
+  graph LR
+  A["@Query JPQL"] --> B[Entity model]
+  B --> C[Hibernate SQL generation]
+  C --> DB[(DB)]
+
+  D["@Query native SQL"] --> E[Raw SQL]
+  E --> DB
+</div>
+
+<h3>Практика выбора</h3>
+<ul>
+  <li>для обычной бизнес-логики сначала пробуют query methods;</li>
+  <li>если выражение становится слишком длинным — используют <code>@Query</code>;</li>
+  <li>native query берут, когда нужен именно SQL, который трудно или неудобно выразить через JPQL.</li>
+</ul>
+
+<div class="endpoint">GET /api/demo/query-annotation</div>
+
+<h3>📁 Связанный код</h3>
+<ul>
+  <li><span class="file-link">QueryProductRepository.java</span></li>
+  <li><span class="file-link">SpringDataDemoService.java</span></li>
+</ul>
+
+<div class="note">
+  <strong>Тест:</strong> <span class="file-link">Section3_QueryAnnotationTest</span>
+</div>
+
+<hr class="section-divider"/>
+
+<h3 id="section4-1">4.1. Сложные результаты из @Query</h3>
+
+<p>Простые запросы возвращают <code>List&lt;Product&gt;</code>. Но что если нужно вернуть вложенные объекты, агрегации, данные из нескольких таблиц?</p>
+
+<p>Есть <strong>6 подходов</strong>, каждый для своей ситуации:</p>
+
+<table>
+  <tr><th>Подход</th><th>Возвращает</th><th>Когда использовать</th></tr>
+  <tr>
+    <td><strong>JOIN FETCH</strong></td>
+    <td>Entity с загруженными ассоциациями</td>
+    <td>Нужен полный граф объекта с Category, Tags и т.д. одним SQL</td>
+  </tr>
+  <tr>
+    <td><strong>select new DTO()</strong></td>
+    <td>Плоский DTO (record)</td>
+    <td>Нужны поля из разных таблиц в одном плоском объекте</td>
+  </tr>
+  <tr>
+    <td><strong>Nested projection</strong></td>
+    <td>Интерфейс с вложенными интерфейсами</td>
+    <td>Read-only с вложенной структурой, без ручного маппинга</td>
+  </tr>
+  <tr>
+    <td><strong>Tuple</strong></td>
+    <td><code>Tuple</code> с доступом по алиасу</td>
+    <td>Агрегации: GROUP BY, COUNT, AVG, MIN, MAX</td>
+  </tr>
+  <tr>
+    <td><strong>Native + Object[]</strong></td>
+    <td>Массив объектов</td>
+    <td>Сложный SQL с подзапросами, оконными функциями</td>
+  </tr>
+  <tr>
+    <td><strong>Сборка в сервисе</strong></td>
+    <td>Map / List, собранные из нескольких запросов</td>
+    <td>Сложный вложенный JSON-ответ для API</td>
+  </tr>
+</table>
+
+<h4>JOIN FETCH — загрузка связей одним запросом</h4>
+
+<pre><code>@Query("select distinct p from Product p " +
+       "join fetch p.category " +
+       "left join fetch p.tags " +
+       "where p.type = :type order by p.name")
+List&lt;Product&gt; findWithCategoryAndTagsByType(String type);</code></pre>
+
+<div class="good">
+  Без <code>fetch</code> связи будут lazy — при сериализации в JSON получите <code>LazyInitializationException</code>. <code>JOIN FETCH</code> загружает всё одним SQL.
+</div>
+
+<h4>select new DTO() — плоский объект из JPQL</h4>
+
+<pre><code>public record ProductSummaryDto(Long id, String name, BigDecimal price, String categoryTitle) {}
+
+@Query("select new com.example.springdatajpa.dto.ProductSummaryDto(" +
+       "p.id, p.name, p.price, p.category.title) " +
+       "from Product p where p.type = :type order by p.name")
+List&lt;ProductSummaryDto&gt; findSummariesByType(String type);</code></pre>
+
+<div class="note">
+  DTO должен быть <strong>плоским</strong> — нельзя передать коллекцию в конструктор. Зато можно собрать поля из нескольких связанных сущностей.
+</div>
+
+<h4>Вложенные интерфейсные проекции</h4>
+
+<pre><code>public interface ProductFullView {
+    Long getId();
+    String getName();
+    BigDecimal getPrice();
+
+    CategoryView getCategory();       // вложенная проекция
+    Set&lt;TagView&gt; getTags();           // коллекция вложенных проекций
+
+    interface CategoryView {
+        Long getId();
+        String getTitle();
+    }
+
+    interface TagView {
+        Long getId();
+        String getName();
+    }
+}
+
+List&lt;ProductFullView&gt; findProductFullViewByType(String type);</code></pre>
+
+<div class="warn">
+  Вложенные проекции удобны, но под капотом могут генерировать <strong>N+1 запросов</strong> для коллекций. Для критичных мест лучше JOIN FETCH.
+</div>
+
+<h4>Tuple — аналитика и агрегации</h4>
+
+<pre><code>@Query("select p.type as type, count(p) as productCount, " +
+       "avg(p.price) as avgPrice, min(p.price) as minPrice, max(p.price) as maxPrice " +
+       "from Product p group by p.type")
+List&lt;Tuple&gt; findStatsByTypeTuple();
+
+// В сервисе:
+tuples.stream().map(t -&gt; new TypeStatsDto(
+    t.get("type", String.class),
+    t.get("productCount", Long.class),
+    BigDecimal.valueOf(t.get("avgPrice", Double.class)),
+    t.get("minPrice", BigDecimal.class),
+    t.get("maxPrice", BigDecimal.class)
+));</code></pre>
+
+<h4>Native SQL + ручной маппинг</h4>
+
+<pre><code>@Query(value =
+    "select p.id, p.name, p.price, p.type, c.title as category_title, " +
+    "  (select count(*) from product_tags pt where pt.product_id = p.id) as tag_count " +
+    "from products p join categories c on p.category_id = c.id " +
+    "where p.type = :type order by p.name",
+    nativeQuery = true)
+List&lt;Object[]&gt; findProductReportNative(String type);</code></pre>
+
+<h4>Сборка в сервисе</h4>
+
+<p>Иногда самый читаемый подход — несколько простых запросов, результаты которых собираются в <code>Map</code>/<code>List</code> в сервисном слое. Это особенно удобно для сложных вложенных JSON-ответов.</p>
+
+<div class="mermaid">
+  flowchart LR
+  subgraph "Простой результат"
+  A["List&lt;Entity&gt;"]
+  end
+  subgraph "Сложный результат"
+  B["JOIN FETCH → Entity + граф"]
+  C["select new → плоский DTO"]
+  D["Nested projection → вложенные интерфейсы"]
+  E["Tuple → агрегации"]
+  F["Object[] → native SQL"]
+  G["Сборка в сервисе → Map/List"]
+  end
+  A --> B
+  A --> C
+  A --> D
+  A --> E
+  A --> F
+  A --> G
+</div>
+
+<div class="endpoint">GET /api/demo/complex-queries?type=DEVICE</div>
+
+<h4>📁 Связанный код</h4>
+<ul>
+  <li><span class="file-link">dto/ProductSummaryDto.java</span></li>
+  <li><span class="file-link">dto/TypeStatsDto.java</span></li>
+  <li><span class="file-link">repository/projection/ProductFullView.java</span></li>
+  <li><span class="file-link">repository/QueryProductRepository.java</span></li>
+  <li><span class="file-link">service/ComplexQueryDemoService.java</span></li>
+</ul>
+
+<!-- ==================== SECTION 5 ==================== -->
+<h2 id="section5">5. Пагинация и сортировка: Pageable, Page, Slice</h2>
+
+<p>Spring Data JPA умеет работать с пагинацией и сортировкой через стандартные абстракции.</p>
+
+<table>
+  <tr><th>Тип</th><th>Что содержит</th><th>Когда удобен</th></tr>
+  <tr><td><code>Pageable</code></td><td>Номер страницы, размер, сортировку</td><td>Входной параметр для запроса</td></tr>
+  <tr><td><code>Page</code></td><td>Контент + total elements + total pages</td><td>Когда нужна полная информация о пагинации</td></tr>
+  <tr><td><code>Slice</code></td><td>Контент + информация, есть ли следующая часть</td><td>Когда не нужен полный <code>count(*)</code></td></tr>
+  <tr><td><code>Sort</code></td><td>Описание сортировки</td><td>Отдельно или внутри <code>Pageable</code></td></tr>
+</table>
+
+<div class="mermaid">
+  flowchart LR
+  P[Pageable] --> Q[Repository method]
+  Q --> PG[Page or Slice]
+  P --> S[Sort]
+</div>
+
+<h3>Примеры из проекта</h3>
+<pre><code>Page&lt;Product&gt; findByPriceGreaterThan(BigDecimal price, Pageable pageable);
+
+Slice&lt;Product&gt; findByType(String type, Pageable pageable);</code></pre>
+
+<h3>Page</h3>
+<div class="good">
+  <strong>Page</strong> удобен, когда на UI нужно показать:
+  <ul>
+    <li>общее число элементов;</li>
+    <li>общее число страниц;</li>
+    <li>текущую страницу.</li>
+  </ul>
+</div>
+
+<h3>Slice</h3>
+<div class="note">
+  <strong>Slice</strong> легче: обычно не требует отдельного полного подсчёта всех строк и хорошо подходит для бесконечной прокрутки, «загрузить ещё» и похожих сценариев.
+</div>
+
+<h3>Сортировка</h3>
+<pre><code>Pageable pageable = PageRequest.of(0, 3, Sort.by(Sort.Direction.ASC, "name"));</code></pre>
+
+<div class="endpoint">GET /api/demo/pagination/page?page=0&amp;size=3</div>
+<div class="endpoint">GET /api/demo/pagination/slice?page=0&amp;size=2</div>
+
+<h3>📁 Связанный код</h3>
+<ul>
+  <li><span class="file-link">ProductRepository.java</span></li>
+  <li><span class="file-link">SpringDataDemoService.java</span></li>
+</ul>
+
+<div class="note">
+  <strong>Тест:</strong> <span class="file-link">Section4_PaginationTest</span>
+</div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 6 ==================== -->
+<h2 id="section6">6. Projections</h2>
+
+<p>Проекции позволяют выбрать не всю entity, а только нужные поля. Это удобно для read-only сценариев и уменьшения объёма данных.</p>
+
+<table>
+  <tr><th>Вид</th><th>Идея</th></tr>
+  <tr><td>Interface-based projection</td><td>Spring Data создаёт прокси под интерфейс с нужными геттерами</td></tr>
+  <tr><td>DTO projection</td><td>Запрос возвращает готовый DTO</td></tr>
+</table>
+
+<h3>Пример интерфейсной проекции</h3>
+<pre><code>public interface ProductView {
+  Long getId();
+  String getName();
+  BigDecimal getPrice();
+}</code></pre>
+
+<pre><code>List&lt;ProductView&gt; findProjectedByTypeOrderByName(String type);</code></pre>
+
+<div class="mermaid">
+  graph LR
+  A[Repository method] --> B[Projection interface]
+  B --> C[Only selected fields]
+  C --> D[Smaller read model]
+</div>
+
+<div class="good">
+  <strong>Когда это полезно:</strong>
+  <ul>
+    <li>списки для REST API;</li>
+    <li>таблицы на UI;</li>
+    <li>read-only сценарии;</li>
+    <li>когда не нужен полный граф сущности.</li>
+  </ul>
+</div>
+
+<div class="warn">
+  Проекции не заменяют entity-модель. Они хороши для чтения, но не для модификации доменного состояния.
+</div>
+
+<div class="endpoint">GET /api/demo/projections</div>
+
+<h3>📁 Связанный код</h3>
+<ul>
+  <li><span class="file-link">ProductView.java</span></li>
+  <li><span class="file-link">ProductRepository.java</span></li>
+  <li><span class="file-link">SpringDataDemoService.java</span></li>
+</ul>
+
+<div class="note">
+  <strong>Тест:</strong> <span class="file-link">Section5_ProjectionTest</span>
+</div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 7 ==================== -->
+<h2 id="section7">7. Specifications</h2>
+
+<p><code>Specification</code> используется для динамической сборки условий запроса. Это удобно, когда фильтры приходят от пользователя и их комбинация заранее неизвестна.</p>
+
+<h3>Пример спецификаций</h3>
+<pre><code>public static Specification&lt;Product&gt; hasType(String type) {
+  return (root, query, cb) -&gt; cb.equal(root.get("type"), type);
+}
+
+public static Specification&lt;Product&gt; nameContains(String text) {
+  return (root, query, cb) -&gt; {
+    String escaped = escapeLike(text.toLowerCase());
+    return cb.like(cb.lower(root.get("name")), "%" + escaped + "%", '\\');
+  };
+}
+
+public static Specification&lt;Product&gt; priceGreaterThan(BigDecimal price) {
+  return (root, query, cb) -&gt; cb.greaterThan(root.get("price"), price);
+}
+
+private static String escapeLike(String value) {
+  return value
+      .replace("\\", "\\\\")
+      .replace("%", "\\%")
+      .replace("_", "\\_");
+}</code></pre>
+
+<h3>Комбинация условий</h3>
+<pre><code>List&lt;Specification&lt;Product&gt;&gt; specs = new ArrayList&lt;&gt;();
+
+if (type != null &amp;&amp; !type.isBlank()) {
+  specs.add(ProductSpecification.hasType(type));
+}
+if (name != null &amp;&amp; !name.isBlank()) {
+  specs.add(ProductSpecification.nameContains(name));
+}
+if (minPrice != null) {
+  specs.add(ProductSpecification.priceGreaterThan(minPrice));
+}
+
+Specification&lt;Product&gt; spec = Specification.allOf(specs);</code></pre>
+
+<div class="mermaid">
+  flowchart TD
+  A[Input filters] --> B[Specification builder]
+  B --> C[Combined Specification]
+  C --> D[JpaSpecificationExecutor]
+  D --> E[Generated criteria query]
+</div>
+
+<div class="note">
+  Для поддержки specifications репозиторий должен расширять <code>JpaSpecificationExecutor&lt;T&gt;</code>.
+</div>
+
+<div class="good">
+  <strong>Плюсы:</strong>
+  <ul>
+    <li>удобно собирать фильтры по частям;</li>
+    <li>легче переиспользовать условия;</li>
+    <li>лучше читается, чем один огромный query method.</li>
+  </ul>
+</div>
+
+<div class="endpoint">GET /api/demo/specifications?type=DEVICE&amp;name=pho&amp;minPrice=500</div>
+
+<h3>📁 Связанный код</h3>
+<ul>
+  <li><span class="file-link">ProductSpecification.java</span></li>
+  <li><span class="file-link">ProductRepository.java</span></li>
+  <li><span class="file-link">SpringDataDemoService.java</span></li>
+</ul>
+
+<div class="note">
+  <strong>Тест:</strong> <span class="file-link">Section6_SpecificationTest</span>
+</div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 8 ==================== -->
+<h2 id="section8">8. Глоссарий терминов</h2>
+
+<table>
+  <tr><th>Термин</th><th>Смысл</th></tr>
+  <tr><td><strong>Repository</strong></td><td>Абстракция доступа к данным в Spring Data</td></tr>
+  <tr><td><strong>JpaRepository</strong></td><td>Основной Spring Data интерфейс для JPA-репозиториев</td></tr>
+  <tr><td><strong>Query Method</strong></td><td>Метод, по имени которого Spring строит запрос</td></tr>
+  <tr><td><strong>@Query</strong></td><td>Аннотация для явного задания JPQL или SQL</td></tr>
+  <tr><td><strong>Native Query</strong></td><td>Запрос на SQL конкретной БД</td></tr>
+  <tr><td><strong>Pageable</strong></td><td>Параметр пагинации и сортировки</td></tr>
+  <tr><td><strong>Page</strong></td><td>Страница результата с общим количеством элементов</td></tr>
+  <tr><td><strong>Slice</strong></td><td>Часть результата без полного total count</td></tr>
+  <tr><td><strong>Sort</strong></td><td>Описание сортировки</td></tr>
+  <tr><td><strong>Projection</strong></td><td>Частичное представление данных вместо полной entity</td></tr>
+  <tr><td><strong>Specification</strong></td><td>Объект для динамического построения критериев запроса</td></tr>
+  <tr><td><strong>EntityGraph</strong></td><td>Способ задать fetch plan для ассоциаций</td></tr>
+  <tr><td><strong>Derived Query</strong></td><td>Запрос, сгенерированный из имени метода</td></tr>
+  <tr><td><strong>Proxy</strong></td><td>Динамически созданная реализация интерфейса репозитория</td></tr>
+</table>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 9 ==================== -->
+<h2 id="section9">9. Структура проекта</h2>
+
+<div class="card">
+<pre><code>05-spring-data-jpa
+├── pom.xml
+├── README.md
+└── src
+    ├── main
+    │   ├── java/com/example/springdatajpa
+    │   │   ├── SpringDataJpaApplication.java
+    │   │   ├── config
+    │   │   │   └── DemoDataInitializer.java
+    │   │   ├── controller
+    │   │   │   ├── DemoController.java
+    │   │   │   └── GlobalExceptionHandler.java
+    │   │   ├── entity
+    │   │   │   ├── Category.java
+    │   │   │   ├── Customer.java
+    │   │   │   ├── CustomerOrder.java
+    │   │   │   ├── Product.java
+    │   │   │   ├── ProductDetails.java
+    │   │   │   └── Tag.java
+    │   │   ├── exception
+    │   │   │   ├── CategoryNotFoundException.java
+    │   │   │   └── ProductNotFoundException.java
+    │   │   ├── model
+    │   │   │   └── ApiModels.java
+    │   │   ├── repository
+    │   │   │   ├── CategoryRepository.java
+    │   │   │   ├── ProductRepository.java
+    │   │   │   ├── QueryProductRepository.java
+    │   │   │   ├── projection
+    │   │   │   │   └── ProductView.java
+    │   │   │   └── specification
+    │   │   │       └── ProductSpecification.java
+    │   │   └── service
+    │   │       └── SpringDataDemoService.java
+    │   └── resources
+    │       ├── application.yaml
+    │       └── static
+    │           └── index.html
+    └── test
+        └── java/com/example/springdatajpa
+            ├── Section1_RepositoryHierarchyTest.java
+            ├── Section2_QueryMethodsTest.java
+            ├── Section3_QueryAnnotationTest.java
+            ├── Section4_PaginationTest.java
+            ├── Section5_ProjectionTest.java
+            ├── Section6_SpecificationTest.java
+            └── Section7_EntityGraphSupportTest.java</code></pre>
+</div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 10 ==================== -->
+<h2 id="section10">10. Endpoint'ы API</h2>
+
+<div class="endpoint">GET /api/demo/repository-hierarchy</div>
+<div class="endpoint">GET /api/demo/query-methods</div>
+<div class="endpoint">GET /api/demo/query-annotation</div>
+<div class="endpoint">GET /api/demo/pagination/page?page=0&amp;size=3</div>
+<div class="endpoint">GET /api/demo/pagination/slice?page=0&amp;size=2</div>
+<div class="endpoint">GET /api/demo/projections</div>
+<div class="endpoint">GET /api/demo/specifications?type=DEVICE&amp;name=pho&amp;minPrice=500</div>
+
+<table>
+  <tr><th>Endpoint</th><th>Что демонстрирует</th></tr>
+  <tr><td><code>GET /api/demo/repository-hierarchy</code></td><td>Иерархию интерфейсов Spring Data Repository</td></tr>
+  <tr><td><code>GET /api/demo/query-methods</code></td><td>Генерацию запросов по имени метода</td></tr>
+  <tr><td><code>GET /api/demo/query-annotation</code></td><td>JPQL и native query через <code>@Query</code></td></tr>
+  <tr><td><code>GET /api/demo/pagination/page</code></td><td>Пагинацию через <code>Page</code></td></tr>
+  <tr><td><code>GET /api/demo/pagination/slice</code></td><td>Пагинацию через <code>Slice</code></td></tr>
+  <tr><td><code>GET /api/demo/projections</code></td><td>Проекции для оптимизации выборки</td></tr>
+  <tr><td><code>GET /api/demo/specifications</code></td><td>Динамическую фильтрацию через specifications</td></tr>
+</table>
+
 </body>
 </html>

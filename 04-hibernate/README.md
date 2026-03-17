@@ -42,15 +42,6 @@ java -jar target/hibernate-demo-1.0.0.jar
 src/main/resources/static/index.html
 ```
 
-Thymeleaf настроен на папку `static`:
-
-```yaml
-spring:
-  thymeleaf:
-    prefix: classpath:/static/
-    suffix: .html
-```
-
 После запуска приложения откройте в браузере:
 
 - `http://localhost:8888/`  

@@ -36,11 +36,6 @@ spring:
           region.factory_class: jcache
         javax.cache:
           provider: org.ehcache.jsr107.EhcacheCachingProvider
-  thymeleaf:
-    prefix: classpath:/static/
-    suffix: .html
-    mode: HTML
-    cache: false
 
 logging:
   level:
