@@ -98,4 +98,21 @@ public final class ApiModels {
       List<ProductShortDto> items
   ) {
   }
+
+  public record ProductSummaryDto(
+      Long id,
+      String name,
+      BigDecimal price,
+      String categoryTitle
+  ) {
+  }
+
+  public record TypeStatsDto(
+      String type,
+      long productCount,
+      BigDecimal avgPrice,
+      BigDecimal minPrice,
+      BigDecimal maxPrice
+  ) {
+  }
 }

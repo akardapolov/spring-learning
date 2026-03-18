@@ -1,7 +1,7 @@
 package com.example.springdatajpa.service;
 
-import com.example.springdatajpa.dto.ProductSummaryDto;
-import com.example.springdatajpa.dto.TypeStatsDto;
+import com.example.springdatajpa.model.ApiModels.ProductSummaryDto;
+import com.example.springdatajpa.model.ApiModels.TypeStatsDto;
 import com.example.springdatajpa.entity.Product;
 import com.example.springdatajpa.repository.QueryProductRepository;
 import com.example.springdatajpa.repository.projection.ProductFullView;

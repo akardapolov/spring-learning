@@ -1,6 +1,6 @@
 package com.example.springdatajpa.repository;
 
-import com.example.springdatajpa.dto.ProductSummaryDto;
+import com.example.springdatajpa.model.ApiModels.ProductSummaryDto;
 import com.example.springdatajpa.entity.Product;
 import com.example.springdatajpa.repository.projection.ProductFullView;
 import jakarta.persistence.Tuple;
@@ -28,7 +28,7 @@ public interface QueryProductRepository extends JpaRepository<Product, Long> {
       "where p.type = :type order by p.name")
   List<Product> findWithCategoryAndTagsByType(String type);
 
-  @Query("select new com.example.springdatajpa.dto.ProductSummaryDto(" +
+  @Query("select new com.example.springdatajpa.model.ApiModels$ProductSummaryDto(" +
       "p.id, p.name, p.price, p.category.title) " +
       "from Product p where p.type = :type order by p.name")
   List<ProductSummaryDto> findSummariesByType(String type);
