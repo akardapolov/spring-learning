@@ -1,47 +1,893 @@
+<!-- filename: 06-spring-data-jdbc/src/main/resources/static/index.html -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Модуль в разработке</title>
+  <meta charset="UTF-8">
+  <title>Spring Data JDBC — теория и демо</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>mermaid.initialize({startOnLoad: true, theme: 'default'});</script>
   <style>
     body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f7f7f8;
-      color: #222;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 20px;
+        line-height: 1.7;
+        color: #333;
+        background: #fafafa;
     }
-
-    .container {
-      text-align: center;
-      background: white;
-      padding: 40px 32px;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-      max-width: 500px;
-      width: 90%;
-    }
-
     h1 {
-      margin: 0 0 12px;
-      font-size: 28px;
+        color: #2c3e50;
+        border-bottom: 3px solid #27ae60;
+        padding-bottom: 10px;
     }
-
-    p {
-      margin: 0;
-      font-size: 16px;
-      color: #555;
+    h2 {
+        color: #27ae60;
+        margin-top: 50px;
+        border-left: 4px solid #2ecc71;
+        padding-left: 12px;
+    }
+    h3 {
+        color: #16a085;
+        margin-top: 28px;
+    }
+    h4 {
+        color: #8e44ad;
+        margin-top: 20px;
+    }
+    pre {
+        background: #2d2d2d;
+        color: #f8f8f2;
+        padding: 16px;
+        border-radius: 6px;
+        overflow-x: auto;
+        font-size: 14px;
+    }
+    code {
+        background: #ecf0f1;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 14px;
+    }
+    pre code {
+        background: none;
+        padding: 0;
+    }
+    .mermaid {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        margin: 16px 0;
+        overflow-x: auto;
+    }
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 12px 0;
+        background: white;
+    }
+    th, td {
+        border: 1px solid #bdc3c7;
+        padding: 10px;
+        text-align: left;
+        vertical-align: top;
+    }
+    th {
+        background: #27ae60;
+        color: white;
+    }
+    a {
+        color: #2980b9;
+    }
+    .file-link {
+        background: #e8f6f3;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 13px;
+        display: inline-block;
+        margin: 2px 0;
+    }
+    .note {
+        background: #fef9e7;
+        border-left: 4px solid #f1c40f;
+        padding: 12px;
+        margin: 12px 0;
+        border-radius: 4px;
+    }
+    .good {
+        background: #eafaf1;
+        border-left: 4px solid #27ae60;
+        padding: 12px;
+        margin: 12px 0;
+        border-radius: 4px;
+    }
+    .warn {
+        background: #fffbeb;
+        border-left: 4px solid #d97706;
+        padding: 12px;
+        margin: 12px 0;
+        border-radius: 4px;
+    }
+    .toc {
+        background: white;
+        border: 1px solid #dcdcdc;
+        border-radius: 8px;
+        padding: 18px;
+        margin: 20px 0 30px 0;
+    }
+    .toc ul {
+        margin: 0;
+        padding-left: 20px;
+    }
+    .endpoint {
+        background: #eef6ff;
+        border: 1px solid #d6eaff;
+        border-radius: 6px;
+        padding: 10px 12px;
+        margin: 6px 0;
+        font-family: monospace;
+        font-size: 13px;
+    }
+    .endpoint a {
+        text-decoration: none;
+        color: #2563eb;
+    }
+    .endpoint a:hover {
+        text-decoration: underline;
+    }
+    .section-divider {
+        margin: 35px 0;
+        border: none;
+        border-top: 1px solid #ddd;
+    }
+    .card {
+        background: white;
+        border: 1px solid #dcdcdc;
+        border-radius: 12px;
+        padding: 18px 18px 16px;
+        margin: 16px 0;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Модуль в разработке</h1>
-    <p>Материалы для этого раздела скоро появятся.</p>
-  </div>
+
+<h1>Spring Data JDBC — теория и демо</h1>
+<p>Теория, работающий код, тесты и HTTP endpoint'ы для демонстрации Spring Data JDBC — простого, предсказуемого и DDD-ориентированного модуля Spring Data.</p>
+
+<div class="good">
+  <strong>Документация:</strong> <code>http://localhost:8890/</code><br/>
+  <strong>H2 Console:</strong> <a href="/h2-console">/h2-console</a><br/>
+  <strong>JDBC URL:</strong> <code>jdbc:h2:mem:springdatajdbc</code><br/>
+  <strong>User:</strong> <code>sa</code><br/>
+  <strong>Password:</strong> пустой
+</div>
+
+<div class="toc">
+  <h3>Содержание</h3>
+  <ul>
+    <li><a href="#section1">1. Что такое Spring Data JDBC</a></li>
+    <li><a href="#section2">2. Spring Data JDBC vs JPA</a></li>
+    <li><a href="#section3">3. Domain-Driven Design и агрегаты</a></li>
+    <li><a href="#section4">4. Маппинг сущностей и связи</a>
+      <ul>
+        <li><a href="#section4-1">4.1 Aggregate root</a></li>
+        <li><a href="#section4-2">4.2 Дочерние коллекции (@MappedCollection)</a></li>
+        <li><a href="#section4-3">4.3 Value Object (@Embedded)</a></li>
+        <li><a href="#section4-4">4.4 Ссылки между агрегатами (AggregateReference)</a></li>
+        <li><a href="#section4-5">4.5 Оптимистичная блокировка (@Version)</a></li>
+        <li><a href="#section4-6">4.6 Стратегия именования (NamingStrategy)</a></li>
+      </ul>
+    </li>
+    <li><a href="#section5">5. Репозитории: иерархия ListCrudRepository</a></li>
+    <li><a href="#section5-1">5.1 Поведение save() — delete-insert для коллекций</a></li>
+    <li><a href="#section5-2">5.2 Транзакции</a></li>
+    <li><a href="#section6">6. Custom Queries</a></li>
+    <li><a href="#section7">7. Lifecycle Events</a></li>
+    <li><a href="#section8">8. Глоссарий терминов</a></li>
+    <li><a href="#section9">9. Структура проекта</a></li>
+    <li><a href="#section10">10. Endpoint'ы API</a></li>
+    <li><a href="#section11">11. Быстрый старт (curl)</a></li>
+    <li><a href="#section12">12. Тесты</a></li>
+  </ul>
+</div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 1 ==================== -->
+<h2 id="section1">1. Что такое Spring Data JDBC</h2>
+
+<p>
+  Spring Data JDBC — это модуль Spring Data, предоставляющий доступ к реляционным базам данных
+  без накладных расходов полноценного ORM (JPA/Hibernate). Он построен вокруг концепции
+  <strong>агрегатов</strong> из Domain-Driven Design и обеспечивает простой, прозрачный
+  и предсказуемый способ работы с данными.
+</p>
+
+<div class="note">
+  <strong>Ключевая идея:</strong> каждый aggregate root загружается и сохраняется целиком,
+  связи между агрегатами явные (через идентификаторы), а поведение при сохранении
+  — максимально простое и близкое к SQL.
+</div>
+
+<p>
+  В отличие от JPA, здесь нет понятий persistence context, lazy loading, dirty checking
+  или каскадных операций. Всё управляется вручную: вы читаете агрегат, меняете его и
+  явно вызываете <code>save()</code>.
+</p>
+
+<div class="mermaid">
+  graph TB
+  APP[Application] --> Repo[Repository]
+  Repo --> JDBC[Spring Data JDBC]
+  JDBC --> JdbcTemplate[JdbcTemplate]
+  JdbcTemplate --> DB[(Database)]
+</div>
+
+<p>
+  Проект использует <strong>H2</strong> в качестве in-memory базы, схема создаётся через
+  <span class="file-link">schema.sql</span>, начальные данные загружаются через
+  <span class="file-link">DemoDataInitializer.java</span>.
+</p>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 2 ==================== -->
+<h2 id="section2">2. Spring Data JDBC vs JPA</h2>
+
+<p>
+  Основные отличия от традиционного подхода JPA/Hibernate. Эти различия возвращаются
+  эндпоинтом <code>/api/jdbc/differences</code> и проверяются тестом
+  <span class="file-link">Section1_DifferencesTest.java</span>.
+</p>
+
+<table>
+  <thead>
+  <tr><th>Тема</th><th>Spring Data JDBC</th><th>JPA / Hibernate</th></tr>
+  </thead>
+  <tbody>
+  <tr><td>Persistence Context</td><td>Отсутствует</td><td>EntityManager с контекстом</td></tr>
+  <tr><td>Lazy Loading</td><td>Нет — всё загружается в пределах агрегата</td><td>Есть, через прокси</td></tr>
+  <tr><td>Dirty Checking</td><td>Нет — нужно явно вызывать <code>save()</code></td><td>Автоматическое на flush</td></tr>
+  <tr><td>Связи</td><td>Дочерние коллекции внутри агрегата + AggregateReference</td><td>@OneToMany, @ManyToOne, @ManyToMany</td></tr>
+  <tr><td>Сохранение</td><td>Весь агрегат целиком (delete-insert для коллекций)</td><td>Гибкое управление каскадами</td></tr>
+  <tr><td>Идентичность</td><td>Новая сущность — id == null; существующая — id != null</td><td>Управляется persistence context</td></tr>
+  <tr><td>Схема БД</td><td>Явная (schema.sql)</td><td>Может генерироваться автоматически</td></tr>
+  </tbody>
+</table>
+
+<div class="warn">
+  <strong>Важно:</strong> Отсутствие lazy loading означает, что при загрузке агрегата
+  загружаются и все его дочерние элементы. Это упрощает логику, но требует внимательного
+  проектирования границ агрегатов.
+</div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 3 ==================== -->
+<h2 id="section3">3. Domain-Driven Design и агрегаты</h2>
+
+<p>
+  Spring Data JDBC идеально сочетается с DDD-подходом. Основная единица работы —
+  <strong>агрегат</strong> (aggregate), который представляет собой группу объектов,
+  изменяемых как единое целое. Корень агрегата (<strong>aggregate root</strong>) —
+  единственная сущность, имеющая репозиторий.
+</p>
+
+<h3>Агрегаты в проекте</h3>
+
+<div class="mermaid">
+  classDiagram
+  class Category {
+  Long id
+  String title
+  List~CategoryProduct~ products
+  addProduct()
+  removeProduct()
+  }
+  class CategoryProduct {
+  Long id
+  String name
+  String type
+  BigDecimal price
+  ProductDetails details
+  AggregateReference~Tag,Long~ tag
+  Long version
+  }
+  class ProductDetails {
+  String manufacturer
+  String sku
+  }
+  class Tag {
+  Long id
+  String name
+  }
+  class Customer {
+  Long id
+  String name
+  String email
+  List~CustomerOrder~ orders
+  addOrder()
+  }
+  class CustomerOrder {
+  Long id
+  String description
+  }
+
+  Category "1" --> "*" CategoryProduct : contains
+  CategoryProduct --> "1" ProductDetails : embedded
+  CategoryProduct --> "1" Tag : references via AggregateReference
+  Customer "1" --> "*" CustomerOrder : contains
+</div>
+
+<ul>
+  <li><strong>Category</strong> — корень агрегата, владеет списком <code>CategoryProduct</code>.</li>
+  <li><strong>Customer</strong> — корень агрегата, владеет списком <code>CustomerOrder</code>.</li>
+  <li><strong>Tag</strong> — самостоятельный агрегат, на который ссылаются продукты через <code>AggregateReference</code>.</li>
+</ul>
+
+<p>
+  Репозитории созданы только для корней агрегатов:
+  <span class="file-link">CategoryRepository</span>,
+  <span class="file-link">CustomerRepository</span>,
+  <span class="file-link">TagRepository</span>.
+  Дочерние сущности (<code>CategoryProduct</code>, <code>CustomerOrder</code>)
+  не имеют собственных репозиториев и всегда сохраняются/удаляются вместе с родителем.
+</p>
+
+<div class="endpoint"><a href="/api/jdbc/ddd">GET /api/jdbc/ddd</a></div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 4 ==================== -->
+<h2 id="section4">4. Маппинг сущностей и связи</h2>
+
+<p>
+  Маппинг в Spring Data JDBC управляется аннотациями из модуля
+  <code>org.springframework.data.relational.core.mapping</code>.
+</p>
+
+<h3 id="section4-1">4.1 Aggregate root</h3>
+
+<p>
+  Корневая сущность помечается <code>@Table</code> (можно опустить, если имя класса совпадает с именем таблицы),
+  а поле идентификатора — <code>@Id</code>.
+</p>
+
+<pre><code>@Table("categories")
+public class Category {
+  @Id
+  private Long id;
+  private String title;
+  // ...
+}</code></pre>
+
+<h3 id="section4-2">4.2 Дочерние коллекции (@MappedCollection)</h3>
+
+<p>
+  Для хранения дочерних элементов внутри агрегата используется <code>@MappedCollection</code>.
+  Она указывает, что дочерние записи хранятся в отдельной таблице и связаны с родителем через внешний ключ.
+</p>
+
+<pre><code>@MappedCollection(idColumn = "category_id", keyColumn = "product_key")
+private List&lt;CategoryProduct&gt; products = new ArrayList&lt;&gt;();</code></pre>
+
+<ul>
+  <li><code>idColumn</code> — имя колонки в дочерней таблице, содержащей ID родителя.</li>
+  <li><code>keyColumn</code> — колонка, определяющая порядок элементов в коллекции (если используется <code>List</code>).</li>
+</ul>
+
+<p>
+  При сохранении агрегата все дочерние записи будут вставлены/обновлены/удалены автоматически
+  (полная замена коллекции — см. <a href="#section5-1">секцию 5.1</a>).
+</p>
+
+<h3 id="section4-3">4.3 Value Object (@Embedded)</h3>
+
+<p>
+  Value Object (объект-значение) не имеет собственного идентификатора и встраивается
+  в таблицу владельца. В проекте <code>ProductDetails</code> встроен в <code>CategoryProduct</code>.
+</p>
+
+<pre><code>@Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
+private ProductDetails details;</code></pre>
+
+<p>
+  Поля <code>manufacturer</code> и <code>sku</code> из <code>ProductDetails</code>
+  будут сохранены в той же таблице <code>category_product</code>.
+</p>
+
+<h3 id="section4-4">4.4 Ссылки между агрегатами (AggregateReference)</h3>
+
+<p>
+  Для ссылки на другой агрегат используется <code>AggregateReference&lt;T, ID&gt;</code> —
+  типобезопасная обёртка над идентификатором. Это явно показывает, что связь ведёт к другому корню.
+</p>
+
+<pre><code>private AggregateReference&lt;Tag, Long&gt; tag;</code></pre>
+
+<p>
+  В базе хранится просто числовой идентификатор, а при чтении ссылка остаётся ссылкой
+  (объект <code>Tag</code> автоматически НЕ подгружается). Чтобы получить связанный объект,
+  нужно выполнить отдельный запрос через его репозиторий.
+</p>
+
+<h3 id="section4-5">4.5 Оптимистичная блокировка (@Version)</h3>
+
+<p>
+  Для защиты от конкурентных обновлений используется аннотация <code>@Version</code>.
+  Поле с этой аннотацией автоматически увеличивается при каждом сохранении,
+  и если версия в базе изменилась — выбрасывается <code>OptimisticLockingFailureException</code>.
+</p>
+
+<pre><code>@Version
+private Long version;</code></pre>
+
+<div class="note">
+  <strong>Как работает:</strong> при <code>UPDATE</code> в условие <code>WHERE</code> добавляется
+  текущая версия. Если строка не найдена (кто-то обновил раньше) — операция завершается
+  с ошибкой, и приложение может повторить попытку или сообщить об этом пользователю.
+</div>
+
+<h3 id="section4-6">4.6 Стратегия именования (NamingStrategy)</h3>
+
+<p>
+  По умолчанию Spring Data JDBC использует <code>NamingStrategy</code>, которая преобразует
+  имена из Java-стиля (camelCase) в SQL-стиль (snake_case):
+</p>
+
+<table>
+  <thead><tr><th>Java</th><th>SQL</th></tr></thead>
+  <tbody>
+  <tr><td><code>CategoryProduct</code> (класс)</td><td>таблица <code>category_product</code></td></tr>
+  <tr><td><code>productName</code> (поле)</td><td>колонка <code>product_name</code></td></tr>
+  <tr><td><code>customerId</code> (поле)</td><td>колонка <code>customer_id</code></td></tr>
+  </tbody>
+</table>
+
+<p>
+  Явное указание имён через <code>@Table("my_table")</code> и <code>@Column("my_column")</code>
+  имеет приоритет над стратегией именования. В проекте <code>@Table</code> указан на aggregate root'ах
+  для наглядности.
+</p>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 5 ==================== -->
+<h2 id="section5">5. Репозитории: иерархия ListCrudRepository</h2>
+
+<p>
+  В Spring Data JDBC нет JpaRepository, вместо него используется
+  <code>ListCrudRepository</code> (или <code>CrudRepository</code>),
+  который предоставляет базовые CRUD-методы, возвращая <code>List</code> вместо <code>Iterable</code>.
+</p>
+
+<div class="mermaid">
+  graph BT
+  MyRepo[CategoryRepository] -->|extends| LCR[ListCrudRepository - findAll → List]
+  LCR -->|extends| CR[CrudRepository - save, findById, delete, ...]
+  CR -->|extends| R[Repository - маркерный интерфейс]
+</div>
+
+<p>
+  <code>ListCrudRepository</code> включает методы:
+</p>
+<pre><code>&lt;S extends T&gt; S save(S entity);
+Optional&lt;T&gt; findById(ID id);
+boolean existsById(ID id);
+List&lt;T&gt; findAll();
+List&lt;T&gt; findAllById(Iterable&lt;ID&gt; ids);
+long count();
+void deleteById(ID id);
+void delete(T entity);
+void deleteAllById(Iterable&lt;? extends ID&gt; ids);
+void deleteAll(Iterable&lt;? extends T&gt; entities);
+void deleteAll();</code></pre>
+
+<p>
+  Этого достаточно для большинства сценариев. При необходимости можно добавлять
+  derived query methods или аннотированные <code>@Query</code> методы.
+</p>
+
+<h3 id="section5-1">5.1 Поведение save() — delete-insert для коллекций</h3>
+
+<div class="warn">
+  <strong>Критически важно:</strong> при вызове <code>save()</code> для агрегата,
+  Spring Data JDBC <strong>удаляет все</strong> дочерние записи коллекции из базы
+  и <strong>вставляет их заново</strong>. Это гарантирует консистентность агрегата,
+  но может быть неэффективно для больших коллекций.
+</div>
+
+<p>Пример. Если у категории 100 продуктов и вы добавили 1 новый:</p>
+<ol>
+  <li>Spring Data JDBC выполняет <code>DELETE FROM category_product WHERE category_id = ?</code></li>
+  <li>Затем 101 <code>INSERT INTO category_product ...</code></li>
+</ol>
+
+<p>
+  Это осознанное проектное решение: агрегат — неделимая единица, и Spring Data JDBC
+  не пытается вычислять diff. Если производительность критична, стоит пересмотреть
+  границы агрегата (например, выделить продукт в отдельный агрегат).
+</p>
+
+<h3 id="section5-2">5.2 Транзакции</h3>
+
+<p>
+  Каждый вызов метода репозитория (<code>save()</code>, <code>findById()</code>, и т.д.)
+  выполняется в <strong>отдельной транзакции</strong>. Если требуется объединить несколько
+  операций в одну бизнес-транзакцию, используйте <code>@Transactional</code> на уровне сервиса:
+</p>
+
+<pre><code>@Service
+public class MyService {
+
+    @Transactional
+    public void transferProduct(Long fromCategoryId, Long toCategoryId, Long productId) {
+        Category from = categoryRepository.findById(fromCategoryId).orElseThrow();
+        Category to = categoryRepository.findById(toCategoryId).orElseThrow();
+
+        CategoryProduct product = from.removeProduct(productId);
+        to.addProduct(product);
+
+        categoryRepository.save(from);  // ← обе операции
+        categoryRepository.save(to);    // ← в одной транзакции
+    }
+}</code></pre>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 6 ==================== -->
+<h2 id="section6">6. Custom Queries</h2>
+
+<p>
+  Spring Data JDBC поддерживает два способа определения собственных запросов:
+  <strong>derived queries</strong> (по имени метода) и <strong>@Query</strong> с SQL.
+</p>
+
+<h3>Derived query example</h3>
+<pre><code>List&lt;Category&gt; findByTitleContainingIgnoreCase(String titlePart);</code></pre>
+
+<p>
+  Такой метод автоматически преобразуется в SQL:
+  <code>SELECT ... WHERE UPPER(title) LIKE UPPER('%' || ? || '%')</code>.
+</p>
+
+<h3>Явный SQL через @Query</h3>
+<pre><code>@Query("""
+    SELECT DISTINCT c.*
+    FROM "categories" c
+    JOIN "category_product" cp ON cp."category_id" = c."ID"
+    WHERE cp."PRICE" >= :minPrice
+    """)
+List&lt;Category&gt; findCategoriesWithProductsAbovePrice(@Param("minPrice") BigDecimal minPrice);</code></pre>
+
+<div class="warn">
+  <strong>Внимание:</strong> двойные кавычки вокруг идентификаторов в примере выше —
+  особенность <strong>H2</strong>. Для PostgreSQL используйте двойные кавычки с другим регистром,
+  для MySQL — обратные кавычки (<code>`table`</code>), а в большинстве случаев кавычки можно
+  опустить, если имена таблиц/колонок не совпадают с зарезервированными словами.
+</div>
+
+<div class="endpoint"><a href="/api/jdbc/custom-query?title=electronics">GET /api/jdbc/custom-query?title=...</a></div>
+<div class="endpoint"><a href="/api/jdbc/custom-query/min-price?minPrice=100">GET /api/jdbc/custom-query/min-price?minPrice=...</a></div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 7 ==================== -->
+<h2 id="section7">7. Lifecycle Events</h2>
+
+<p>
+  Spring Data JDBC предоставляет события жизненного цикла сущностей, на которые можно подписаться
+  с помощью <code>@EventListener</code>. В проекте реализован слушатель
+  <span class="file-link">CategoryLifecycleListener.java</span>, который собирает события в
+  <span class="file-link">LifecycleEventsCollector.java</span>.
+</p>
+
+<h3>События при сохранении и чтении</h3>
+
+<table>
+  <tr><th>Событие</th><th>Момент возникновения</th></tr>
+  <tr><td><code>BeforeConvertEvent</code></td><td>Перед преобразованием entity в структуру для сохранения</td></tr>
+  <tr><td><code>BeforeSaveEvent</code></td><td>Перед выполнением SQL INSERT/UPDATE</td></tr>
+  <tr><td><code>AfterSaveEvent</code></td><td>После успешного сохранения</td></tr>
+  <tr><td><code>AfterConvertEvent</code></td><td>После чтения из БД и создания entity</td></tr>
+</table>
+
+<h3>События при удалении</h3>
+
+<table>
+  <tr><th>Событие</th><th>Момент возникновения</th></tr>
+  <tr><td><code>BeforeDeleteEvent</code></td><td>Перед выполнением SQL DELETE</td></tr>
+  <tr><td><code>AfterDeleteEvent</code></td><td>После успешного удаления из БД</td></tr>
+</table>
+
+<div class="note">
+  В демо-проекте слушатель подписан на события сохранения и чтения.
+  События удаления (<code>BeforeDeleteEvent</code>, <code>AfterDeleteEvent</code>) также
+  доступны, но не отслеживаются в <code>LifecycleEventsCollector</code>.
+</div>
+
+<div class="mermaid">
+  sequenceDiagram
+  participant Service
+  participant Framework as Spring Data JDBC
+  participant Listener
+  participant DB
+
+  Service->>Framework: save(entity)
+  Framework->>Listener: BeforeConvertEvent
+  Framework->>Listener: BeforeSaveEvent
+  Framework->>DB: INSERT / UPDATE
+  DB-->>Framework: ok
+  Framework->>Listener: AfterSaveEvent
+  Framework-->>Service: saved entity
+
+  Service->>Framework: findById(id)
+  Framework->>DB: SELECT
+  DB-->>Framework: row data
+  Framework->>Listener: AfterConvertEvent
+  Framework-->>Service: entity
+</div>
+
+<p>
+  Эндпоинт <code>/api/jdbc/lifecycle</code> создаёт новую категорию, затем читает её,
+  и возвращает список зафиксированных событий.
+</p>
+
+<div class="endpoint"><a href="/api/jdbc/lifecycle">GET /api/jdbc/lifecycle</a></div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 8 ==================== -->
+<h2 id="section8">8. Глоссарий терминов</h2>
+
+<table>
+  <tr><th>Термин</th><th>Определение</th></tr>
+  <tr><td><strong>Aggregate</strong></td><td>Группа объектов предметной области, которые рассматриваются как единое целое для изменений.</td></tr>
+  <tr><td><strong>Aggregate Root</strong></td><td>Корневая сущность агрегата. Только она имеет репозиторий и обеспечивает доступ к остальным частям.</td></tr>
+  <tr><td><strong>Entity</strong></td><td>Объект с идентичностью (поле <code>@Id</code>).</td></tr>
+  <tr><td><strong>Value Object</strong></td><td>Объект без идентичности, определяется своими атрибутами (например, <code>ProductDetails</code>).</td></tr>
+  <tr><td><strong>AggregateReference</strong></td><td>Типизированная ссылка на другой aggregate root по его ID.</td></tr>
+  <tr><td><strong>@MappedCollection</strong></td><td>Аннотация для связи один-ко-многим внутри агрегата.</td></tr>
+  <tr><td><strong>@Embedded</strong></td><td>Встраивание value object в таблицу владельца.</td></tr>
+  <tr><td><strong>@Version</strong></td><td>Поле для оптимистичной блокировки.</td></tr>
+  <tr><td><strong>Lifecycle Events</strong></td><td>События, возникающие при сохранении/загрузке/удалении агрегата.</td></tr>
+  <tr><td><strong>ListCrudRepository</strong></td><td>Базовый интерфейс репозитория для CRUD операций с возвратом <code>List</code>.</td></tr>
+  <tr><td><strong>NamingStrategy</strong></td><td>Стратегия преобразования имён Java-классов и полей в имена таблиц и колонок БД.</td></tr>
+</table>
+
+<div class="endpoint"><a href="/api/jdbc/glossary">GET /api/jdbc/glossary</a></div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 9 ==================== -->
+<h2 id="section9">9. Структура проекта</h2>
+
+<div class="card">
+<pre><code>06-spring-data-jdbc
+├── pom.xml
+├── README.md
+└── src
+    ├── main
+    │   ├── java/com/example/springdatajdbc
+    │   │   ├── SpringDataJdbcApplication.java
+    │   │   ├── config
+    │   │   │   ├── CategoryLifecycleListener.java
+    │   │   │   ├── DemoDataInitializer.java
+    │   │   │   └── LifecycleEventsCollector.java
+    │   │   ├── controller
+    │   │   │   ├── ApiExceptionHandler.java
+    │   │   │   └── SpringDataJdbcController.java
+    │   │   ├── entity
+    │   │   │   ├── Category.java
+    │   │   │   ├── CategoryProduct.java
+    │   │   │   ├── Customer.java
+    │   │   │   ├── CustomerOrder.java
+    │   │   │   ├── ProductDetails.java
+    │   │   │   └── Tag.java
+    │   │   ├── model
+    │   │   │   └── ApiModels.java
+    │   │   ├── repository
+    │   │   │   ├── CategoryRepository.java
+    │   │   │   ├── CustomerRepository.java
+    │   │   │   └── TagRepository.java
+    │   │   └── service
+    │   │       └── SpringDataJdbcDemoService.java
+    │   └── resources
+    │       ├── application.yaml
+    │       ├── schema.sql
+    │       └── static
+    │           └── index.html
+    └── test
+        └── java/com/example/springdatajdbc
+            ├── Section1_DifferencesTest.java
+            ├── Section2_DddAggregatesTest.java
+            ├── Section3_MappingAndRelationsTest.java
+            ├── Section4_CustomQueriesTest.java
+            ├── Section5_LifecycleEventsTest.java
+            ├── Section6_GlossaryTest.java
+            ├── Section7_CrudApiTest.java
+            └── Section8_MockMvcIntegrationTest.java</code></pre>
+</div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 10 ==================== -->
+<h2 id="section10">10. Endpoint'ы API</h2>
+
+<table>
+  <thead><tr><th>Метод</th><th>Путь</th><th>Описание</th></tr></thead>
+  <tbody>
+  <tr><td>GET</td><td><a href="/api/jdbc/differences"><code>/api/jdbc/differences</code></a></td><td>Отличия JDBC vs JPA</td></tr>
+  <tr><td>GET</td><td><a href="/api/jdbc/ddd"><code>/api/jdbc/ddd</code></a></td><td>Информация об агрегатах</td></tr>
+  <tr><td>GET</td><td><a href="/api/jdbc/categories"><code>/api/jdbc/categories</code></a></td><td>Все категории с продуктами</td></tr>
+  <tr><td>GET</td><td><a href="/api/jdbc/categories/1"><code>/api/jdbc/categories/{id}</code></a></td><td>Категория по ID</td></tr>
+  <tr><td>POST</td><td><code>/api/jdbc/categories</code></td><td>Создать категорию</td></tr>
+  <tr><td>PUT</td><td><code>/api/jdbc/categories/{id}</code></td><td>Обновить название категории</td></tr>
+  <tr><td>DELETE</td><td><code>/api/jdbc/categories/{id}</code></td><td>Удалить категорию</td></tr>
+  <tr><td>POST</td><td><code>/api/jdbc/categories/{id}/products</code></td><td>Добавить продукт в категорию</td></tr>
+  <tr><td>PUT</td><td><code>/api/jdbc/categories/{catId}/products/{prodId}</code></td><td>Обновить продукт</td></tr>
+  <tr><td>DELETE</td><td><code>/api/jdbc/categories/{catId}/products/{prodId}</code></td><td>Удалить продукт из категории</td></tr>
+  <tr><td>GET</td><td><a href="/api/jdbc/customers/1"><code>/api/jdbc/customers/{id}</code></a></td><td>Клиент с заказами</td></tr>
+  <tr><td>POST</td><td><code>/api/jdbc/customers</code></td><td>Создать клиента</td></tr>
+  <tr><td>POST</td><td><code>/api/jdbc/customers/{id}/orders</code></td><td>Добавить заказ клиенту</td></tr>
+  <tr><td>GET</td><td><a href="/api/jdbc/custom-query?title=electronics"><code>/api/jdbc/custom-query?title=...</code></a></td><td>Поиск категорий по части названия</td></tr>
+  <tr><td>GET</td><td><a href="/api/jdbc/custom-query/min-price?minPrice=100"><code>/api/jdbc/custom-query/min-price?minPrice=...</code></a></td><td>Категории с продуктами дороже цены</td></tr>
+  <tr><td>GET</td><td><a href="/api/jdbc/lifecycle"><code>/api/jdbc/lifecycle</code></a></td><td>Демонстрация lifecycle events</td></tr>
+  <tr><td>GET</td><td><a href="/api/jdbc/glossary"><code>/api/jdbc/glossary</code></a></td><td>Глоссарий терминов</td></tr>
+  <tr><td>GET</td><td><a href="/api/jdbc/endpoints"><code>/api/jdbc/endpoints</code></a></td><td>Список всех endpoint'ов</td></tr>
+  </tbody>
+</table>
+
+<h3>Примеры JSON запросов</h3>
+
+<h4>POST /api/jdbc/categories — создание категории</h4>
+<p><strong>Request body:</strong></p>
+<pre><code>{
+  "title": "Electronics"
+}</code></pre>
+<p><strong>Response (201 Created):</strong></p>
+<pre><code>{
+  "id": 4,
+  "title": "Electronics",
+  "products": []
+}</code></pre>
+
+<h4>POST /api/jdbc/categories/{id}/products — добавление продукта</h4>
+<p><strong>Request body:</strong></p>
+<pre><code>{
+  "name": "Laptop",
+  "type": "computer",
+  "price": 1299.99,
+  "manufacturer": "Dell",
+  "sku": "DELL-001",
+  "tagId": 1
+}</code></pre>
+<p><strong>Response (200 OK):</strong></p>
+<pre><code>{
+  "id": 4,
+  "title": "Electronics",
+  "products": [
+    {
+      "id": 10,
+      "name": "Laptop",
+      "type": "computer",
+      "price": 1299.99,
+      "details": {
+        "manufacturer": "Dell",
+        "sku": "DELL-001"
+      },
+      "tag": 1,
+      "version": 0
+    }
+  ]
+}</code></pre>
+
+<h4>POST /api/jdbc/customers — создание клиента</h4>
+<p><strong>Request body:</strong></p>
+<pre><code>{
+  "name": "John Doe",
+  "email": "john@example.com"
+}</code></pre>
+
+<h4>POST /api/jdbc/customers/{id}/orders — добавление заказа</h4>
+<p><strong>Request body:</strong></p>
+<pre><code>{
+  "description": "Order for 2 laptops"
+}</code></pre>
+
+<div class="endpoint"><a href="/api/jdbc/endpoints">GET /api/jdbc/endpoints</a></div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 11 ==================== -->
+<h2 id="section11">11. Быстрый старт (curl)</h2>
+
+<p>Примеры запросов для быстрого тестирования API после запуска приложения:</p>
+
+<h4>Получить все категории</h4>
+<pre><code>curl http://localhost:8890/api/jdbc/categories | jq</code></pre>
+
+<h4>Создать категорию</h4>
+<pre><code>curl -X POST http://localhost:8890/api/jdbc/categories \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Books"}'</code></pre>
+
+<h4>Добавить продукт в категорию</h4>
+<pre><code>curl -X POST http://localhost:8890/api/jdbc/categories/1/products \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Clean Code",
+    "type": "book",
+    "price": 39.99,
+    "manufacturer": "Prentice Hall",
+    "sku": "CC-001",
+    "tagId": 1
+  }'</code></pre>
+
+<h4>Обновить название категории</h4>
+<pre><code>curl -X PUT http://localhost:8890/api/jdbc/categories/1 \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Updated Category"}'</code></pre>
+
+<h4>Удалить категорию</h4>
+<pre><code>curl -X DELETE http://localhost:8890/api/jdbc/categories/1</code></pre>
+
+<h4>Создать клиента с заказом</h4>
+<pre><code># Создать клиента
+curl -X POST http://localhost:8890/api/jdbc/customers \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Alice", "email": "alice@example.com"}'
+
+# Добавить заказ
+curl -X POST http://localhost:8890/api/jdbc/customers/1/orders \
+  -H "Content-Type: application/json" \
+  -d '{"description": "First order"}'</code></pre>
+
+<h4>Custom queries</h4>
+<pre><code># Поиск по названию
+curl "http://localhost:8890/api/jdbc/custom-query?title=electronics"
+
+# Категории с дорогими продуктами
+curl "http://localhost:8890/api/jdbc/custom-query/min-price?minPrice=100"</code></pre>
+
+<h4>Демо lifecycle events</h4>
+<pre><code>curl http://localhost:8890/api/jdbc/lifecycle | jq</code></pre>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 12 ==================== -->
+<h2 id="section12">12. Тесты</h2>
+
+<p>
+  Каждый ключевой аспект покрыт интеграционными тестами, разбитыми по секциям:
+</p>
+
+<ul>
+  <li><span class="file-link">Section1_DifferencesTest.java</span> — проверяет список отличий от JPA.</li>
+  <li><span class="file-link">Section2_DddAggregatesTest.java</span> — наличие трёх агрегатов.</li>
+  <li><span class="file-link">Section3_MappingAndRelationsTest.java</span> — корректность загрузки дочерних коллекций и <code>@Embedded</code>.</li>
+  <li><span class="file-link">Section4_CustomQueriesTest.java</span> — работа derived и <code>@Query</code> методов.</li>
+  <li><span class="file-link">Section5_LifecycleEventsTest.java</span> — фиксация всех событий.</li>
+  <li><span class="file-link">Section6_GlossaryTest.java</span> — наличие основных терминов.</li>
+  <li><span class="file-link">Section7_CrudApiTest.java</span> — полное CRUD-тестирование через сервис.</li>
+  <li><span class="file-link">Section8_MockMvcIntegrationTest.java</span> — тестирование всех REST endpoint'ов.</li>
+</ul>
+
+<div class="good">
+  Тесты можно запустить командой <code>mvn clean test</code> в модуле.
+</div>
+
+<hr class="section-divider"/>
+
+<h2>Вывод</h2>
+<p>
+  Spring Data JDBC предлагает простой и прозрачный путь работы с базами данных,
+  особенно если вы придерживаетесь DDD и хотите явно контролировать границы агрегатов.
+  Этот проект демонстрирует все основные возможности модуля: агрегаты, маппинг,
+  ссылки между агрегатами, события, кастомные запросы и полноценный REST API.
+</p>
+
 </body>
 </html>
