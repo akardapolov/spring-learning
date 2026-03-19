@@ -1,14 +1,22 @@
 package com.example.springdatajdbc;
 
+import com.example.springdatajdbc.config.CategoryLifecycleListener;
+import com.example.springdatajdbc.config.LifecycleEventsCollector;
 import com.example.springdatajdbc.model.ApiModels.LifecycleEventResult;
 import com.example.springdatajdbc.service.SpringDataJdbcDemoService;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestConstructor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
+@DataJdbcTest
+@Import({
+    SpringDataJdbcDemoService.class,
+    LifecycleEventsCollector.class,
+    CategoryLifecycleListener.class
+})
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 class Section5_LifecycleEventsTest {
 
@@ -19,13 +27,14 @@ class Section5_LifecycleEventsTest {
   }
 
   @Test
-  void shouldCaptureAllLifecycleEvents() {
+  void shouldCaptureLifecycleEventsInExactOrderForSaveThenLoad() {
     LifecycleEventResult result = service.lifecycleDemo();
 
-    assertThat(result.events()).isNotEmpty();
-    assertThat(result.events().stream().anyMatch(e -> e.startsWith("BeforeConvert"))).isTrue();
-    assertThat(result.events().stream().anyMatch(e -> e.startsWith("BeforeSave"))).isTrue();
-    assertThat(result.events().stream().anyMatch(e -> e.startsWith("AfterSave"))).isTrue();
-    assertThat(result.events().stream().anyMatch(e -> e.startsWith("AfterConvert"))).isTrue();
+    assertThat(result.events()).containsExactly(
+        "BeforeConvert: Lifecycle Demo",
+        "BeforeSave: Lifecycle Demo",
+        "AfterSave: Lifecycle Demo",
+        "AfterConvert: Lifecycle Demo"
+    );
   }
 }

@@ -1,29 +1,43 @@
 package com.example.springdatajdbc;
 
+import com.example.springdatajdbc.model.ApiModels.GlossaryItem;
 import com.example.springdatajdbc.model.ApiModels.GlossaryResult;
 import com.example.springdatajdbc.service.SpringDataJdbcDemoService;
+import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestConstructor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
-@TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 class Section6_GlossaryTest {
 
-  private final SpringDataJdbcDemoService service;
-
-  Section6_GlossaryTest(SpringDataJdbcDemoService service) {
-    this.service = service;
-  }
+  private final SpringDataJdbcDemoService service =
+      new SpringDataJdbcDemoService(null, null, null);
 
   @Test
-  void shouldReturnGlossaryTerms() {
-    GlossaryResult result = service.glossaryDemo();
+  void shouldReturnExactGlossary() {
+    GlossaryResult expected = new GlossaryResult(List.of(
+        new GlossaryItem("Aggregate",
+                         "A cluster of domain objects treated as a single unit for data changes."),
+        new GlossaryItem("Aggregate Root",
+                         "The entry point entity of an aggregate. Only root has a Repository."),
+        new GlossaryItem("Entity",
+                         "An object with identity (id field)."),
+        new GlossaryItem("Value Object",
+                         "An object without identity, embedded into entity (e.g. ProductDetails)."),
+        new GlossaryItem("AggregateReference",
+                         "A typed ID reference to another aggregate root, replacing JPA associations."),
+        new GlossaryItem("@MappedCollection",
+                         "Annotation declaring a one-to-many child collection inside an aggregate."),
+        new GlossaryItem("@Embedded",
+                         "Annotation for embedding a value object's columns into the parent table."),
+        new GlossaryItem("@Version",
+                         "Optimistic locking field incremented on each save."),
+        new GlossaryItem("Lifecycle Events",
+                         "BeforeConvert, BeforeSave, AfterSave, AfterConvert — hooks during persistence operations."),
+        new GlossaryItem("Repository",
+                         "Interface providing CRUD operations for an aggregate root.")
+    ));
 
-    assertThat(result.items()).hasSizeGreaterThanOrEqualTo(6);
-    assertThat(result.items().stream().anyMatch(i -> i.term().equals("Aggregate"))).isTrue();
-    assertThat(result.items().stream().anyMatch(i -> i.term().equals("AggregateReference"))).isTrue();
+    assertThat(service.glossaryDemo()).isEqualTo(expected);
   }
 }

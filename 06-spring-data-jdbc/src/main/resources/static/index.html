@@ -336,6 +336,41 @@
   не имеют собственных репозиториев и всегда сохраняются/удаляются вместе с родителем.
 </p>
 
+<h3>
+Жизненный цикл в Spring Data JDBC (Отсутствие магии)
+</h3>
+
+<div class="mermaid">
+  sequenceDiagram
+  autonumber
+  actor Dev as Твой Код
+  participant Repo as CategoryRepository
+  participant DB as База Данных (H2)
+
+  Note over Dev, DB: 1. ЧТЕНИЕ АГРЕГАТА
+  Dev->>Repo: findById(1)
+  Repo->>DB: SELECT category JOIN category_product...
+  DB-->>Repo: Строки из БД
+  Repo-->>Dev: Category объект (со всеми продуктами внутри)
+
+  Note over Dev, DB: 2. БИЗНЕС ЛОГИКА (В ПАМЯТИ)
+  Dev->>Dev: category.addProduct(newProduct)
+  Note right of Dev: Изменили состояние в памяти.<br/>В JPA тут сработал бы транзакционный коммит,<br/>но в Spring Data JDBC ничего не произойдет!
+
+  Note over Dev, DB: 3. СОХРАНЕНИЕ (ЯВНОЕ)
+  Dev->>Repo: save(category)
+
+  rect rgb(240, 200, 200)
+  Note over Repo, DB: DDD Правило: Сохраняем весь кластер целиком
+  Repo->>DB: UPDATE category SET title=? WHERE id=1
+  Repo->>DB: DELETE FROM category_product WHERE category_id=1
+  Note right of Repo: Удаляет все старые продукты!
+  Repo->>DB: INSERT INTO category_product ... (вставляет все элементы списка заново)
+  end
+
+  Repo-->>Dev: Обновленный Category
+</div>
+
 <div class="endpoint"><a href="/api/jdbc/ddd">GET /api/jdbc/ddd</a></div>
 
 <hr class="section-divider"/>
@@ -707,8 +742,8 @@ List&lt;Category&gt; findCategoriesWithProductsAbovePrice(@Param("minPrice") Big
             ├── Section4_CustomQueriesTest.java
             ├── Section5_LifecycleEventsTest.java
             ├── Section6_GlossaryTest.java
-            ├── Section7_CrudApiTest.java
-            └── Section8_MockMvcIntegrationTest.java</code></pre>
+            ├── Section7_ServiceCrudTest.java
+            └── Section8_HttpContractTest.java</code></pre>
 </div>
 
 <hr class="section-divider"/>
@@ -871,8 +906,8 @@ curl "http://localhost:8890/api/jdbc/custom-query/min-price?minPrice=100"</code>
   <li><span class="file-link">Section4_CustomQueriesTest.java</span> — работа derived и <code>@Query</code> методов.</li>
   <li><span class="file-link">Section5_LifecycleEventsTest.java</span> — фиксация всех событий.</li>
   <li><span class="file-link">Section6_GlossaryTest.java</span> — наличие основных терминов.</li>
-  <li><span class="file-link">Section7_CrudApiTest.java</span> — полное CRUD-тестирование через сервис.</li>
-  <li><span class="file-link">Section8_MockMvcIntegrationTest.java</span> — тестирование всех REST endpoint'ов.</li>
+  <li><span class="file-link">Section7_ServiceCrudTest.java</span> — полное CRUD-тестирование через сервис.</li>
+  <li><span class="file-link">Section8_HttpContractTest.java</span> — тестирование всех REST endpoint'ов.</li>
 </ul>
 
 <div class="good">
