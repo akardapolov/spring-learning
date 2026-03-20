@@ -337,6 +337,56 @@
 </p>
 
 <h3>
+  Связи агрегатов в проекте
+</h3>
+
+<div class="mermaid">
+  flowchart TD
+  %% Стилизация
+  classDef root fill:#f9f2f4,stroke:#c7254e,stroke-width:2px,color:#c7254e
+  classDef entity fill:#d9edf7,stroke:#31708f,stroke-width:1px,color:#31708f
+  classDef vo fill:#dff0d8,stroke:#3c763d,stroke-width:1px,color:#3c763d
+  classDef repo fill:#fcf8e3,stroke:#8a6d3b,stroke-width:2px,stroke-dasharray: 5 5
+
+  %% Агрегат Категории
+  subgraph Aggregate_Category ["📦 Агрегат: Категория (Изменяется как единое целое)"]
+  direction TB
+  C[("👑 Category\n(Aggregate Root)")]:::root
+  CP["CategoryProduct\n(Entity)"]:::entity
+  PD["ProductDetails\n(Value Object)"]:::vo
+
+  C == "Владеет (List)" ===> CP
+  CP -- "Включает (@Embedded)" --> PD
+  end
+
+  %% Агрегат Тега
+  subgraph Aggregate_Tag ["📦 Агрегат: Тег"]
+  T[("👑 Tag\n(Aggregate Root)")]:::root
+  end
+
+  %% Агрегат Клиента
+  subgraph Aggregate_Customer ["📦 Агрегат: Клиент"]
+  direction TB
+  Cust[("👑 Customer\n(Aggregate Root)")]:::root
+  CO["CustomerOrder\n(Entity)"]:::entity
+
+  Cust == "Владеет (List)" ===> CO
+  end
+
+  %% Репозитории (Существуют ТОЛЬКО для корней)
+  C_Repo[["CategoryRepository"]]:::repo
+  T_Repo[["TagRepository"]]:::repo
+  Cust_Repo[["CustomerRepository"]]:::repo
+
+  C_Repo -. "Управляет" .-> C
+  T_Repo -. "Управляет" .-> T
+  Cust_Repo -. "Управляет" .-> Cust
+
+  %% Связь между агрегатами (ТОЛЬКО по ID)
+  CP -. "Ссылается по ID\n(AggregateReference)" .-> T
+</div>
+
+<h3>
 Жизненный цикл в Spring Data JDBC (Отсутствие магии)
 </h3>
 
