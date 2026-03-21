@@ -39,3 +39,6 @@ bin/
 # === OS Files (Mac/Windows) ===
 .DS_Store
 Thumbs.db
+
+#AI
+.claude/settings.local.json
