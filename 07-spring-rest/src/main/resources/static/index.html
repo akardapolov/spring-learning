@@ -180,32 +180,234 @@
 <div class="toc">
   <h3>Содержание</h3>
   <ul>
-    <li><a href="#section1">1. Введение в Spring REST</a></li>
-    <li><a href="#section-rest-principles">2. Принципы REST (ограничения Филдинга)</a></li>
-    <li><a href="#section-rest-maturity">3. Модель зрелости Ричардсона</a></li>
-    <li><a href="#section2">4. HTTP методы и маппинг</a></li>
-    <li><a href="#section-idempotency">5. Идемпотентность и безопасность методов</a></li>
-    <li><a href="#section3">6. Параметры запроса</a></li>
-    <li><a href="#section4">7. Обработка ответов</a></li>
-    <li><a href="#section5">8. Обработка исключений</a></li>
-    <li><a href="#section6">9. Валидация</a></li>
-    <li><a href="#section7">10. DTO vs Entity</a></li>
-    <li><a href="#section8">11. Пагинация и сортировка</a></li>
-    <li><a href="#section9">12. CRUD операции</a></li>
-    <li><a href="#section-patch">13. PATCH: JSON Merge Patch vs JSON Patch</a></li>
-    <li><a href="#section-hateoas">14. HATEOAS и гипермедиа</a></li>
-    <li><a href="#section-versioning">15. Версионирование API</a></li>
-    <li><a href="#section-problem-details">16. RFC 7807 — Problem Details</a></li>
-    <li><a href="#section-best-practices">17. Best Practices проектирования REST API</a></li>
-    <li><a href="#section10">18. Глоссарий терминов</a></li>
-    <li><a href="#section11">19. Endpoint'ы API</a></li>
+    <li><a href="#section-http-transport">1. Транспорт HTTP/HTTPS — как работает</a></li>
+    <li><a href="#section1">2. Введение в Spring REST</a></li>
+    <li><a href="#section-rest-principles">3. Принципы REST (ограничения Филдинга)</a></li>
+    <li><a href="#section-rest-maturity">4. Модель зрелости Ричардсона</a></li>
+    <li><a href="#section2">5. HTTP методы и маппинг</a></li>
+    <li><a href="#section-idempotency">6. Идемпотентность и безопасность методов</a></li>
+    <li><a href="#section3">7. Параметры запроса</a></li>
+    <li><a href="#section4">8. Обработка ответов</a></li>
+    <li><a href="#section5">9. Обработка исключений</a></li>
+    <li><a href="#section6">10. Валидация</a></li>
+    <li><a href="#section7">11. DTO vs Entity</a></li>
+    <li><a href="#section8">12. Пагинация и сортировка</a></li>
+    <li><a href="#section9">13. CRUD операции</a></li>
+    <li><a href="#section-patch">14. PATCH: JSON Merge Patch vs JSON Patch</a></li>
+    <li><a href="#section-hateoas">15. HATEOAS и гипермедиа</a></li>
+    <li><a href="#section-versioning">16. Версионирование API</a></li>
+    <li><a href="#section-code-api-first">17. Code First vs API First</a></li>
+    <li><a href="#section-problem-details">17. RFC 7807 — Problem Details</a></li>
+    <li><a href="#section-best-practices">18. Best Practices проектирования REST API</a></li>
+    <li><a href="#section10">19. Глоссарий терминов</a></li>
+    <li><a href="#section11">20. Endpoint'ы API</a></li>
   </ul>
 </div>
 
 <hr class="section-divider"/>
 
+<!-- ==================== HTTP/HTTPS TRANSPORT ==================== -->
+<h2 id="section-http-transport">1. Транспорт HTTP/HTTPS — как работает</h2>
+
+<p><strong>HTTP</strong> (HyperText Transfer Protocol) — протокол прикладного уровня, основа взаимодействия в вебе. <strong>HTTPS</strong> — тот же HTTP, но внутри зашифрованного TLS-канала. Понимание того, как HTTP-запрос путешествует от клиента до сервера — фундамент для работы с REST API.</p>
+
+<h3>Место HTTP в сетевой модели</h3>
+
+<p>HTTP работает поверх TCP (а TCP — поверх IP). Каждый HTTP-запрос — это текстовое сообщение, которое TCP доставляет как поток байтов.</p>
+
+<div class="mermaid">
+  graph TB
+  subgraph "Сетевые уровни"
+  APP["Application Layer\nHTTP / HTTPS"]
+  TLS["TLS / SSL\nтолько для HTTPS"]
+  TCP["Transport Layer\nTCP"]
+  IP["Network Layer\nIP"]
+  PHY["Link Layer\nEthernet / Wi-Fi"]
+  end
+
+  APP -->|"plaintext или зашифровано"| TLS
+  TLS -->|"зашифрованный поток"| TCP
+  APP -.->|"HTTP без шифрования"| TCP
+  TCP -->|"сегменты"| IP
+  IP -->|"пакеты"| PHY
+
+  style TLS fill:#fff3cd,stroke:#ffc107,color:#333
+</div>
+
+<h3>Жизненный цикл HTTP-запроса</h3>
+
+<p>Что происходит, когда клиент отправляет <code>GET http://localhost:8891/api/rest/products</code>:</p>
+
+<div class="mermaid">
+  sequenceDiagram
+  participant Client as Client (curl / browser)
+  participant DNS as DNS Resolver
+  participant Server as Server :8891
+
+  Note over Client: 1. Парсинг URL
+  Client->>Client: Разбор URL на host, port, path
+
+  Note over Client,DNS: 2. DNS-резолвинг
+  Client->>DNS: Какой IP у localhost?
+  DNS-->>Client: 127.0.0.1
+
+  Note over Client,Server: 3. TCP Handshake
+  Client->>Server: SYN
+  Server-->>Client: SYN-ACK
+  Client->>Server: ACK
+  Note over Client,Server: TCP-соединение установлено
+
+  Note over Client,Server: 4. HTTP Request
+  Client->>Server: GET /api/rest/products HTTP/1.1\nHost: localhost:8891\nAccept: application/json
+
+  Note over Server: 5. Обработка
+  Server->>Server: DispatcherServlet\nController\nService\nRepository
+
+  Note over Client,Server: 6. HTTP Response
+  Server-->>Client: HTTP/1.1 200 OK\nContent-Type: application/json\n\n[{"id":1,"name":"Phone"...}]
+
+  Note over Client,Server: 7. Закрытие (или keep-alive)
+  Client->>Server: FIN
+  Server-->>Client: FIN-ACK
+</div>
+
+<h3>Структура HTTP-запроса и ответа</h3>
+
+<p>HTTP-сообщение — это обычный текст (до HTTP/2, где используется бинарный формат).</p>
+
+<pre><code>--- HTTP REQUEST ---
+GET /api/rest/products?type=DEVICE HTTP/1.1    ← Request Line (метод, путь, версия)
+Host: localhost:8891                            ← Заголовки (headers)
+Accept: application/json
+Authorization: Bearer eyJhbGciOi...
+User-Agent: curl/8.4.0
+                                                ← Пустая строка = конец заголовков
+                                                ← Тело (body) — у GET обычно нет
+
+--- HTTP RESPONSE ---
+HTTP/1.1 200 OK                                 ← Status Line (версия, код, причина)
+Content-Type: application/json                  ← Заголовки
+Content-Length: 245
+Cache-Control: no-cache
+                                                ← Пустая строка
+[{"id":1,"name":"Phone","price":999.00}]        ← Тело (body)</code></pre>
+
+<div class="mermaid">
+  graph LR
+  subgraph "HTTP Request"
+  RL["Request Line\nGET /path HTTP/1.1"]
+  RH["Headers\nHost, Accept,\nContent-Type,\nAuthorization"]
+  RB["Body\nJSON / Form / пусто"]
+  end
+
+  subgraph "HTTP Response"
+  SL["Status Line\nHTTP/1.1 200 OK"]
+  RSH["Headers\nContent-Type,\nContent-Length,\nCache-Control"]
+  RSB["Body\nJSON / HTML / пусто"]
+  end
+
+  RL --> RH --> RB
+  SL --> RSH --> RSB
+</div>
+
+<h3>HTTP vs HTTPS</h3>
+
+<p><strong>HTTPS</strong> = HTTP + TLS (Transport Layer Security). Данные шифруются <strong>до</strong> отправки по TCP. Сервер подтверждает свою подлинность сертификатом.</p>
+
+<div class="mermaid">
+  sequenceDiagram
+  participant Client
+  participant Server
+
+  Note over Client,Server: TLS Handshake (упрощённо)
+
+  Client->>Server: ClientHello (поддерживаемые шифры, версия TLS)
+  Server-->>Client: ServerHello + сертификат + выбранный шифр
+  Client->>Client: Проверка сертификата (CA, срок, домен)
+  Client->>Server: Обмен ключами (Pre-Master Secret)
+  Note over Client,Server: Обе стороны вычисляют сессионный ключ
+
+  Client->>Server: Finished (зашифровано)
+  Server-->>Client: Finished (зашифровано)
+  Note over Client,Server: TLS-канал установлен
+
+  Note over Client,Server: Теперь HTTP внутри шифрованного канала
+  Client->>Server: GET /api/products (зашифровано)
+  Server-->>Client: 200 OK + JSON (зашифровано)
+</div>
+
+<table>
+  <tr><th>Аспект</th><th>HTTP</th><th>HTTPS</th></tr>
+  <tr><td>Порт по умолчанию</td><td>80</td><td>443</td></tr>
+  <tr><td>Шифрование</td><td>❌ Нет — данные передаются открытым текстом</td><td>✅ TLS — весь трафик зашифрован</td></tr>
+  <tr><td>Аутентификация сервера</td><td>❌ Нет</td><td>✅ Сертификат X.509 подтверждает, что сервер — тот, за кого себя выдаёт</td></tr>
+  <tr><td>Целостность</td><td>❌ Данные могут быть изменены на лету (MITM)</td><td>✅ MAC/HMAC гарантирует целостность</td></tr>
+  <tr><td>Производительность</td><td>Быстрее (нет TLS-хэндшейка)</td><td>Чуть медленнее (TLS-хэндшейк + шифрование). TLS 1.3 значительно ускорил процесс</td></tr>
+  <tr><td>Использование</td><td>Только для разработки (localhost)</td><td>Обязательно для production</td></tr>
+</table>
+
+<h3>Keep-Alive и HTTP/2</h3>
+
+<p>В HTTP/1.0 каждый запрос требовал нового TCP-соединения. Начиная с HTTP/1.1, соединение <strong>переиспользуется</strong> (keep-alive). HTTP/2 идёт дальше — <strong>мультиплексирование</strong>: множество запросов по одному TCP-соединению параллельно.</p>
+
+<div class="mermaid">
+  graph LR
+  subgraph "HTTP/1.0"
+  A1["TCP open"] --> R1["Request 1"] --> C1["TCP close"]
+  A2["TCP open"] --> R2["Request 2"] --> C2["TCP close"]
+  A3["TCP open"] --> R3["Request 3"] --> C3["TCP close"]
+  end
+
+  subgraph "HTTP/1.1 Keep-Alive"
+  A4["TCP open"] --> R4["Request 1"] --> R5["Request 2"] --> R6["Request 3"] --> C4["TCP close"]
+  end
+
+  subgraph "HTTP/2 Multiplexing"
+  A5["TCP open"] --> MUX["Req 1 + Req 2 + Req 3\nпараллельно в одном соединении"] --> C5["TCP close"]
+  end
+</div>
+
+<h3>Как Spring Boot обрабатывает HTTP</h3>
+
+<p>Spring Boot использует встроенный веб-сервер (Tomcat по умолчанию). Tomcat слушает TCP-порт, принимает соединения и передаёт HTTP-запросы в Spring MVC.</p>
+
+<div class="mermaid">
+  graph LR
+  Client["Client"] -->|"TCP :8891"| Tomcat["Embedded Tomcat\nслушает порт"]
+  Tomcat -->|"HttpServletRequest"| DS["DispatcherServlet"]
+  DS -->|"маршрутизация"| HM["HandlerMapping"]
+  HM -->|"найден контроллер"| Ctrl["@RestController"]
+  Ctrl -->|"Java object"| MC["HttpMessageConverter\nJackson JSON"]
+  MC -->|"JSON bytes"| Tomcat
+  Tomcat -->|"HTTP Response"| Client
+</div>
+
+<div class="note">
+  <strong>Настройка в application.properties:</strong>
+  <pre><code># Порт
+server.port=8891
+
+# HTTPS (для production)
+server.ssl.key-store=classpath:keystore.p12
+server.ssl.key-store-password=changeit
+server.ssl.key-store-type=PKCS12
+
+# HTTP/2
+server.http2.enabled=true</code></pre>
+</div>
+
+<div class="good">
+  <strong>Ключевые выводы:</strong><br/>
+  — HTTP — текстовый протокол поверх TCP, состоит из Request Line + Headers + Body<br/>
+  — HTTPS — тот же HTTP, но внутри зашифрованного TLS-канала<br/>
+  — REST API работает поверх HTTP(S), используя его методы, заголовки и статус-коды<br/>
+  — Spring Boot встраивает Tomcat, который слушает порт и передаёт запросы в DispatcherServlet
+</div>
+
+<hr class="section-divider"/>
+
 <!-- ==================== SECTION 1 ==================== -->
-<h2 id="section1">1. Введение в Spring REST</h2>
+<h2 id="section1">2. Введение в Spring REST</h2>
 
 <p><strong>REST</strong> (Representational State Transfer) — архитектурный стиль, описанный Роем Филдингом в его докторской диссертации (2000 год). REST определяет набор ограничений (constraints) для построения масштабируемых и слабосвязанных распределённых систем. Spring MVC предоставляет мощный инструментарий для создания REST API.</p>
 
@@ -234,7 +436,6 @@ public class ProductController {
     }
 }</code></pre>
 
-<!-- Исправлено: Entity не ходит в контроллер, контроллер оперирует DTO -->
 <h3>Общая архитектура</h3>
 <div class="mermaid">
   graph LR
@@ -307,7 +508,7 @@ public class DemoController {
 <hr class="section-divider"/>
 
 <!-- ==================== REST PRINCIPLES ==================== -->
-<h2 id="section-rest-principles">2. Принципы REST (ограничения Филдинга)</h2>
+<h2 id="section-rest-principles">3. Принципы REST (ограничения Филдинга)</h2>
 
 <p>REST — это не протокол и не стандарт, а набор из <strong>6 архитектурных ограничений</strong>. API, которое соблюдает все ограничения, называется <strong>RESTful</strong>.</p>
 
@@ -369,7 +570,7 @@ public class DemoController {
 <hr class="section-divider"/>
 
 <!-- ==================== RICHARDSON MATURITY MODEL ==================== -->
-<h2 id="section-rest-maturity">3. Модель зрелости Ричардсона</h2>
+<h2 id="section-rest-maturity">4. Модель зрелости Ричардсона</h2>
 
 <p>Леонард Ричардсон предложил модель из 4 уровней, описывающую степень «RESTfulness» API.</p>
 
@@ -421,7 +622,7 @@ public class DemoController {
 <hr class="section-divider"/>
 
 <!-- ==================== SECTION 2 ==================== -->
-<h2 id="section2">4. HTTP методы и маппинг</h2>
+<h2 id="section2">5. HTTP методы и маппинг</h2>
 
 <p>Каждый HTTP метод имеет свою семантику, определённую в <a href="https://datatracker.ietf.org/doc/html/rfc7231">RFC 7231</a>.</p>
 
@@ -441,7 +642,6 @@ public ProductDto getProductById(@PathVariable Long id) {
 <h3>POST — создание</h3>
 <p>Используется для создания новых ресурсов. <strong>Не идемпотентен</strong> — повторный вызов создаст дубликат. Должен возвращать <strong>201 Created</strong> с заголовком <code>Location</code>, содержащим URI нового ресурса.</p>
 
-<!-- Исправлено: добавлен Location header через ServletUriComponentsBuilder -->
 <pre><code>@PostMapping("/products")
 public ResponseEntity&lt;CrudOperationResult&gt; createProduct(
         @Valid @RequestBody ProductCreateRequest request) {
@@ -458,7 +658,6 @@ public ResponseEntity&lt;CrudOperationResult&gt; createProduct(
     // Ответ: 201 Created + Location: /api/rest/products/7
 }</code></pre>
 
-<!-- Исправлено: убрано "если не существует — создаёт" -->
 <h3>PUT — полная замена ресурса</h3>
 <p><strong>Идемпотентен</strong> — повторный вызов с теми же данными даёт тот же результат. Клиент должен отправить <strong>все</strong> поля ресурса; отсутствующие поля будут обнулены. Создание через PUT возможно только если API явно это поддерживает (клиент задаёт URI ресурса).</p>
 
@@ -470,7 +669,7 @@ public CrudOperationResult updateProduct(
 }</code></pre>
 
 <h3>PATCH — частичное обновление</h3>
-<p>Обновляет <strong>только указанные</strong> поля ресурса. В отличие от PUT, не требует отправки всех полей. Формально может быть не идемпотентным по <a href="https://datatracker.ietf.org/doc/html/rfc5789">RFC 5789</a>, но на практике обычно реализуется идемпотентно. Подробнее о форматах PATCH — в <a href="#section-patch">секции 13</a>.</p>
+<p>Обновляет <strong>только указанные</strong> поля ресурса. В отличие от PUT, не требует отправки всех полей. Формально может быть не идемпотентным по <a href="https://datatracker.ietf.org/doc/html/rfc5789">RFC 5789</a>, но на практике обычно реализуется идемпотентно. Подробнее о форматах PATCH — в <a href="#section-patch">секции 14</a>.</p>
 
 <pre><code>@PatchMapping("/products/{id}")
 public CrudOperationResult patchProduct(
@@ -489,7 +688,6 @@ public ResponseEntity&lt;Void&gt; deleteProduct(@PathVariable Long id) {
     return ResponseEntity.noContent().build();
 }</code></pre>
 
-<!-- Исправлено: HEAD и OPTIONS — это HTTP-методы, а не отдельные пути -->
 <h3>HEAD и OPTIONS</h3>
 <ul>
   <li><strong>HEAD</strong> — идентичен GET, но возвращает только заголовки (без тела). Используется для проверки существования ресурса или получения метаданных (Content-Length, Last-Modified).</li>
@@ -549,7 +747,7 @@ curl -X OPTIONS -i http://localhost:8891/api/rest/products
 <hr class="section-divider"/>
 
 <!-- ==================== IDEMPOTENCY ==================== -->
-<h2 id="section-idempotency">5. Идемпотентность и безопасность методов</h2>
+<h2 id="section-idempotency">6. Идемпотентность и безопасность методов</h2>
 
 <p>Два ключевых свойства HTTP-методов, определённых в спецификации HTTP.</p>
 
@@ -631,7 +829,7 @@ Content-Type: application/json
 <hr class="section-divider"/>
 
 <!-- ==================== SECTION 3 ==================== -->
-<h2 id="section3">6. Параметры запроса</h2>
+<h2 id="section3">7. Параметры запроса</h2>
 
 <p>Spring MVC предоставляет удобные аннотации для извлечения данных из различных частей HTTP-запроса.</p>
 
@@ -694,7 +892,6 @@ public ResponseEntity&lt;CrudOperationResult&gt; createProduct(
     // через MappingJackson2HttpMessageConverter
 }</code></pre>
 
-<!-- Исправлено: используем HttpHeaders вместо Map<String,String> -->
 <h3>@RequestHeader — заголовки</h3>
 
 <pre><code>// Конкретный заголовок
@@ -726,7 +923,6 @@ public String getInfo(
     // ...
 }</code></pre>
 
-<!-- Исправлена Mermaid: добавлены HttpMessageConverter, Validation, @ControllerAdvice -->
 <div class="mermaid">
   flowchart TD
   A["HTTP Request"] --> B{"Controller method arguments"}
@@ -766,7 +962,7 @@ public String getInfo(
 <hr class="section-divider"/>
 
 <!-- ==================== SECTION 4 ==================== -->
-<h2 id="section4">7. Обработка ответов</h2>
+<h2 id="section4">8. Обработка ответов</h2>
 
 <p>Spring MVC предоставляет несколько способов формирования ответа клиенту.</p>
 
@@ -812,7 +1008,6 @@ public ResponseEntity&lt;ProductDto&gt; getProduct(@PathVariable Long id) {
 
 <p>Устанавливает статус-код по умолчанию. Используйте <strong>либо</strong> <code>@ResponseStatus</code>, <strong>либо</strong> <code>ResponseEntity</code> — не оба одновременно.</p>
 
-<!-- Исправлено: убрано дублирование @ResponseStatus + ResponseEntity -->
 <pre><code>// Вариант 1: @ResponseStatus (простой)
 @ExceptionHandler(ProductNotFoundException.class)
 @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -856,7 +1051,6 @@ public ResponseEntity&lt;ErrorResponse&gt; handleNotFound(ProductNotFoundExcepti
   <tr><td>503</td><td>Service Unavailable</td><td>Сервис временно недоступен</td></tr>
 </table>
 
-<!-- Исправлено: Content Negotiation с указанием 406 и produces/consumes -->
 <h3>Content Negotiation</h3>
 
 <p>Spring определяет формат ответа на основе заголовка <code>Accept</code>. Jackson (JSON) подключён по умолчанию; для XML нужна зависимость <code>jackson-dataformat-xml</code>.</p>
@@ -899,13 +1093,12 @@ public ResponseEntity&lt;CrudOperationResult&gt; create(
 <hr class="section-divider"/>
 
 <!-- ==================== SECTION 5 ==================== -->
-<h2 id="section5">8. Обработка исключений</h2>
+<h2 id="section5">9. Обработка исключений</h2>
 
 <p>Spring MVC позволяет централизованно обрабатывать исключения через <code>@ControllerAdvice</code>, избегая дублирования try-catch в каждом контроллере.</p>
 
 <h3>@ControllerAdvice и @ExceptionHandler</h3>
 
-<!-- Исправлено: конструктор ErrorResponse с правильным числом аргументов, убрано дублирование @ResponseStatus + ResponseEntity -->
 <pre><code>@RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -960,7 +1153,6 @@ public class GlobalExceptionHandler {
 
 <h3>Иерархия обработки исключений</h3>
 
-<!-- Исправлена Mermaid: разделены 400/404/500, корректный синтаксис -->
 <div class="mermaid">
   flowchart TD
   Req["Client request"] --> Ctrl["Controller"]
@@ -1050,7 +1242,7 @@ Content-Type: application/json
 <hr class="section-divider"/>
 
 <!-- ==================== SECTION 6 ==================== -->
-<h2 id="section6">9. Валидация</h2>
+<h2 id="section6">10. Валидация</h2>
 
 <p>Spring MVC интегрируется с Bean Validation (JSR 380 / Hibernate Validator) для декларативной проверки входных данных.</p>
 
@@ -1166,7 +1358,7 @@ HTTP/1.1 400 Bad Request
 <hr class="section-divider"/>
 
 <!-- ==================== SECTION 7 ==================== -->
-<h2 id="section7">10. DTO vs Entity</h2>
+<h2 id="section7">11. DTO vs Entity</h2>
 
 <p><strong>DTO</strong> (Data Transfer Object) — объект для передачи данных между слоями приложения. Ключевой паттерн в REST API.</p>
 
@@ -1312,7 +1504,7 @@ public record ProductUpdateRequest(
 <hr class="section-divider"/>
 
 <!-- ==================== SECTION 8 ==================== -->
-<h2 id="section8">11. Пагинация и сортировка в REST</h2>
+<h2 id="section8">12. Пагинация и сортировка в REST</h2>
 
 <p>При больших объёмах данных необходимо возвращать результаты постранично. Spring Data предоставляет <code>Pageable</code> и <code>Page&lt;T&gt;</code>.</p>
 
@@ -1403,11 +1595,10 @@ public PaginationResult getPaginatedProducts(
 <hr class="section-divider"/>
 
 <!-- ==================== SECTION 9 ==================== -->
-<h2 id="section9">12. CRUD операции</h2>
+<h2 id="section9">13. CRUD операции</h2>
 
 <p>Полный набор операций для работы с ресурсами, реализующий Level 2 модели зрелости Ричардсона.</p>
 
-<!-- Исправлена Mermaid: убраны дженерики в тексте, добавлен Location header -->
 <div class="mermaid">
   sequenceDiagram
   participant C as Client
@@ -1545,7 +1736,7 @@ HTTP/1.1 204 No Content
 <hr class="section-divider"/>
 
 <!-- ==================== PATCH FORMATS ==================== -->
-<h2 id="section-patch">13. PATCH: JSON Merge Patch vs JSON Patch</h2>
+<h2 id="section-patch">14. PATCH: JSON Merge Patch vs JSON Patch</h2>
 
 <p>Существует два стандартных формата для частичного обновления ресурса через PATCH.</p>
 
@@ -1619,9 +1810,30 @@ Content-Type: application/json-patch+json
 <hr class="section-divider"/>
 
 <!-- ==================== HATEOAS ==================== -->
-<h2 id="section-hateoas">14. HATEOAS и гипермедиа</h2>
+<h2 id="section-hateoas">15. HATEOAS и гипермедиа</h2>
 
-<p><strong>HATEOAS</strong> (Hypermedia As The Engine Of Application State) — принцип REST уровня 3 по Ричардсону. Ответы сервера содержат ссылки на связанные действия и ресурсы, позволяя клиенту навигировать по API без заранее заданных URL.</p>
+<p><strong>HATEOAS</strong> (Hypermedia As The Engine Of Application State) — ключевое ограничение REST уровня 3 по Ричардсону. Суть: ответы сервера содержат <strong>ссылки на связанные действия и ресурсы</strong>, позволяя клиенту навигировать по API без заранее «зашитых» URL. Клиент <strong>обнаруживает</strong> возможности API из ответов, а не из документации.</p>
+
+<h3>Аналогия: веб-сайт vs жёстко закодированный клиент</h3>
+
+<p>Обычный веб-сайт — это HATEOAS: пользователь открывает главную страницу, видит ссылки и переходит по ним. Ему не нужно знать URL заранее. Без HATEOAS — это как если бы пользователь вручную вбивал адреса страниц.</p>
+
+<div class="mermaid">
+  graph LR
+  subgraph "Без HATEOAS (Level 2)"
+  C1["Клиент знает все URL заранее"]
+  C1 -->|"GET /products/1"| S1["Сервер"]
+  S1 -->|"JSON без ссылок"| C1
+  C1 -->|"Клиент сам конструирует URL\nGET /categories/1"| S1
+  end
+
+  subgraph "С HATEOAS (Level 3)"
+  C2["Клиент знает только\nточку входа"]
+  C2 -->|"GET /api"| S2["Сервер"]
+  S2 -->|"JSON + ссылки"| C2
+  C2 -->|"Переходит по ссылке\nиз ответа"| S2
+  end
+</div>
 
 <h3>Пример без HATEOAS (Level 2)</h3>
 
@@ -1631,10 +1843,15 @@ Content-Type: application/json-patch+json
   "id": 1,
   "name": "Phone",
   "price": 999.00,
-  "categoryId": 1
+  "categoryId": 1,
+  "status": "IN_STOCK"
 }
-// Клиент должен ЗНАТЬ, что категорию можно получить по /api/categories/1
-// Это знание «зашито» в клиентский код</code></pre>
+// Клиент должен ЗНАТЬ:
+// - категория по /api/categories/1
+// - обновить по PUT /api/products/1
+// - удалить по DELETE /api/products/1
+// - купить по POST /api/orders
+// Все URL зашиты в клиентском коде!</code></pre>
 
 <h3>Пример с HATEOAS (Level 3)</h3>
 
@@ -1644,25 +1861,111 @@ Content-Type: application/json-patch+json
   "id": 1,
   "name": "Phone",
   "price": 999.00,
+  "status": "IN_STOCK",
   "_links": {
-    "self": {"href": "/api/products/1"},
-    "update": {"href": "/api/products/1", "method": "PUT"},
-    "delete": {"href": "/api/products/1", "method": "DELETE"},
-    "category": {"href": "/api/categories/1"},
-    "all-products": {"href": "/api/products"}
+    "self": {
+      "href": "/api/products/1"
+    },
+    "update": {
+      "href": "/api/products/1",
+      "method": "PUT"
+    },
+    "delete": {
+      "href": "/api/products/1",
+      "method": "DELETE"
+    },
+    "category": {
+      "href": "/api/categories/1"
+    },
+    "purchase": {
+      "href": "/api/orders",
+      "method": "POST"
+    },
+    "all-products": {
+      "href": "/api/products"
+    }
   }
 }
-// Клиент ОБНАРУЖИВАЕТ доступные действия из ответа</code></pre>
+// Клиент ОБНАРУЖИВАЕТ доступные действия из ответа.
+// Если товар закончился — ссылка "purchase" исчезает.</code></pre>
+
+<h3>Динамические ссылки — главная сила HATEOAS</h3>
+
+<p>Ссылки в ответе зависят от <strong>состояния ресурса</strong>. Это позволяет серверу управлять тем, какие действия доступны клиенту.</p>
+
+<div class="mermaid">
+  stateDiagram-v2
+  [*] --> DRAFT: Создан заказ
+  DRAFT --> CONFIRMED: confirm
+  DRAFT --> CANCELLED: cancel
+  CONFIRMED --> SHIPPED: ship
+  CONFIRMED --> CANCELLED: cancel
+  SHIPPED --> DELIVERED: deliver
+  DELIVERED --> [*]
+  CANCELLED --> [*]
+
+  note right of DRAFT
+  _links: confirm, cancel, self
+  end note
+
+  note right of CONFIRMED
+  _links: ship, cancel, self
+  end note
+
+  note right of SHIPPED
+  _links: deliver, self
+  (cancel уже недоступен!)
+  end note
+</div>
+
+<pre><code>// Заказ в статусе DRAFT — можно подтвердить или отменить
+GET /api/orders/42
+{
+  "id": 42, "status": "DRAFT", "total": 999.00,
+  "_links": {
+    "self":    {"href": "/api/orders/42"},
+    "confirm": {"href": "/api/orders/42/confirm", "method": "POST"},
+    "cancel":  {"href": "/api/orders/42/cancel",  "method": "POST"}
+  }
+}
+
+// Тот же заказ после подтверждения — отмена ещё доступна, добавилась отправка
+GET /api/orders/42
+{
+  "id": 42, "status": "CONFIRMED", "total": 999.00,
+  "_links": {
+    "self":   {"href": "/api/orders/42"},
+    "ship":   {"href": "/api/orders/42/ship",   "method": "POST"},
+    "cancel": {"href": "/api/orders/42/cancel", "method": "POST"}
+  }
+}
+
+// После отправки — отменить уже нельзя, ссылки cancel нет
+GET /api/orders/42
+{
+  "id": 42, "status": "SHIPPED", "total": 999.00,
+  "_links": {
+    "self":    {"href": "/api/orders/42"},
+    "deliver": {"href": "/api/orders/42/deliver", "method": "POST"}
+  }
+}</code></pre>
 
 <h3>Spring HATEOAS</h3>
 
-<pre><code>// Зависимость: spring-boot-starter-hateoas
+<p>Spring предоставляет модуль <code>spring-boot-starter-hateoas</code> с классами <code>EntityModel</code>, <code>CollectionModel</code> и утилитами для генерации ссылок.</p>
+
+<pre><code>// Зависимость в pom.xml:
+// &lt;dependency&gt;
+//   &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+//   &lt;artifactId&gt;spring-boot-starter-hateoas&lt;/artifactId&gt;
+// &lt;/dependency&gt;
 
 @GetMapping("/products/{id}")
 public EntityModel&lt;ProductDto&gt; getProduct(@PathVariable Long id) {
     ProductDto product = service.getProductById(id);
 
     return EntityModel.of(product,
+        // linkTo + methodOn — типобезопасная генерация ссылок
         linkTo(methodOn(ProductController.class).getProduct(id)).withSelfRel(),
         linkTo(methodOn(ProductController.class).getAllProducts()).withRel("products"),
         linkTo(methodOn(CategoryController.class)
@@ -1682,14 +1985,56 @@ public CollectionModel&lt;EntityModel&lt;ProductDto&gt;&gt; getAllProducts() {
         linkTo(methodOn(ProductController.class).getAllProducts()).withSelfRel());
 }</code></pre>
 
+<h3>Форматы гипермедиа</h3>
+
+<table>
+  <tr><th>Формат</th><th>Content-Type</th><th>Описание</th></tr>
+  <tr><td><strong>HAL</strong></td><td><code>application/hal+json</code></td><td>Самый популярный. Ссылки в <code>_links</code>, вложенные ресурсы в <code>_embedded</code>. Поддерживается Spring HATEOAS по умолчанию.</td></tr>
+  <tr><td><strong>HAL-FORMS</strong></td><td><code>application/prs.hal-forms+json</code></td><td>Расширение HAL — описывает формы (какие поля нужны для POST/PUT).</td></tr>
+  <tr><td><strong>JSON:API</strong></td><td><code>application/vnd.api+json</code></td><td>Стандартизированный формат с <code>data</code>, <code>links</code>, <code>included</code>. Популярен в JavaScript-экосистеме.</td></tr>
+  <tr><td><strong>Siren</strong></td><td><code>application/vnd.siren+json</code></td><td>Описывает сущности, действия (actions) и ссылки.</td></tr>
+  <tr><td><strong>Collection+JSON</strong></td><td><code>application/vnd.collection+json</code></td><td>Специализирован для коллекций с шаблонами для создания/редактирования.</td></tr>
+</table>
+
+<h3>Когда HATEOAS нужен и когда — нет</h3>
+
+<div class="principle-grid">
+  <div class="principle-card">
+    <h4>✅ Полезен</h4>
+    <p>— Публичные API с множеством клиентов (клиенты не ломаются при изменении URL)<br/>
+      — Сложные workflow (заказы, согласования) — сервер управляет доступными действиями<br/>
+      — API, которое должно быть самодокументируемым<br/>
+      — Микросервисная архитектура — сервисы обнаруживают друг друга через ссылки</p>
+  </div>
+  <div class="principle-card">
+    <h4>❌ Избыточен</h4>
+    <p>— Внутренние API с одним клиентом (фронтенд = бэкенд одной команды)<br/>
+      — Простые CRUD без сложной бизнес-логики<br/>
+      — Мобильные приложения, где минимизация трафика важнее (ссылки увеличивают размер ответа)<br/>
+      — Когда клиент всё равно «зашивает» URL</p>
+  </div>
+</div>
+
+<div class="mermaid">
+  graph TB
+  A{"Нужен ли HATEOAS?"}
+  A -->|"Много клиентов,\nсложный workflow"| B["Да - Level 3"]
+  A -->|"Один клиент,\nпростой CRUD"| C["Нет - Level 2 достаточно"]
+  B --> D["Spring HATEOAS\nEntityModel + CollectionModel"]
+  C --> E["Обычный @RestController\nJSON без ссылок"]
+
+  style B fill:#d4edda,stroke:#28a745
+  style C fill:#fff3cd,stroke:#ffc107
+</div>
+
 <div class="note">
-  <strong>В этом проекте</strong> HATEOAS не реализован (используется Level 2). В реальных проектах полноценный HATEOAS применяется редко — он добавляет сложность, и большинство клиентов всё равно «зашивают» URL. Тем не менее, он является частью «истинного» REST по Филдингу.
+  <strong>В этом проекте</strong> HATEOAS не реализован (используется Level 2). В реальных проектах полноценный HATEOAS применяется нечасто, но понимание концепции важно — оно помогает проектировать API, где сервер управляет навигацией клиента.
 </div>
 
 <hr class="section-divider"/>
 
 <!-- ==================== VERSIONING ==================== -->
-<h2 id="section-versioning">15. Версионирование API</h2>
+<h2 id="section-versioning">16. Версионирование API</h2>
 
 <p>При развитии API неизбежны обратно несовместимые изменения. Версионирование позволяет поддерживать старых клиентов при выпуске новой версии.</p>
 
@@ -1752,8 +2097,177 @@ public List&lt;ProductV2Dto&gt; getProductsV2() { ... }</code></pre>
 
 <hr class="section-divider"/>
 
+<!-- ==================== CODE FIRST vs API FIRST ==================== -->
+<h2 id="section-code-api-first">17. Code First vs API First</h2>
+
+<p>Два подхода к разработке REST API, определяющие <strong>что создаётся первым</strong> — код или спецификация.</p>
+
+<h3>Code First</h3>
+
+<p>Сначала пишем контроллеры, DTO и аннотации — спецификация (OpenAPI/Swagger) <strong>генерируется из кода</strong>.</p>
+
+<pre><code>// 1. Пишем контроллер
+@RestController
+@RequestMapping("/api/products")
+public class ProductController {
+
+    @Operation(summary = "Get product by ID")        // Swagger-аннотация
+    @ApiResponse(responseCode = "200")
+    @ApiResponse(responseCode = "404")
+    @GetMapping("/{id}")
+    public ProductDto getProduct(@PathVariable Long id) {
+        return service.getProductById(id);
+    }
+}
+
+// 2. Подключаем springdoc-openapi
+// &lt;dependency&gt;
+//   &lt;groupId&gt;org.springdoc&lt;/groupId&gt;
+//   &lt;artifactId&gt;springdoc-openapi-starter-webmvc-ui&lt;/artifactId&gt;
+// &lt;/dependency&gt;
+
+// 3. Спецификация генерируется автоматически:
+//    GET /v3/api-docs        → OpenAPI JSON
+//    GET /swagger-ui.html    → Swagger UI</code></pre>
+
+<h3>API First (Contract First)</h3>
+
+<p>Сначала описываем API в спецификации OpenAPI (YAML/JSON) — код <strong>генерируется из спецификации</strong>.</p>
+
+<pre><code># 1. Пишем спецификацию openapi.yaml
+openapi: 3.0.3
+info:
+  title: Product API
+  version: 1.0.0
+paths:
+  /api/products/{id}:
+    get:
+      operationId: getProduct
+      summary: Get product by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDto'
+        '404':
+          description: Not Found
+
+components:
+  schemas:
+    ProductDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        price:
+          type: number
+
+# 2. openapi-generator-maven-plugin генерирует:
+#    - интерфейс ProductApi с методом getProduct()
+#    - классы ProductDto
+#
+# 3. Разработчик реализует сгенерированный интерфейс:
+
+@RestController
+public class ProductController implements ProductApi {
+    @Override
+    public ResponseEntity&lt;ProductDto&gt; getProduct(Long id) {
+        return ResponseEntity.ok(service.getProductById(id));
+    }
+}</code></pre>
+
+<h3>Сравнение подходов</h3>
+
+<div class="mermaid">
+  graph LR
+  subgraph "Code First"
+  CF1["Java-код\n@RestController\n+ Swagger-аннотации"] -->|"springdoc-openapi\nгенерирует"| CF2["OpenAPI spec\nopenapi.json"]
+  CF2 --> CF3["Swagger UI\nДокументация"]
+  end
+
+  subgraph "API First"
+  AF1["OpenAPI spec\nopenapi.yaml"] -->|"openapi-generator\nгенерирует"| AF2["Java-интерфейсы\n+ DTO классы"]
+  AF2 -->|"разработчик\nреализует"| AF3["Java-код\nimplements ProductApi"]
+  end
+
+  style CF1 fill:#d4edda,stroke:#28a745
+  style AF1 fill:#cce5ff,stroke:#0066cc
+</div>
+
+<table>
+  <tr><th>Аспект</th><th>Code First</th><th>API First</th></tr>
+  <tr><td><strong>Что первично</strong></td><td>Java-код</td><td>OpenAPI-спецификация (YAML/JSON)</td></tr>
+  <tr><td><strong>Спецификация</strong></td><td>Генерируется из кода (springdoc-openapi)</td><td>Пишется вручную или в редакторе (Stoplight, Swagger Editor)</td></tr>
+  <tr><td><strong>Код</strong></td><td>Пишется вручную</td><td>Интерфейсы и DTO генерируются (openapi-generator)</td></tr>
+  <tr><td><strong>Контракт</strong></td><td>Следует за кодом — может «уехать»</td><td>Фиксирован — код обязан соответствовать</td></tr>
+  <tr><td><strong>Параллельная работа</strong></td><td>❌ Фронтенд ждёт, пока бэкенд напишет эндпоинты</td><td>✅ Фронтенд и бэкенд работают параллельно по контракту</td></tr>
+  <tr><td><strong>Согласованность</strong></td><td>⚠️ Документация может отстать от кода</td><td>✅ Код компилируется только если соответствует спецификации</td></tr>
+  <tr><td><strong>Простота старта</strong></td><td>✅ Быстро — просто пиши код</td><td>⚠️ Нужно настроить генератор и изучить OpenAPI</td></tr>
+  <tr><td><strong>Удобство</strong></td><td>✅ Всё в Java, привычные инструменты</td><td>⚠️ YAML-спецификация может быть громоздкой</td></tr>
+  <tr><td><strong>Инструменты</strong></td><td>springdoc-openapi, Springfox (устарел)</td><td>openapi-generator, Swagger Codegen, Stoplight</td></tr>
+</table>
+
+<h3>Процесс разработки</h3>
+
+<div class="mermaid">
+  graph TB
+  subgraph "Code First workflow"
+  C1["Разработчик пишет\nController + DTO"] --> C2["springdoc-openapi\nсканирует аннотации"]
+  C2 --> C3["Генерируется\nopenapi.json"]
+  C3 --> C4["Swagger UI\nдля тестирования"]
+  C3 --> C5["Фронтенд получает\nспецификацию"]
+  end
+
+  subgraph "API First workflow"
+  A1["Команда проектирует\nopenapi.yaml"] --> A2["Ревью спецификации\nфронтенд + бэкенд"]
+  A2 --> A3["openapi-generator\nгенерирует код"]
+  A3 --> A4["Бэкенд реализует\nинтерфейсы"]
+  A3 --> A5["Фронтенд генерирует\nтипы и клиент"]
+  A4 --> A6["CI проверяет\nсоответствие контракту"]
+  end
+</div>
+
+<h3>Когда что выбирать</h3>
+
+<div class="principle-grid">
+  <div class="principle-card">
+    <h4>✅ Code First подходит</h4>
+    <p>— Небольшая команда (1–3 бэкендера)<br/>
+      — Быстрый прототип или MVP<br/>
+      — Внутренний API без внешних потребителей<br/>
+      — Фронтенд и бэкенд — одна команда<br/>
+      — Простое CRUD-приложение</p>
+  </div>
+  <div class="principle-card">
+    <h4>✅ API First подходит</h4>
+    <p>— Много команд и потребителей API<br/>
+      — Публичное API (партнёры, мобильные клиенты)<br/>
+      — Фронтенд и бэкенд — разные команды<br/>
+      — Микросервисы (контракт между сервисами)<br/>
+      — Строгие требования к обратной совместимости</p>
+  </div>
+</div>
+
+<div class="good">
+  <strong>В этом проекте</strong> используется <strong>Code First</strong> — контроллеры и DTO написаны вручную. Для production-проектов с несколькими командами рекомендуется рассмотреть API First.
+</div>
+
+<hr class="section-divider"/>
+
 <!-- ==================== PROBLEM DETAILS ==================== -->
-<h2 id="section-problem-details">16. RFC 7807 — Problem Details</h2>
+<h2 id="section-problem-details">17. RFC 7807 — Problem Details</h2>
 
 <p><strong>Problem Details for HTTP APIs</strong> (<a href="https://datatracker.ietf.org/doc/html/rfc7807">RFC 7807</a>) — стандартный формат ответов об ошибках. Spring 6+ / Spring Boot 3+ имеет встроенную поддержку через <code>ProblemDetail</code>.</p>
 
@@ -1802,7 +2316,7 @@ public ResponseEntity&lt;ProblemDetail&gt; handleNotFound(ProductNotFoundExcepti
 <hr class="section-divider"/>
 
 <!-- ==================== BEST PRACTICES ==================== -->
-<h2 id="section-best-practices">17. Best Practices проектирования REST API</h2>
+<h2 id="section-best-practices">18. Best Practices проектирования REST API</h2>
 
 <h3>Именование ресурсов</h3>
 
@@ -1861,10 +2375,18 @@ public ResponseEntity&lt;ProblemDetail&gt; handleNotFound(ProductNotFoundExcepti
 <hr class="section-divider"/>
 
 <!-- ==================== SECTION 10 ==================== -->
-<h2 id="section10">18. Глоссарий терминов</h2>
+<h2 id="section10">19. Глоссарий терминов</h2>
 
 <table>
   <tr><th>Термин</th><th>Определение</th></tr>
+  <tr><td><strong>HTTP</strong></td><td>HyperText Transfer Protocol — текстовый протокол прикладного уровня для передачи данных в вебе. Работает поверх TCP. Определяет формат запросов (Request Line + Headers + Body) и ответов (Status Line + Headers + Body).</td></tr>
+  <tr><td><strong>HTTPS</strong></td><td>HTTP over TLS — тот же HTTP, но внутри зашифрованного TLS-канала. Обеспечивает конфиденциальность (шифрование), целостность (MAC) и аутентификацию сервера (сертификат X.509).</td></tr>
+  <tr><td><strong>TLS/SSL</strong></td><td>Transport Layer Security — криптографический протокол, обеспечивающий шифрование TCP-соединения. SSL — устаревшее название (SSLv3 заменён на TLS 1.0+). Текущая версия — TLS 1.3.</td></tr>
+  <tr><td><strong>TCP</strong></td><td>Transmission Control Protocol — протокол транспортного уровня с гарантированной доставкой, порядком пакетов и контролем потока. HTTP работает поверх TCP.</td></tr>
+  <tr><td><strong>TCP Handshake</strong></td><td>Трёхстороннее рукопожатие (SYN → SYN-ACK → ACK) для установления TCP-соединения перед обменом данными.</td></tr>
+  <tr><td><strong>TLS Handshake</strong></td><td>Процесс согласования шифрования между клиентом и сервером: обмен сертификатами, выбор шифров, генерация сессионного ключа. Происходит после TCP-хэндшейка.</td></tr>
+  <tr><td><strong>Keep-Alive</strong></td><td>Режим HTTP/1.1, при котором TCP-соединение переиспользуется для нескольких запросов, избегая накладных расходов на повторные TCP/TLS-хэндшейки.</td></tr>
+  <tr><td><strong>HTTP/2</strong></td><td>Бинарный протокол (в отличие от текстового HTTP/1.1) с мультиплексированием (множество запросов параллельно по одному TCP-соединению), сжатием заголовков (HPACK) и server push.</td></tr>
   <tr><td><strong>REST</strong></td><td>Representational State Transfer — архитектурный стиль, описанный Роем Филдингом (2000). Набор из 6 ограничений для построения масштабируемых распределённых систем.</td></tr>
   <tr><td><strong>RESTful</strong></td><td>API, соблюдающее все ограничения REST (включая HATEOAS). На практике термин часто используется для API уровня 2 по Ричардсону.</td></tr>
   <tr><td><strong>Resource</strong></td><td>Ресурс — любая сущность, к которой можно обратиться по URI (продукт, пользователь, заказ).</td></tr>
@@ -1875,7 +2397,10 @@ public ResponseEntity&lt;ProblemDetail&gt; handleNotFound(ProductNotFoundExcepti
   <tr><td><strong>Status codes</strong></td><td>Трёхзначные числовые коды результата обработки запроса (200, 404, 500). Сгруппированы по категориям: 2xx — успех, 3xx — перенаправление, 4xx — ошибка клиента, 5xx — ошибка сервера.</td></tr>
   <tr><td><strong>Idempotent</strong></td><td>Идемпотентный — повторный вызов с теми же параметрами даёт тот же результат (GET, PUT, DELETE).</td></tr>
   <tr><td><strong>Safe method</strong></td><td>Безопасный метод — не изменяет состояние сервера (GET, HEAD, OPTIONS).</td></tr>
-  <tr><td><strong>HATEOAS</strong></td><td>Hypermedia As The Engine Of Application State — ответы содержат ссылки на связанные действия (Level 3 по Ричардсону).</td></tr>
+  <tr><td><strong>HATEOAS</strong></td><td>Hypermedia As The Engine Of Application State — принцип REST Level 3: ответы содержат ссылки на связанные действия и ресурсы. Клиент обнаруживает возможности API из ответов, а не из документации. Сервер управляет доступными действиями через наличие/отсутствие ссылок.</td></tr>
+  <tr><td><strong>HAL</strong></td><td>Hypertext Application Language — самый популярный формат гипермедиа. Ссылки в <code>_links</code>, вложенные ресурсы в <code>_embedded</code>. Поддерживается Spring HATEOAS по умолчанию.</td></tr>
+  <tr><td><strong>EntityModel</strong></td><td>Класс Spring HATEOAS — обёртка над DTO, добавляющая ссылки (<code>_links</code>) к одиночному ресурсу.</td></tr>
+  <tr><td><strong>CollectionModel</strong></td><td>Класс Spring HATEOAS — обёртка над коллекцией <code>EntityModel</code>, добавляющая ссылки для коллекции в целом.</td></tr>
   <tr><td><strong>Content Negotiation</strong></td><td>Механизм выбора формата ответа (JSON/XML) на основе заголовка Accept. При отсутствии подходящего конвертера — 406 Not Acceptable.</td></tr>
   <tr><td><strong>DTO</strong></td><td>Data Transfer Object — объект для передачи данных между слоями, отделённый от Entity.</td></tr>
   <tr><td><strong>Entity</strong></td><td>JPA-сущность, маппится на таблицу в базе данных. Управляется EntityManager.</td></tr>
@@ -1897,12 +2422,14 @@ public ResponseEntity&lt;ProblemDetail&gt; handleNotFound(ProductNotFoundExcepti
   <tr><td><strong>JSON Merge Patch</strong></td><td>RFC 7396 — частичный JSON для обновления ресурса. Поле null = удалить, отсутствие = не менять.</td></tr>
   <tr><td><strong>JSON Patch</strong></td><td>RFC 6902 — массив операций (add, remove, replace, move, copy, test) для обновления ресурса.</td></tr>
   <tr><td><strong>Idempotency-Key</strong></td><td>Заголовок для обеспечения идемпотентности POST-запросов при сетевых сбоях.</td></tr>
+  <tr><td><strong>DispatcherServlet</strong></td><td>Центральный сервлет Spring MVC, принимающий все HTTP-запросы и маршрутизирующий их к нужному контроллеру через HandlerMapping.</td></tr>
+  <tr><td><strong>Embedded Tomcat</strong></td><td>Встроенный веб-сервер в Spring Boot. Слушает TCP-порт, принимает HTTP-соединения и передаёт запросы в DispatcherServlet.</td></tr>
 </table>
 
 <hr class="section-divider"/>
 
 <!-- ==================== SECTION 11 ==================== -->
-<h2 id="section11">19. Endpoint'ы API</h2>
+<h2 id="section11">20. Endpoint'ы API</h2>
 
 <h3>Demo Endpoints</h3>
 <div class="endpoint">GET /api/rest/basics</div>
