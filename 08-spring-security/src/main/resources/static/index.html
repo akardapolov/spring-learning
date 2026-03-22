@@ -1,47 +1,864 @@
+<!-- filename: 08-spring-security/src/main/resources/static/index.html -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Модуль в разработке</title>
+  <meta charset="UTF-8">
+  <title>Spring Security — теория и демо</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>mermaid.initialize({startOnLoad: true, theme: 'default'});</script>
   <style>
     body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f7f7f8;
-      color: #222;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 20px;
+        line-height: 1.7;
+        color: #333;
+        background: #fafafa;
     }
-
-    .container {
-      text-align: center;
-      background: white;
-      padding: 40px 32px;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-      max-width: 500px;
-      width: 90%;
-    }
-
     h1 {
-      margin: 0 0 12px;
-      font-size: 28px;
+        color: #2c3e50;
+        border-bottom: 3px solid #3498db;
+        padding-bottom: 10px;
     }
-
-    p {
-      margin: 0;
-      font-size: 16px;
-      color: #555;
+    h2 {
+        color: #2980b9;
+        margin-top: 50px;
+        border-left: 4px solid #3498db;
+        padding-left: 12px;
+    }
+    h3 {
+        color: #16a085;
+        margin-top: 28px;
+    }
+    h4 {
+        color: #8e44ad;
+        margin-top: 20px;
+    }
+    pre {
+        background: #2d2d2d;
+        color: #f8f8f2;
+        padding: 16px;
+        border-radius: 6px;
+        overflow-x: auto;
+        font-size: 14px;
+    }
+    code {
+        background: #ecf0f1;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 14px;
+    }
+    pre code {
+        background: none;
+        padding: 0;
+    }
+    .mermaid {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        margin: 16px 0;
+        overflow-x: auto;
+    }
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 12px 0;
+        background: white;
+    }
+    th, td {
+        border: 1px solid #bdc3c7;
+        padding: 10px;
+        text-align: left;
+        vertical-align: top;
+    }
+    th {
+        background: #2980b9;
+        color: white;
+    }
+    a {
+        color: #2980b9;
+    }
+    .file-link {
+        background: #e8f6f3;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 13px;
+        display: inline-block;
+        margin: 2px 0;
+    }
+    .note {
+        background: #fef9e7;
+        border-left: 4px solid #f1c40f;
+        padding: 12px;
+        margin: 12px 0;
+        border-radius: 4px;
+    }
+    .good {
+        background: #eafaf1;
+        border-left: 4px solid #27ae60;
+        padding: 12px;
+        margin: 12px 0;
+        border-radius: 4px;
+    }
+    .warn {
+        background: #fffbeb;
+        border-left: 4px solid #d97706;
+        padding: 12px;
+        margin: 12px 0;
+        border-radius: 4px;
+    }
+    .toc {
+        background: white;
+        border: 1px solid #dcdcdc;
+        border-radius: 8px;
+        padding: 18px;
+        margin: 20px 0 30px 0;
+    }
+    .toc ul {
+        margin: 0;
+        padding-left: 20px;
+    }
+    .endpoint {
+        background: #eef6ff;
+        border: 1px solid #d6eaff;
+        border-radius: 6px;
+        padding: 10px 12px;
+        margin: 6px 0;
+        font-family: monospace;
+        font-size: 13px;
+    }
+    .endpoint a {
+        text-decoration: none;
+        color: #2563eb;
+    }
+    .endpoint a:hover {
+        text-decoration: underline;
+    }
+    .section-divider {
+        margin: 35px 0;
+        border: none;
+        border-top: 1px solid #ddd;
+    }
+    .card {
+        background: white;
+        border: 1px solid #dcdcdc;
+        border-radius: 12px;
+        padding: 18px 18px 16px;
+        margin: 16px 0;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Модуль в разработке</h1>
-    <p>Материалы для этого раздела скоро появятся.</p>
-  </div>
+
+<h1>Spring Security — теория и демо</h1>
+<p>Теория, работающий код, тесты и HTTP endpoint'ы для демонстрации Spring Security — мощного фреймворка для аутентификации и авторизации в приложениях на Spring.</p>
+
+<div class="good">
+  <strong>Документация:</strong> <code>http://localhost:8892/</code><br/>
+  <strong>H2 Console:</strong> <a href="/h2-console">/h2-console</a><br/>
+  <strong>JDBC URL:</strong> <code>jdbc:h2:mem:springsecurity</code><br/>
+  <strong>User:</strong> <code>sa</code><br/>
+  <strong>Password:</strong> пустой
+</div>
+
+<div class="note">
+  <strong>Тестовые пользователи:</strong><br/>
+  admin/admin123 (ROLE_ADMIN)<br/>
+  user/user123 (ROLE_USER)<br/>
+  moderator/moderator123 (ROLE_MODERATOR)<br/>
+  disabled_user/disabled123 (ROLE_USER, disabled)
+</div>
+
+<div class="toc">
+  <h3>Содержание</h3>
+  <ul>
+    <li><a href="#section1">1. Что такое Spring Security</a></li>
+    <li><a href="#section2">2. Аутентификация vs Авторизация</a></li>
+    <li><a href="#section3">3. Архитектура Spring Security</a></li>
+    <li><a href="#section4">4. Security Filter Chain</a></li>
+    <li><a href="#section5">5. Конфигурация безопасности</a></li>
+    <li><a href="#section6">6. Password Encoding</a></li>
+    <li><a href="#section7">7. Пользователи, роли и разрешения (RBAC)</a></li>
+    <li><a href="#section8">8. Method Security</a></li>
+    <li><a href="#section9">9. Security Events</a></li>
+    <li><a href="#section10">10. Глоссарий терминов</a></li>
+    <li><a href="#section11">11. Структура проекта</a></li>
+    <li><a href="#section12">12. Endpoint'ы API</a></li>
+    <li><a href="#section13">13. Быстрый старт (curl)</a></li>
+    <li><a href="#section14">14. Тесты</a></li>
+  </ul>
+</div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 1 ==================== -->
+<h2 id="section1">1. Что такое Spring Security</h2>
+
+<p>
+  Spring Security — это мощный и настраиваемый фреймворк аутентификации и контроля доступа
+  для приложений Java. Он обеспечивает комплексную защиту для приложений Spring.
+</p>
+
+<div class="note">
+  <strong>Ключевые возможности:</strong> аутентификация, авторизация, защита от атак (CSRF, XSS, session fixation),
+  интеграция с OAuth2, SAML, LDAP, JWT и многое другое.
+</div>
+
+<div class="mermaid">
+  graph TB
+  Client[Client] --> FilterChain[Security Filter Chain]
+  FilterChain --> Auth[Authentication Manager]
+  FilterChain --> Authz[Access Decision Manager]
+  Auth --> Provider[Authentication Provider]
+  Provider --> DB[(Database)]
+  Authz --> Voting[Access Decision Voting]
+</div>
+
+<p>
+  Проект использует <strong>H2</strong> в качестве in-memory базы данных, схема создаётся
+  автоматически через JPA (ddl-auto=create-drop), начальные данные загружаются через
+  <span class="file-link">DemoDataInitializer.java</span>.
+</p>
+
+<div class="endpoint"><a href="/api/security/concepts">GET /api/security/concepts</a></div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 2 ==================== -->
+<h2 id="section2">2. Аутентификация vs Авторизация</h2>
+
+<p>
+  Часто путают эти два понятия, но в Spring Security они играют разные роли.
+  Это различие возвращается эндпоинтом <code>/api/security/auth-vs-authorization</code>
+  и проверяется тестом <span class="file-link">Section3_AuthVsAuthorizationTest.java</span>.
+</p>
+
+<table>
+  <thead>
+  <tr><th>Аспект</th><th>Аутентификация</th><th>Авторизация</th></tr>
+  </thead>
+  <tbody>
+  <tr><td>Цель</td><td>Кто вы? (проверка идентичности)</td><td>Что вы можете делать? (проверка прав)</td></tr>
+  <tr><td>Когда происходит</td><td>Первой — при каждом запросе</td><td>После аутентификации — при доступе к ресурсам</td></tr>
+  <tr><td>Классы Spring Security</td><td>Authentication, AuthenticationManager</td><td>AccessDecisionManager, SecurityExpressionHandler</td></tr>
+  <tr><td>Механизмы</td><td>Username/password, JWT, OAuth2, SAML</td><td>Роли, разрешения, @PreAuthorize, @Secured</td></tr>
+  <tr><td>При ошибке</td><td>401 Unauthorized — не вошёл в систему</td><td>403 Forbidden — вошёл, но нет прав</td></tr>
+  </tbody>
+</table>
+
+<div class="note">
+  <strong>Простой способ запомнить:</strong><br/>
+  Аутентификация = проверить личность (показать паспорт)<br/>
+  Авторизация = проверить права (получить доступ к VIP-зоне)
+</div>
+
+<div class="endpoint"><a href="/api/security/auth-vs-authorization">GET /api/security/auth-vs-authorization</a></div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 3 ==================== -->
+<h2 id="section3">3. Архитектура Spring Security</h2>
+
+<p>
+  Spring Security построен на цепочке фильтров (Security Filter Chain), через которую проходит
+  каждый HTTP-запрос перед тем, как достичь вашего контроллера.
+</p>
+
+<h3>Ключевые компоненты</h3>
+
+<ul>
+  <li><strong>SecurityContext</strong> — хранит информацию о текущем аутентифицированном пользователе (Principal).</li>
+  <li><strong>SecurityContextHolder</strong> — статический класс для доступа к SecurityContext текущего потока.</li>
+  <li><strong>Authentication</strong> — представляет токен аутентификации (credentials, principal, authorities).</li>
+  <li><strong>AuthenticationManager</strong> — интерфейс для обработки аутентификации.</li>
+  <li><strong>UserDetailsService</strong> — загрузка пользовательских данных по username.</li>
+  <li><strong>PasswordEncoder</strong> — шифрование и проверка паролей (BCrypt, Argon2, etc.).</li>
+</ul>
+
+<h3>Диаграмма архитектуры</h3>
+
+<div class="mermaid">
+  sequenceDiagram
+    autonumber
+    actor Client as Клиент
+    participant FilterChain as Security Filter Chain
+    participant AuthManager as AuthenticationManager
+    participant Provider as AuthenticationProvider
+    participant DB as База Данных
+
+    Client->>FilterChain: HTTP Request
+    FilterChain->>AuthManager: authenticate(Authentication)
+    AuthManager->>Provider: authenticate(Authentication)
+    Provider->>DB: loadUserByUsername()
+    DB-->>Provider: UserDetails
+    Provider->>Provider: check password
+    Provider-->>AuthManager: Authentication (success)
+    AuthManager-->>FilterChain: Authentication
+    FilterChain->>FilterChain: SecurityContextHolder.setContext()
+    FilterChain-->>Client: HTTP Response
+</div>
+
+<div class="endpoint"><a href="/api/security/architecture">GET /api/security/architecture</a></div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 4 ==================== -->
+<h2 id="section4">4. Security Filter Chain</h2>
+
+<p>
+  Цепочка фильтров (Filter Chain) — это ядро Spring Security. Каждый фильтр
+  выполняет определённую задачу: проверку CSRF, базовую аутентификацию, обработку формы логина и т.д.
+</p>
+
+<p>
+  Фильтры выполняются в определённом порядке. Если фильтр не может обработать запрос,
+  он передаёт управление следующему фильтру в цепочке.
+</p>
+
+<h3>Основные фильтры в цепочке</h3>
+
+<table>
+  <thead><tr><th>Порядок</th><th>Фильтр</th><th>Описание</th></tr></thead>
+  <tbody>
+  <tr><td>1</td><td>ChannelProcessingFilter</td><td>Проверяет, должен ли запрос быть по HTTPS</td></tr>
+  <tr><td>3</td><td>SecurityContextPersistenceFilter</td><td>Загружает/сохраняет SecurityContext</td></tr>
+  <tr><td>4</td><td>HeaderWriterFilter</td><td>Добавляет security headers</td></tr>
+  <tr><td>5</td><td>CorsFilter</td><td>Обрабатывает CORS запросы</td></tr>
+  <tr><td>6</td><td>CsrfFilter</td><td>Защита от CSRF атак</td></tr>
+  <tr><td>8</td><td>UsernamePasswordAuthenticationFilter</td><td>Обрабатывает форму логина</td></tr>
+  <tr><td>9</td><td>BasicAuthenticationFilter</td><td>Обрабатывает HTTP Basic</td></tr>
+  <tr><td>14</td><td>ExceptionTranslationFilter</td><td>Преобразует исключения в HTTP ответы</td></tr>
+  <tr><td>15</td><td>FilterSecurityInterceptor</td><td>Авторизует запросы</td></tr>
+  </tbody>
+</table>
+
+<div class="note">
+  В проекте <span class="file-link">SecurityConfiguration.java</span> настраивает SecurityFilterChain,
+  отключает CSRF для REST API и определяет правила доступа к endpoint'ам.
+</div>
+
+<div class="endpoint"><a href="/api/security/filter-chain">GET /api/security/filter-chain</a></div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 5 ==================== -->
+<h2 id="section5">5. Конфигурация безопасности</h2>
+
+<p>
+  Основная конфигурация безопасности определена в классе
+  <span class="file-link">SecurityConfiguration.java</span>.
+  Она настраивает SecurityFilterChain, PasswordEncoder и AuthenticationManager.
+</p>
+
+<h3>Основные настройки конфигурации</h3>
+
+<pre><code>@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity
+public class SecurityConfiguration {
+
+  @Bean
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    http
+        .csrf(AbstractHttpConfigurer::disable)
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/api/auth/**", "/api/security/**").permitAll()
+            .anyRequest().authenticated()
+        )
+        .httpBasic(Customizer.withDefaults())
+        .formLogin(form -> form
+            .loginPage("/login")
+            .permitAll()
+        );
+
+    return http.build();
+  }
+
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
+}</code></pre>
+
+<h3>Пояснение настроек</h3>
+
+<ul>
+  <li><strong>@EnableWebSecurity</strong> — включает Spring Security веб-безопасность.</li>
+  <li><strong>@EnableMethodSecurity</strong> — включает аннотации для безопасности на уровне методов (@PreAuthorize, @Secured).</li>
+  <li><strong>csrf().disable()</strong> — отключает CSRF (для REST API с JWT).</li>
+  <li><strong>authorizeHttpRequests()</strong> — определяет правила доступа к endpoint'ам.</li>
+  <li><strong>httpBasic()</strong> — включает HTTP Basic аутентификацию.</li>
+  <li><strong>formLogin()</strong> — настраивает форму логина.</li>
+  <li><strong>passwordEncoder()</strong> — BCrypt для хеширования паролей.</li>
+</ul>
+
+<div class="warn">
+  <strong>Важно:</strong> Для production приложений не отключайте CSRF без веских причин.
+  Используйте JWT или другой stateless механизм аутентификации вместе с CSRF защитой.
+</div>
+
+<div class="endpoint"><a href="/api/security/config">GET /api/security/config</a></div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 6 ==================== -->
+<h2 id="section6">6. Password Encoding</h2>
+
+<p>
+  Пароли никогда не должны храниться в открытом виде. Spring Security предоставляет интерфейс
+  <code>PasswordEncoder</code> для шифрования паролей. Проект использует BCrypt — один из
+  самых популярных и безопасных алгоритмов.
+</p>
+
+<h3>BCrypt Password Encoder</h3>
+
+<p>
+  BCrypt автоматически генерирует соль (salt) при каждом хешировании и включает её в результат.
+  Это делает каждый хеш уникальным, даже для одинаковых паролей.
+</p>
+
+<pre><code>PasswordEncoder encoder = new BCryptPasswordEncoder();
+
+// Хеширование пароля
+String encodedPassword = encoder.encode("password123");
+// Результат: $2a$10$N9qo8uLOickgx2ZMRZoMy...
+
+// Проверка пароля
+boolean matches = encoder.matches("password123", encodedPassword);</code></pre>
+
+<div class="good">
+  <strong>Преимущества BCrypt:</strong><br/>
+  - Встроенная соль (не нужно хранить отдельно)<br/>
+  - Активная работа по замедлению (сложность можно настраивать)<br/>
+  - Широкая поддержка и проверка временем
+</div>
+
+<h3>Настройка strength (сильны)</h3>
+
+<p>
+  По умолчанию BCrypt использует 10 rounds (итераций). Можно изменить силу:
+</p>
+
+<pre><code>@Bean
+public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder(12); // Более безопасно, но медленнее
+}</code></pre>
+
+<div class="endpoint"><a href="/api/security/password-encoder">GET /api/security/password-encoder</a></div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 7 ==================== -->
+<h2 id="section7">7. Пользователи, роли и разрешения (RBAC)</h2>
+
+<p>
+  Проект реализует RBAC (Role-Based Access Control) с тремя уровнями:
+  <strong>Users</strong> (пользователи), <strong>Roles</strong> (роли) и <strong>Permissions</strong> (разрешения).
+</p>
+
+<h3>Модель данных</h3>
+
+<div class="mermaid">
+  classDiagram
+  class User {
+    Long id
+    String username
+    String password
+    String email
+    Boolean enabled
+    Set~Role~ roles
+  }
+  class Role {
+    Long id
+    String name
+    String description
+    Set~Permission~ permissions
+    Set~User~ users
+  }
+  class Permission {
+    Long id
+    String name
+    String description
+    Set~Role~ roles
+  }
+
+  User "many" -- "many" Role : has
+  Role "many" -- "many" Permission : has
+</div>
+
+<h3>Сущности в проекте</h3>
+
+<ul>
+  <li><span class="file-link">User</span> — учётная запись пользователя с полями username, password, email, enabled, roles.</li>
+  <li><span class="file-link">Role</span> — роль (USER, MODERATOR, ADMIN) с набором разрешений.</li>
+  <li><span class="file-link">Permission</span> — детальное разрешение (USER_READ, USER_WRITE, ROLE_READ, etc.).</li>
+</ul>
+
+<h3>Иерархия прав в демо-данных</h3>
+
+<table>
+  <thead><tr><th>Роль</th><th>Разрешения</th></tr></thead>
+  <tbody>
+  <tr><td>USER</td><td>USER_READ</td></tr>
+  <tr><td>MODERATOR</td><td>USER_READ, USER_WRITE, ROLE_READ</td></tr>
+  <tr><td>ADMIN</td><td>Все разрешения</td></tr>
+  </tbody>
+</table>
+
+<div class="note">
+  Демо-пользователи создаются в <span class="file-link">DemoDataInitializer.java</span>.
+  Пароли хешируются через BCrypt перед сохранением в базу.
+</div>
+
+<div class="endpoint"><a href="/api/security/user-details/admin">GET /api/security/user-details/{username}</a></div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 8 ==================== -->
+<h2 id="section8">8. Method Security</h2>
+
+<p>
+  Spring Security обеспечивает безопасность на уровне методов с помощью аннотаций.
+  Это позволяет контролировать доступ к конкретным методам сервиса или контроллера.
+</p>
+
+<h3>Аннотации метод-безопасности</h3>
+
+<table>
+  <thead><tr><th>Аннотация</th><th>Описание</th><th>Пример</th></tr></thead>
+  <tbody>
+  <tr><td>@Secured</td><td>Простая проверка роли</td><td>@Secured("ROLE_ADMIN")</td></tr>
+  <tr><td>@PreAuthorize</td><td>SpEL-выражение до выполнения</td><td>@PreAuthorize("hasRole('ADMIN')")</td></tr>
+  <tr><td>@PostAuthorize</td><td>SpEL-выражение после выполнения</td><td>@PostAuthorize("returnObject.owner == authentication.name")</td></tr>
+  <tr><td>@PreFilter</td><td>Фильтрация коллекций до выполнения</td><td>@PreFilter("filterObject.owner == authentication.name")</td></tr>
+  <tr><td>@PostFilter</td><td>Фильтрация результата после выполнения</td><td>@PostFilter("filterObject.visible == true")</td></tr>
+  </tbody>
+</table>
+
+<h3>SpEL-выражения</h3>
+
+<table>
+  <thead><tr><th>Выражение</th><th>Описание</th></tr></thead>
+  <tbody>
+  <tr><td>hasRole('ADMIN')</td><td>Проверка наличия роли (автоматически добавляет ROLE_)</td></tr>
+  <tr><td>hasAuthority('USER_WRITE')</td><td>Проверка наличия разрешения</td></tr>
+  <tr><td>isAuthenticated()</td><td>Проверка, что пользователь аутентифицирован</td></tr>
+  <tr><td>isAnonymous()</td><td>Проверка, что пользователь анонимный</td></tr>
+  <tr><td>permitAll()</td><td>Разрешить доступ всем</td></tr>
+  <tr><td>denyAll()</td><td>Запретить доступ всем</td></tr>
+  </tbody>
+</table>
+
+<h3>Примеры из проекта</h3>
+
+<pre><code>@RestController
+@RequestMapping("/api/users")
+public class UserController {
+
+  @GetMapping
+  @PreAuthorize("hasRole('ADMIN')")
+  public ApiResponse<List<UserDto>> getAllUsers() {
+      // Только администраторы могут видеть всех пользователей
+  }
+
+  @GetMapping("/{id}")
+  @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
+  public ApiResponse<UserDto> getUserById(@PathVariable Long id) {
+      // Админы или владелец профиля
+  }
+
+  @PostMapping
+  @PreAuthorize("hasRole('ADMIN')")
+  public ApiResponse<UserDto> createUser(@RequestBody UserCreateRequest request) {
+      // Только админы создают пользователей
+  }
+}</code></pre>
+
+<div class="endpoint"><a href="/api/security/method-security">GET /api/security/method-security</a></div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 9 ==================== -->
+<h2 id="section9">9. Security Events</h2>
+
+<p>
+  Spring Security предоставляет события, которые происходят при различных действиях безопасности.
+  Проект использует <span class="file-link">SecurityEventsCollector.java</span> для сбора
+  таких событий.
+</p>
+
+<h3>Типы событий</h3>
+
+<ul>
+  <li><strong>AUTHENTICATION_SUCCESS</strong> — успешная аутентификация пользователя.</li>
+  <li><strong>AUTHENTICATION_FAILED</strong> — неудачная попытка входа.</li>
+  <li><strong>USER_CREATED</strong> — создание нового пользователя.</li>
+  <li><strong>USER_DELETED</strong> — удаление пользователя.</li>
+  <li><strong>USER_ENABLED</strong> / <strong>USER_DISABLED</strong> — включение/отключение учётной записи.</li>
+  <li><strong>ROLE_ASSIGNED</strong> / <strong>ROLE_REMOVED</strong> — назначение/удаление роли.</li>
+  <li><strong>PASSWORD_CHANGED</strong> — изменение пароля.</li>
+</ul>
+
+<h3>Пример события</h3>
+
+<pre><code>eventsCollector.recordEvent("AUTHENTICATION_SUCCESS", username,
+    "User logged in successfully");</code></pre>
+
+<div class="note">
+  В продакшене эти события могут быть отправлены в систему логирования, мониторинга,
+  аудита или использованы для уведомлений пользователей о подозрительной активности.
+</div>
+
+<div class="endpoint"><a href="/api/security/events">GET /api/security/events</a></div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 10 ==================== -->
+<h2 id="section10">10. Глоссарий терминов</h2>
+
+<table>
+  <tr><th>Термин</th><th>Определение</th></tr>
+  <tr><td><strong>Authentication</strong></td><td>Процесс проверки личности пользователя (Кто вы?)</td></tr>
+  <tr><td><strong>Authorization</strong></td><td>Процесс определения прав доступа (Что вы можете делать?)</td></tr>
+  <tr><td><strong>Principal</strong></td><td>Аутентифицированный пользователь в Spring Security</td></tr>
+  <tr><td><strong>GrantedAuthority</strong></td><td>Разрешение или роль, назначенная пользователю</td></tr>
+  <tr><td><strong>SecurityContext</strong></td><td>Контекст, хранящий информацию безопасности для текущего запроса</td></tr>
+  <tr><td><strong>SecurityFilterChain</strong></td><td>Цепочка фильтров, обрабатывающая каждый HTTP запрос</td></tr>
+  <tr><td><strong>UserDetails</strong></td><td>Интерфейс для представления пользовательских данных</td></tr>
+  <tr><td><strong>UserDetailsService</strong></td><td>Интерфейс для загрузки пользовательских данных по username</td></tr>
+  <tr><td><strong>PasswordEncoder</strong></td><td>Интерфейс для шифрования и проверки паролей</td></tr>
+  <tr><td><strong>CSRF</strong></td><td>Защита от межсайтовой подделки запроса</td></tr>
+  <tr><td><strong>CORS</strong></td><td>Разрешение междоменных запросов</td></tr>
+  <tr><td><strong>JWT</strong></td><td>JSON Web Token для stateless аутентификации</td></tr>
+  <tr><td><strong>RBAC</strong></td><td>Role-Based Access Control — доступ на основе ролей</td></tr>
+  <tr><td><strong>@Secured</strong></td><td>Аннотация для простой роли-безопасности</td></tr>
+  <tr><td><strong>@PreAuthorize</strong></td><td>Аннотация для SpEL-безопасности перед выполнением</td></tr>
+  <tr><td><strong>BCrypt</strong></td><td>Алгоритм хеширования паролей с солью</td></tr>
+</table>
+
+<div class="endpoint"><a href="/api/security/glossary">GET /api/security/glossary</a></div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 11 ==================== -->
+<h2 id="section11">11. Структура проекта</h2>
+
+<div class="card">
+<pre><code>08-spring-security
+├── pom.xml
+└── src
+    ├── main
+    │   ├── java/com/example/springsecurity
+    │   │   ├── SpringSecurityApplication.java
+    │   │   ├── config
+    │   │   │   ├── DemoDataInitializer.java
+    │   │   │   ├── SecurityConfiguration.java
+    │   │   │   └── SecurityEventsCollector.java
+    │   │   ├── controller
+    │   │   │   ├── AuthController.java
+    │   │   │   ├── DemoController.java
+    │   │   │   ├── GlobalExceptionHandler.java
+    │   │   │   ├── PermissionController.java
+    │   │   │   ├── RoleController.java
+    │   │   │   └── UserController.java
+    │   │   ├── entity
+    │   │   │   ├── Permission.java
+    │   │   │   ├── Role.java
+    │   │   │   └── User.java
+    │   │   ├── exception
+    │   │   │   ├── RoleNotFoundException.java
+    │   │   │   ├── UserAlreadyExistsException.java
+    │   │   │   └── UserNotFoundException.java
+    │   │   ├── model
+    │   │   │   └── ApiModels.java
+    │   │   ├── repository
+    │   │   │   ├── PermissionRepository.java
+    │   │   │   ├── RoleRepository.java
+    │   │   │   └── UserRepository.java
+    │   │   └── service
+    │   │       ├── PermissionService.java
+    │   │       ├── RoleService.java
+    │   │       ├── SpringSecurityDemoService.java
+    │   │       └── UserService.java
+    │   └── resources
+    │       ├── application.yaml
+    │       └── static
+    │           └── index.html
+    └── test
+        └── java/com/example/springsecurity
+            ├── Section1_SecurityConceptsTest.java
+            ├── Section2_FilterChainTest.java
+            ├── Section3_AuthVsAuthorizationTest.java
+            ├── Section4_MethodSecurityTest.java
+            ├── Section5_SecurityConfigTest.java
+            ├── Section6_GlossaryTest.java
+            ├── Section7_EndpointsTest.java
+            └── Section8_ArchitectureTest.java</code></pre>
+</div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 12 ==================== -->
+<h2 id="section12">12. Endpoint'ы API</h2>
+
+<table>
+  <thead><tr><th>Метод</th><th>Путь</th><th>Описание</th><th>Auth</th></tr></thead>
+  <tbody>
+  <tr><td>GET</td><td><a href="/api/security/concepts"><code>/api/security/concepts</code></a></td><td>Ключевые концепции Spring Security</td><td>Нет</td></tr>
+  <tr><td>GET</td><td><a href="/api/security/filter-chain"><code>/api/security/filter-chain</code></a></td><td>Цепочка фильтров</td><td>Нет</td></tr>
+  <tr><td>GET</td><td><a href="/api/security/architecture"><code>/api/security/architecture</code></a></td><td>Обзор архитектуры</td><td>Нет</td></tr>
+  <tr><td>GET</td><td><a href="/api/security/auth-vs-authorization"><code>/api/security/auth-vs-authorization</code></a></td><td>Аутентификация vs Авторизация</td><td>Нет</td></tr>
+  <tr><td>GET</td><td><a href="/api/security/method-security"><code>/api/security/method-security</code></a></td><td>Аннотации метод-безопасности</td><td>Нет</td></tr>
+  <tr><td>GET</td><td><a href="/api/security/password-encoder"><code>/api/security/password-encoder</code></a></td><td>Demo шифрования паролей</td><td>Нет</td></tr>
+  <tr><td>GET</td><td><a href="/api/security/config"><code>/api/security/config</code></a></td><td>Опции конфигурации</td><td>Нет</td></tr>
+  <tr><td>GET</td><td><a href="/api/security/glossary"><code>/api/security/glossary</code></a></td><td>Глоссарий терминов</td><td>Нет</td></tr>
+  <tr><td>GET</td><td><a href="/api/security/events"><code>/api/security/events</code></a></td><td>Лог событий безопасности</td><td>Нет</td></tr>
+  <tr><td>GET</td><td><a href="/api/security/endpoints"><code>/api/security/endpoints</code></a></td><td>Список всех endpoint'ов</td><td>Нет</td></tr>
+  <tr><td>POST</td><td><code>/api/auth/login</code></td><td>Аутентификация пользователя</td><td>Нет</td></tr>
+  <tr><td>GET</td><td><code>/api/users</code></td><td>Список всех пользователей</td><td>ADMIN</td></tr>
+  <tr><td>GET</td><td><code>/api/users/{id}</code></td><td>Получить пользователя по ID</td><td>ADMIN или owner</td></tr>
+  <tr><td>GET</td><td><code>/api/users/me</code></td><td>Текущий пользователь</td><td>Да</td></tr>
+  <tr><td>POST</td><td><code>/api/users</code></td><td>Создать пользователя</td><td>ADMIN</td></tr>
+  <tr><td>PUT</td><td><code>/api/users/{id}</code></td><td>Обновить пользователя</td><td>ADMIN или owner</td></tr>
+  <tr><td>DELETE</td><td><code>/api/users/{id}</code></td><td>Удалить пользователя</td><td>ADMIN</td></tr>
+  <tr><td>PUT</td><td><code>/api/users/{id}/password</code></td><td>Изменить пароль</td><td>Да</td></tr>
+  <tr><td>POST</td><td><code>/api/users/{id}/roles/{roleId}</code></td><td>Назначить роль пользователю</td><td>ADMIN</td></tr>
+  <tr><td>DELETE</td><td><code>/api/users/{id}/roles/{roleId}</code></td><td>Удалить роль у пользователя</td><td>ADMIN</td></tr>
+  <tr><td>PUT</td><td><code>/api/users/{id}/enable</code></td><td>Включить пользователя</td><td>ADMIN</td></tr>
+  <tr><td>PUT</td><td><code>/api/users/{id}/disable</code></td><td>Отключить пользователя</td><td>ADMIN</td></tr>
+  <tr><td>GET</td><td><code>/api/roles</code></td><td>Список ролей</td><td>Да</td></tr>
+  <tr><td>GET</td><td><code>/api/roles/{id}</code></td><td>Роль по ID</td><td>Да</td></tr>
+  <tr><td>POST</td><td><code>/api/roles</code></td><td>Создать роль</td><td>ADMIN</td></tr>
+  <tr><td>DELETE</td><td><code>/api/roles/{id}</code></td><td>Удалить роль</td><td>ADMIN</td></tr>
+  <tr><td>GET</td><td><code>/api/permissions</code></td><td>Список разрешений</td><td>Да</td></tr>
+  <tr><td>POST</td><td><code>/api/permissions</code></td><td>Создать разрешение</td><td>ADMIN</td></tr>
+  <tr><td>DELETE</td><td><code>/api/permissions/{id}</code></td><td>Удалить разрешение</td><td>ADMIN</td></tr>
+  </tbody>
+</table>
+
+<h3>Примеры JSON запросов</h3>
+
+<h4>POST /api/auth/login — аутентификация</h4>
+<p><strong>Request body:</strong></p>
+<pre><code>{
+  "username": "admin",
+  "password": "admin123"
+}</code></pre>
+<p><strong>Response (200 OK):</strong></p>
+<pre><code>{
+  "success": true,
+  "data": {
+    "token": "mock-jwt-token-...",
+    "type": "Bearer",
+    "user": {
+      "id": 1,
+      "username": "admin",
+      "email": "admin@example.com",
+      "fullName": "System Administrator",
+      "enabled": true,
+      "roles": ["ADMIN"]
+    }
+  }
+}</code></pre>
+
+<h4>POST /api/users — создание пользователя</h4>
+<p><strong>Request body:</strong></p>
+<pre><code>{
+  "username": "newuser",
+  "password": "password123",
+  "email": "newuser@example.com",
+  "firstName": "New",
+  "lastName": "User"
+}</code></pre>
+
+<div class="endpoint"><a href="/api/security/endpoints">GET /api/security/endpoints</a></div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 13 ==================== -->
+<h2 id="section13">13. Быстрый старт (curl)</h2>
+
+<p>Примеры запросов для быстрого тестирования API после запуска приложения:</p>
+
+<h4>Получить концепции безопасности</h4>
+<pre><code>curl http://localhost:8892/api/security/concepts | jq</code></pre>
+
+<h4>Аутентификация</h4>
+<pre><code>curl -X POST http://localhost:8892/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username": "admin", "password": "admin123"}' | jq</code></pre>
+
+<h4>Получить всех пользователей (HTTP Basic auth)</h4>
+<pre><code>curl -u admin:admin123 \
+  http://localhost:8892/api/users | jq</code></pre>
+
+<h4>Создать пользователя</h4>
+<pre><code>curl -X POST http://localhost:8892/api/users \
+  -H "Content-Type: application/json" \
+  -u admin:admin123 \
+  -d '{
+    "username": "testuser",
+    "password": "test123",
+    "email": "test@example.com",
+    "firstName": "Test",
+    "lastName": "User"
+  }' | jq</code></pre>
+
+<h4>Назначить роль пользователю</h4>
+<pre><code>curl -X POST http://localhost:8892/api/users/2/roles/2 \
+  -H "Content-Type: application/json" \
+  -u admin:admin123 | jq</code></pre>
+
+<h4>Отключить пользователя</h4>
+<pre><code>curl -X PUT http://localhost:8892/api/users/2/disable \
+  -H "Content-Type: application/json" \
+  -u admin:admin123 | jq</code></pre>
+
+<h4>Получить все роли</h4>
+<pre><code>curl http://localhost:8892/api/roles | jq</code></pre>
+
+<h4>Получить все разрешения</h4>
+<pre><code>curl http://localhost:8892/api/permissions | jq</code></pre>
+
+<h4>Получить события безопасности</h4>
+<pre><code>curl http://localhost:8892/api/security/events | jq</code></pre>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 14 ==================== -->
+<h2 id="section14">14. Тесты</h2>
+
+<p>
+  Каждый ключевой аспект покрыт интеграционными тестами, разбитыми по секциям:
+</p>
+
+<ul>
+  <li><span class="file-link">Section1_SecurityConceptsTest.java</span> — проверяет ключевые концепции.</li>
+  <li><span class="file-link">Section2_FilterChainTest.java</span> — проверяет цепочку фильтров.</li>
+  <li><span class="file-link">Section3_AuthVsAuthorizationTest.java</span> — сравнение аутентификации и авторизации.</li>
+  <li><span class="file-link">Section4_MethodSecurityTest.java</span> — аннотации метод-безопасности.</li>
+  <li><span class="file-link">Section5_SecurityConfigTest.java</span> — настройки конфигурации.</li>
+  <li><span class="file-link">Section6_GlossaryTest.java</span> — наличие основных терминов.</li>
+  <li><span class="file-link">Section7_EndpointsTest.java</span> — проверка REST endpoint'ов.</li>
+  <li><span class="file-link">Section8_ArchitectureTest.java</span> — обзор архитектуры.</li>
+</ul>
+
+<div class="good">
+  Тесты можно запустить командой <code>mvn clean test</code> в модуле.
+</div>
+
+<hr class="section-divider"/>
+
+<h2>Вывод</h2>
+<p>
+  Spring Security предоставляет комплексное решение для аутентификации и авторизации
+  в Spring-приложениях. Этот проект демонстрирует все ключевые возможности:
+  RBAC с пользователями, ролями и разрешениями, method security, password encoding,
+  security events, конфигурацию цепочки фильтров и полноценный REST API.
+</p>
+
 </body>
 </html>
