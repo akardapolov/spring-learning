@@ -1,4 +1,3 @@
-<!-- filename: 08-spring-security/src/main/resources/static/index.html -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -228,31 +227,348 @@
 <hr class="section-divider"/>
 
 <!-- ==================== SECTION 2 ==================== -->
-<h2 id="section2">2. Аутентификация vs Авторизация</h2>
+<h2 id="section2">2. Идентификация, Аутентификация и Авторизация</h2>
 
 <p>
-  Часто путают эти два понятия, но в Spring Security они играют разные роли.
-  Это различие возвращается эндпоинтом <code>/api/security/auth-vs-authorization</code>
+  Три ключевых процесса безопасности, которые часто путают, но выполняют <strong>принципиально разные функции</strong>.
+  Различие между аутентификацией и авторизацией возвращается эндпоинтом <code>/api/security/auth-vs-authorization</code>
   и проверяется тестом <span class="file-link">Section3_AuthVsAuthorizationTest.java</span>.
 </p>
 
+<h3>Аналогия из реальной жизни</h3>
+
+<div class="card">
+  <strong>🏢 Вход в офисное здание:</strong>
+  <table>
+    <thead><tr><th>Этап</th><th>Действие</th><th>Вопрос</th></tr></thead>
+    <tbody>
+    <tr><td>1. <strong>Идентификация</strong></td><td>«Меня зовут Иван Петров»</td><td>Кто ты?</td></tr>
+    <tr><td>2. <strong>Аутентификация</strong></td><td><em>показывает паспорт с фото</em></td><td>Докажи это!</td></tr>
+    <tr><td>3. <strong>Авторизация</strong></td><td><em>охранник проверяет список допуска</em></td><td>Что тебе разрешено?</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===== Идентификация ===== -->
+<h3>Идентификация (Identification) — «Кто ты?»</h3>
+
+<p>
+  Идентификация — процесс <strong>заявления</strong> о своей личности.
+  Пользователь <strong>называет себя</strong>, но ещё <strong>ничего не доказывает</strong>.
+  Система ищет предъявленный идентификатор в своей базе данных.
+</p>
+
+<div class="card">
+  <strong>Типичные идентификаторы:</strong>
+  <ul>
+    <li>Логин (username)</li>
+    <li>Email-адрес</li>
+    <li>Номер телефона</li>
+    <li>ID карты / badge</li>
+    <li>Номер паспорта</li>
+    <li>Отпечаток пальца (при поиске по базе — это тоже идентификация)</li>
+  </ul>
+</div>
+
+<div class="warn">
+  <strong>⚠️ На этапе идентификации доверия ещё нет!</strong>
+  Любой может заявить: «Я — admin». Это не значит, что система ему поверит.
+</div>
+
+<pre><code>// Пользователь вводит логин — это ИДЕНТИФИКАЦИЯ
+POST /api/auth/login
+{
+    "username": "ivan_petrov",   // ← Идентификация: "Я — ivan_petrov"
+    "password": "***"            // ← Это уже для аутентификации (следующий шаг)
+}
+
+// Сервер: "Ок, я нашёл такого пользователя. Теперь докажи, что это ты."</code></pre>
+
+<h4>Идентификация в Spring Security</h4>
+
+<p>
+  В Spring Security идентификация происходит внутри <code>UserDetailsService.loadUserByUsername()</code> —
+  система ищет пользователя по предъявленному идентификатору:
+</p>
+
+<pre><code>@Service
+public class CustomUserDetailsService implements UserDetailsService {
+
+    @Override
+    public UserDetails loadUserByUsername(String username)
+            throws UsernameNotFoundException {
+
+        // ← Это ИДЕНТИФИКАЦИЯ: поиск пользователя по заявленному имени
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new UsernameNotFoundException(
+                "Пользователь не найден: " + username  // Идентификация не прошла
+            ));
+
+        return buildUserDetails(user);
+        // Далее AuthenticationProvider проверит пароль — это уже АУТЕНТИФИКАЦИЯ
+    }
+}</code></pre>
+
+<!-- ===== Аутентификация ===== -->
+<h3>Аутентификация (Authentication) — «Докажи, что ты — тот, за кого себя выдаёшь!»</h3>
+
+<p>
+  Аутентификация — процесс <strong>подтверждения</strong> заявленной личности.
+  Пользователь предоставляет <strong>доказательства</strong> (credentials),
+  что он действительно тот, кем представился на этапе идентификации.
+</p>
+
+<div class="card">
+  <strong>Три фактора аутентификации:</strong>
+  <table>
+    <thead><tr><th>Фактор</th><th>Тип</th><th>Примеры</th></tr></thead>
+    <tbody>
+    <tr><td>🔑 Знание</td><td>Что-то, что вы <em>знаете</em></td><td>Пароль, PIN-код, секретный вопрос</td></tr>
+    <tr><td>📱 Владение</td><td>Что-то, что вы <em>имеете</em></td><td>Телефон (SMS/TOTP), смарт-карта, USB-токен</td></tr>
+    <tr><td>🧬 Свойство</td><td>Что-то, что вы <em>есть</em></td><td>Отпечаток пальца, распознавание лица, сетчатка</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h4>Уровни аутентификации</h4>
 <table>
-  <thead>
-  <tr><th>Аспект</th><th>Аутентификация</th><th>Авторизация</th></tr>
-  </thead>
+  <thead><tr><th>Уровень</th><th>Описание</th><th>Пример</th></tr></thead>
   <tbody>
-  <tr><td>Цель</td><td>Кто вы? (проверка идентичности)</td><td>Что вы можете делать? (проверка прав)</td></tr>
-  <tr><td>Когда происходит</td><td>Первой — при каждом запросе</td><td>После аутентификации — при доступе к ресурсам</td></tr>
-  <tr><td>Классы Spring Security</td><td>Authentication, AuthenticationManager</td><td>AccessDecisionManager, SecurityExpressionHandler</td></tr>
-  <tr><td>Механизмы</td><td>Username/password, JWT, OAuth2, SAML</td><td>Роли, разрешения, @PreAuthorize, @Secured</td></tr>
-  <tr><td>При ошибке</td><td>401 Unauthorized — не вошёл в систему</td><td>403 Forbidden — вошёл, но нет прав</td></tr>
+  <tr><td>Однофакторная (1FA)</td><td>Один фактор</td><td>Только пароль</td></tr>
+  <tr><td>Двухфакторная (2FA)</td><td>Два разных фактора</td><td>Пароль + SMS-код</td></tr>
+  <tr><td>Многофакторная (MFA)</td><td>Два и более факторов</td><td>Пароль + Отпечаток + Смарт-карта</td></tr>
   </tbody>
 </table>
 
+<h4>Аутентификация в Spring Security</h4>
+
+<pre><code>// Полный путь: Идентификация → Аутентификация
+public Authentication authenticate(Authentication authentication) {
+
+    String username = authentication.getName();
+    String password = authentication.getCredentials().toString();
+
+    // 1. ИДЕНТИФИКАЦИЯ — поиск пользователя
+    UserDetails user = userDetailsService.loadUserByUsername(username);
+    //   └── Если не найден → UsernameNotFoundException
+
+    // 2. АУТЕНТИФИКАЦИЯ — проверка пароля
+    if (!passwordEncoder.matches(password, user.getPassword())) {
+        throw new BadCredentialsException("Неверный пароль");
+        //   └── Идентификация прошла, но аутентификация НЕТ
+    }
+
+    // ✅ Оба этапа пройдены — личность подтверждена
+    return new UsernamePasswordAuthenticationToken(
+        user, null, user.getAuthorities()
+    );
+}</code></pre>
+
+<!-- ===== Авторизация ===== -->
+<h3>Авторизация (Authorization) — «Что тебе разрешено делать?»</h3>
+
+<p>
+  Авторизация — процесс определения <strong>прав доступа</strong> уже подтверждённого пользователя.
+  Система проверяет, какие ресурсы доступны и какие действия разрешены.
+</p>
+
+<div class="card">
+  <strong>Авторизация определяет:</strong>
+  <ul>
+    <li>Какие ресурсы доступны?</li>
+    <li>Какие действия разрешены (чтение, запись, удаление)?</li>
+    <li>Какой уровень доступа у пользователя?</li>
+  </ul>
+</div>
+
+<h4>Авторизация в Spring Security</h4>
+
+<pre><code>@GetMapping("/api/users")
+@PreAuthorize("hasRole('ADMIN')")  // ← АВТОРИЗАЦИЯ: только админы
+public List&lt;UserDto&gt; getAllUsers() { ... }
+
+@GetMapping("/api/users/{id}")
+@PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
+public UserDto getUserById(@PathVariable Long id) { ... }
+// ↑ АВТОРИЗАЦИЯ: админ ИЛИ владелец профиля</code></pre>
+
+<!-- ===== Сравнительная таблица ===== -->
+<h3>Сравнительная таблица</h3>
+
+<table>
+  <thead>
+  <tr><th>Аспект</th><th>Идентификация</th><th>Аутентификация</th><th>Авторизация</th></tr>
+  </thead>
+  <tbody>
+  <tr>
+    <td><strong>Вопрос</strong></td>
+    <td>Кто ты?</td>
+    <td>Ты точно он? Докажи!</td>
+    <td>Что тебе можно делать?</td>
+  </tr>
+  <tr>
+    <td><strong>Действие пользователя</strong></td>
+    <td>Предъявить идентификатор</td>
+    <td>Предоставить доказательство</td>
+    <td>Запросить ресурс</td>
+  </tr>
+  <tr>
+    <td><strong>Действие системы</strong></td>
+    <td>Найти пользователя в базе</td>
+    <td>Проверить credentials</td>
+    <td>Проверить права доступа</td>
+  </tr>
+  <tr>
+    <td><strong>Пример</strong></td>
+    <td>Ввести логин</td>
+    <td>Ввести пароль + SMS-код</td>
+    <td>Открыть страницу /admin</td>
+  </tr>
+  <tr>
+    <td><strong>HTTP-код при ошибке</strong></td>
+    <td>404 (пользователь не найден)</td>
+    <td>401 Unauthorized</td>
+    <td>403 Forbidden</td>
+  </tr>
+  <tr>
+    <td><strong>Порядок</strong></td>
+    <td>1-й шаг</td>
+    <td>2-й шаг</td>
+    <td>3-й шаг</td>
+  </tr>
+  <tr>
+    <td><strong>Доверие</strong></td>
+    <td>Нет — только заявление</td>
+    <td>Да — личность подтверждена</td>
+    <td>Да — права определены</td>
+  </tr>
+  <tr>
+    <td><strong>Аналогия</strong></td>
+    <td>«Я — Иван Петров»</td>
+    <td><em>показ паспорта</em></td>
+    <td><em>пропуск на нужный этаж</em></td>
+  </tr>
+  <tr>
+    <td><strong>Spring Security классы</strong></td>
+    <td>UserDetailsService, UserRepository</td>
+    <td>AuthenticationManager, AuthenticationProvider</td>
+    <td>AccessDecisionManager, @PreAuthorize, @Secured</td>
+  </tr>
+  <tr>
+    <td><strong>Механизмы</strong></td>
+    <td>Поиск по username, email, телефону</td>
+    <td>Password, JWT, OAuth2, SAML, биометрия</td>
+    <td>Роли, разрешения, SpEL-выражения</td>
+  </tr>
+  </tbody>
+</table>
+
+<!-- ===== Полный поток ===== -->
+<h3>Полный поток: все три этапа</h3>
+
+<div class="mermaid">
+  sequenceDiagram
+  autonumber
+  actor Client as Клиент
+  participant Server as Сервер
+  participant DB as База Данных
+
+  Note over Client,DB: ━━━ ЭТАП 1: ИДЕНТИФИКАЦИЯ ━━━
+
+  Client->>Server: POST /login { username: "ivan" }
+  Server->>DB: findByUsername("ivan")
+  DB-->>Server: User found ✅
+
+  Note over Client,DB: ━━━ ЭТАП 2: АУТЕНТИФИКАЦИЯ ━━━
+
+  Client->>Server: password: "MyS3cret!", otp: "482916"
+  Server->>Server: passwordEncoder.matches()
+  Server->>Server: verifyOTP()
+  Server-->>Client: ✅ Token: "eyJhbGci..."
+
+  Note over Client,DB: ━━━ ЭТАП 3: АВТОРИЗАЦИЯ (каждый запрос) ━━━
+
+  Client->>Server: GET /admin/users (Bearer token)
+  Server->>Server: Роль = USER, требуется ADMIN
+  Server-->>Client: ❌ 403 Forbidden
+</div>
+
+<!-- ===== Пример: банкомат ===== -->
+<h3>Практический пример: банкомат</h3>
+
+<div class="card">
+  <table>
+    <thead><tr><th>Шаг</th><th>Действие</th><th>Процесс</th></tr></thead>
+    <tbody>
+    <tr>
+      <td><strong>1. Идентификация</strong></td>
+      <td>Вставить карту (номер карты = идентификатор)</td>
+      <td>«Я — владелец карты ****1234»</td>
+    </tr>
+    <tr>
+      <td><strong>2. Аутентификация</strong></td>
+      <td>Ввести PIN-код (секрет = доказательство)</td>
+      <td>«Вот моё доказательство — PIN»</td>
+    </tr>
+    <tr>
+      <td><strong>3. Авторизация</strong></td>
+      <td>Запрос на снятие 50 000 ₽ (лимит 30 000 ₽)</td>
+      <td>❌ «Превышен дневной лимит» — авторизация отклонена</td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===== Биометрия: особый случай ===== -->
+<h3>Особый случай: биометрия</h3>
+
 <div class="note">
-  <strong>Простой способ запомнить:</strong><br/>
-  Аутентификация = проверить личность (показать паспорт)<br/>
-  Авторизация = проверить права (получить доступ к VIP-зоне)
+  <strong>Биометрия может выступать в двух ролях:</strong><br/><br/>
+  <strong>Как идентификация</strong> — система ищет лицо в базе всех сотрудников
+  (поиск «один ко многим»: <em>«Чьё это лицо?»</em>)<br/><br/>
+  <strong>Как аутентификация</strong> — система сравнивает отпечаток с конкретным
+  пользователем, который уже назвал своё имя
+  (сравнение «один к одному»: <em>«Это действительно Иван?»</em>)
+</div>
+
+<!-- ===== Типичные ошибки ===== -->
+<h3>Типичные ошибки в понимании</h3>
+
+<table>
+  <thead><tr><th>❌ Неправильно</th><th>✅ Правильно</th></tr></thead>
+  <tbody>
+  <tr>
+    <td>«Логин и пароль — это аутентификация»</td>
+    <td>Логин — идентификация, пароль — аутентификация</td>
+  </tr>
+  <tr>
+    <td>«401 и 403 — одно и то же»</td>
+    <td>401 — не аутентифицирован, 403 — не авторизован</td>
+  </tr>
+  <tr>
+    <td>«Авторизация = вход в систему»</td>
+    <td>Вход = идентификация + аутентификация. Авторизация = проверка прав</td>
+  </tr>
+  <tr>
+    <td>«Идентификация не нужна, хватит аутентификации»</td>
+    <td>Без идентификации система не знает, <em>чьи</em> учётные данные проверять</td>
+  </tr>
+  <tr>
+    <td>«Биометрия — это только аутентификация»</td>
+    <td>Биометрия может быть и идентификацией (поиск по базе лиц), и аутентификацией (подтверждение конкретного пользователя)</td>
+  </tr>
+  </tbody>
+</table>
+
+<!-- ===== Резюме ===== -->
+<h3>Резюме</h3>
+
+<div class="good">
+  <strong>Строгая последовательность:</strong><br/><br/>
+  <strong>Идентификация</strong> → <strong>Аутентификация</strong> → <strong>Авторизация</strong><br/><br/>
+  Нельзя аутентифицировать того, кто не идентифицирован.<br/>
+  Нельзя авторизовать того, кто не аутентифицирован.<br/><br/>
+  <code>«Я — Иван»</code> → <code>«Вот мой пароль»</code> → <code>«Могу ли я сюда?»</code>
 </div>
 
 <div class="endpoint"><a href="/api/security/auth-vs-authorization">GET /api/security/auth-vs-authorization</a></div>
