@@ -20,6 +20,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -123,6 +124,18 @@ public class GlobalExceptionHandler {
         request.getRequestURI(),
         null
     );
+  }
+
+  @ExceptionHandler(NoResourceFoundException.class)
+  public ResponseEntity<Void> handleNoResourceFoundException(
+      NoResourceFoundException ex, HttpServletRequest request) {
+
+    if (request.getRequestURI().contains("favicon.ico")) {
+      return ResponseEntity.noContent().build();
+    }
+
+    log.warn("Resource not found: {}", request.getRequestURI());
+    return ResponseEntity.notFound().build();
   }
 
   @ExceptionHandler(Exception.class)

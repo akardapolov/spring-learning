@@ -7,6 +7,13 @@ import com.example.springrest.model.ApiModels;
 import com.example.springrest.model.ApiModels.CrudOperationResult;
 import com.example.springrest.model.ApiModels.PaginationResult;
 import com.example.springrest.service.RestDemoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -22,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "Products", description = "Product management API - CRUD operations and search")
 @RestController
 @RequestMapping("/api/rest/products")
 public class ProductController {
@@ -32,19 +40,30 @@ public class ProductController {
     this.demoService = demoService;
   }
 
-  // GET /api/rest/products - list all products
+  @Operation(summary = "Get all products", description = "Returns a list of all available products")
+  @ApiResponse(responseCode = "200", description = "Successfully retrieved products")
   @GetMapping
   public List<ProductDto> getAllProducts() {
     return demoService.getAllProducts();
   }
 
-  // GET /api/rest/products/{id} - get product by id
+  @Operation(summary = "Get product by ID", description = "Returns a single product by its unique identifier")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "Product found"),
+      @ApiResponse(responseCode = "404", description = "Product not found", content = @Content(schema = @Schema(implementation = com.example.springrest.dto.ErrorResponse.class)))
+  })
   @GetMapping("/{id}")
-  public ProductDto getProductById(@PathVariable Long id) {
+  public ProductDto getProductById(
+      @Parameter(description = "Product ID", example = "1", required = true)
+      @PathVariable Long id) {
     return demoService.getProductById(id);
   }
 
-  // POST /api/rest/products - create product
+  @Operation(summary = "Create a new product", description = "Creates a new product and returns the created product with its assigned ID")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "201", description = "Product created successfully"),
+      @ApiResponse(responseCode = "400", description = "Invalid input data", content = @Content(schema = @Schema(implementation = com.example.springrest.dto.ValidationError.class)))
+  })
   @PostMapping
   public ResponseEntity<CrudOperationResult> createProduct(
       @Valid @RequestBody ProductCreateRequest request) {
@@ -53,18 +72,29 @@ public class ProductController {
     return ResponseEntity.status(HttpStatus.CREATED).body(result);
   }
 
-  // PUT /api/rest/products/{id} - full update
+  @Operation(summary = "Update product (full)", description = "Updates all fields of an existing product. All fields are required.")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "Product updated successfully"),
+      @ApiResponse(responseCode = "404", description = "Product not found"),
+      @ApiResponse(responseCode = "400", description = "Invalid input data")
+  })
   @PutMapping("/{id}")
   public CrudOperationResult updateProduct(
+      @Parameter(description = "Product ID", example = "1", required = true)
       @PathVariable Long id,
       @Valid @RequestBody ProductUpdateRequest request) {
 
     return demoService.updateProduct(id, request);
   }
 
-  // PATCH /api/rest/products/{id} - partial update
+  @Operation(summary = "Update product (partial)", description = "Updates only provided fields of an existing product. Null fields are ignored.")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "Product updated successfully"),
+      @ApiResponse(responseCode = "404", description = "Product not found")
+  })
   @PatchMapping("/{id}")
   public CrudOperationResult patchProduct(
+      @Parameter(description = "Product ID", example = "1", required = true)
       @PathVariable Long id,
       @RequestBody ProductUpdateRequest request) {
 
@@ -72,22 +102,41 @@ public class ProductController {
     return demoService.updateProduct(id, request);
   }
 
-  // DELETE /api/rest/products/{id} - delete product
+  @Operation(summary = "Delete product", description = "Deletes a product by its ID")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "204", description = "Product deleted successfully"),
+      @ApiResponse(responseCode = "404", description = "Product not found")
+  })
   @DeleteMapping("/{id}")
-  public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+  public ResponseEntity<Void> deleteProduct(
+      @Parameter(description = "Product ID", example = "1", required = true)
+      @PathVariable Long id) {
     demoService.deleteProduct(id);
     return ResponseEntity.noContent().build();
   }
 
-  // GET /api/rest/products/search - search with pagination
+  @Operation(summary = "Search products", description = "Search products with filters and pagination")
   @GetMapping("/search")
   public PaginationResult searchProducts(
+      @Parameter(description = "Filter by product type", example = "Electronics")
       @RequestParam(required = false) String type,
+
+      @Parameter(description = "Filter by product name (partial match)", example = "Laptop")
       @RequestParam(required = false) String name,
+
+      @Parameter(description = "Minimum price", example = "100.00")
       @RequestParam(required = false) java.math.BigDecimal minPrice,
+
+      @Parameter(description = "Maximum price", example = "2000.00")
       @RequestParam(required = false) java.math.BigDecimal maxPrice,
+
+      @Parameter(description = "Filter by category ID", example = "1")
       @RequestParam(required = false) Long categoryId,
+
+      @Parameter(description = "Page number (0-indexed)", example = "0")
       @RequestParam(defaultValue = "0") int page,
+
+      @Parameter(description = "Page size", example = "10")
       @RequestParam(defaultValue = "10") int size) {
 
     ApiModels.SearchCriteria criteria = new ApiModels.SearchCriteria(
@@ -96,12 +145,19 @@ public class ProductController {
     return demoService.searchProducts(criteria, page, size);
   }
 
-  // GET /api/rest/products/paginated - paginated list
+  @Operation(summary = "Get paginated products", description = "Returns products with pagination and sorting")
   @GetMapping("/paginated")
   public PaginationResult getPaginatedProducts(
+      @Parameter(description = "Page number (0-indexed)", example = "0")
       @RequestParam(defaultValue = "0") int page,
+
+      @Parameter(description = "Page size", example = "10")
       @RequestParam(defaultValue = "10") int size,
+
+      @Parameter(description = "Sort field", example = "name")
       @RequestParam(defaultValue = "name") String sortBy,
+
+      @Parameter(description = "Sort direction (asc/desc)", example = "asc")
       @RequestParam(defaultValue = "asc") String sortDir) {
 
     return demoService.getPaginatedProducts(page, size, sortBy, sortDir);
