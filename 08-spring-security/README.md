@@ -177,3 +177,48 @@ mvn test
 - глоссария терминов
 - REST endpoint'ов через MockMvc
 - архитектуры Spring Security
+
+# Варианты проверки
+
+## 1. Без логина
+```bash
+curl -i http://localhost:8892/api/users
+```
+Результат:
+- `401` в curl
+- или redirect на `/login` в браузере
+
+---
+
+## 2. Неверный пароль
+```bash
+curl -i -u admin:wrong http://localhost:8892/api/users
+```
+
+- идентификация прошла
+- пароль не сошёлся
+- 401
+
+---
+
+## 3. USER идёт в ADMIN endpoint
+```bash
+curl -i -u user:user123 http://localhost:8892/api/users
+```
+
+- аутентификация успешна
+- роль `ROLE_USER`
+- доступ запрещён
+- `403`
+
+---
+
+## 4. ADMIN проходит
+```bash
+curl -i -u admin:admin123 http://localhost:8892/api/users
+```
+
+- аутентификация успешна
+- роль `ROLE_ADMIN`
+- метод выполнен
+- `200`

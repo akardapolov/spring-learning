@@ -179,15 +179,17 @@
     <li><a href="#section3">3. Архитектура Spring Security</a></li>
     <li><a href="#section4">4. Security Filter Chain</a></li>
     <li><a href="#section5">5. Конфигурация безопасности</a></li>
-    <li><a href="#section6">6. Password Encoding</a></li>
-    <li><a href="#section7">7. Пользователи, роли и разрешения (RBAC)</a></li>
-    <li><a href="#section8">8. Method Security</a></li>
-    <li><a href="#section9">9. Security Events</a></li>
-    <li><a href="#section10">10. Глоссарий терминов</a></li>
-    <li><a href="#section11">11. Структура проекта</a></li>
-    <li><a href="#section12">12. Endpoint'ы API</a></li>
-    <li><a href="#section13">13. Быстрый старт (curl)</a></li>
-    <li><a href="#section14">14. Тесты</a></li>
+    <li><a href="#section6">6. Способы аутентификации</a></li>
+    <li><a href="#section7">7. JSON Web Token (JWT)</a></li>
+    <li><a href="#section8">8. Password Encoding</a></li>
+    <li><a href="#section9">9. Пользователи, роли и разрешения (RBAC)</a></li>
+    <li><a href="#section10">10. Method Security</a></li>
+    <li><a href="#section11">11. Security Events</a></li>
+    <li><a href="#section12">12. Глоссарий терминов</a></li>
+    <li><a href="#section13">13. Структура проекта</a></li>
+    <li><a href="#section14">14. Endpoint'ы API</a></li>
+    <li><a href="#section15">15. Быстрый старт (curl)</a></li>
+    <li><a href="#section16">16. Тесты</a></li>
   </ul>
 </div>
 
@@ -666,7 +668,7 @@ public UserDto getUserById(@PathVariable Long id) { ... }
 <p>
   Основная конфигурация безопасности определена в классе
   <span class="file-link">SecurityConfiguration.java</span>.
-  Она настраивает SecurityFilterChain, PasswordEncoder и AuthenticationManager.
+  Она настраивает SecurityFilterChain и PasswordEncoder.
 </p>
 
 <h3>Основные настройки конфигурации</h3>
@@ -685,10 +687,7 @@ public class SecurityConfiguration {
             .anyRequest().authenticated()
         )
         .httpBasic(Customizer.withDefaults())
-        .formLogin(form -> form
-            .loginPage("/login")
-            .permitAll()
-        );
+        .formLogin(Customizer.withDefaults());
 
     return http.build();
   }
@@ -721,7 +720,960 @@ public class SecurityConfiguration {
 <hr class="section-divider"/>
 
 <!-- ==================== SECTION 6 ==================== -->
-<h2 id="section6">6. Password Encoding</h2>
+<h2 id="section6">6. Способы аутентификации</h2>
+
+<p>
+  Spring Security поддерживает множество способов аутентификации. Каждый подходит для
+  определённого типа приложений и сценариев использования. Ниже — обзор всех основных
+  механизмов: от простейших до enterprise-решений.
+</p>
+
+<!-- ===== Обзорная таблица ===== -->
+<h3>Обзорная таблица способов</h3>
+
+<table>
+  <thead>
+  <tr>
+    <th>Способ</th>
+    <th>Тип</th>
+    <th>Stateful / Stateless</th>
+    <th>Где применяется</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+    <td><strong>Form-based Login</strong></td>
+    <td>Пароль</td>
+    <td>Stateful (сессия)</td>
+    <td>Классические веб-приложения с UI</td>
+  </tr>
+  <tr>
+    <td><strong>HTTP Basic</strong></td>
+    <td>Пароль</td>
+    <td>Stateless</td>
+    <td>Простые API, внутренние сервисы, тестирование</td>
+  </tr>
+  <tr>
+    <td><strong>HTTP Digest</strong></td>
+    <td>Пароль (хеш)</td>
+    <td>Stateless</td>
+    <td>Устаревший, почти не используется</td>
+  </tr>
+  <tr>
+    <td><strong>JWT (JSON Web Token)</strong></td>
+    <td>Токен</td>
+    <td>Stateless</td>
+    <td>REST API, SPA, мобильные приложения</td>
+  </tr>
+  <tr>
+    <td><strong>OAuth 2.0 / OpenID Connect</strong></td>
+    <td>Делегированная</td>
+    <td>Stateless (токены)</td>
+    <td>«Войти через Google/GitHub», SSO</td>
+  </tr>
+  <tr>
+    <td><strong>SAML 2.0</strong></td>
+    <td>Делегированная</td>
+    <td>Stateful</td>
+    <td>Enterprise SSO (корпоративные системы)</td>
+  </tr>
+  <tr>
+    <td><strong>LDAP</strong></td>
+    <td>Пароль (каталог)</td>
+    <td>Stateful</td>
+    <td>Корпоративные приложения с Active Directory</td>
+  </tr>
+  <tr>
+    <td><strong>X.509 (сертификаты)</strong></td>
+    <td>Сертификат</td>
+    <td>Stateless</td>
+    <td>Mutual TLS, межсервисная связь</td>
+  </tr>
+  <tr>
+    <td><strong>API Key</strong></td>
+    <td>Ключ</td>
+    <td>Stateless</td>
+    <td>Публичные API, интеграции</td>
+  </tr>
+  <tr>
+    <td><strong>Remember-Me</strong></td>
+    <td>Токен (cookie)</td>
+    <td>Stateful</td>
+    <td>«Запомнить меня» на сайтах</td>
+  </tr>
+  </tbody>
+</table>
+
+<!-- ===== 1. Form-based ===== -->
+<h3>1. Form-based Login (аутентификация через форму)</h3>
+
+<p>
+  Самый классический способ. Пользователь заполняет HTML-форму с логином и паролем,
+  отправляет POST-запрос. Сервер проверяет данные, создаёт HTTP-сессию и ставит cookie
+  <code>JSESSIONID</code>.
+</p>
+
+<div class="mermaid">
+  sequenceDiagram
+  autonumber
+  actor User as Пользователь
+  participant Browser as Браузер
+  participant Server as Сервер
+
+  User->>Browser: Открывает /dashboard
+  Browser->>Server: GET /dashboard
+  Server-->>Browser: 302 Redirect → /login
+  User->>Browser: Вводит логин/пароль
+  Browser->>Server: POST /login (username, password)
+  Server->>Server: Проверка пароля
+  Server-->>Browser: 302 Redirect → /dashboard + Set-Cookie: JSESSIONID=abc123
+  Browser->>Server: GET /dashboard + Cookie: JSESSIONID=abc123
+  Server-->>Browser: 200 OK (страница)
+</div>
+
+<pre><code>// Spring Security конфигурация
+http
+    .formLogin(form -> form
+        .loginPage("/login")         // Кастомная страница логина
+        .defaultSuccessUrl("/")      // Куда после успешного входа
+        .failureUrl("/login?error")  // Куда при ошибке
+        .permitAll()
+    );
+
+// Или дефолтная страница Spring Security:
+http.formLogin(Customizer.withDefaults());</code></pre>
+
+<div class="card">
+  <strong>Как это работает внутри Spring Security:</strong>
+  <ol>
+    <li><code>UsernamePasswordAuthenticationFilter</code> перехватывает POST <code>/login</code></li>
+    <li>Создаёт <code>UsernamePasswordAuthenticationToken</code> с введёнными данными</li>
+    <li>Передаёт его в <code>AuthenticationManager</code></li>
+    <li><code>DaoAuthenticationProvider</code> вызывает <code>UserDetailsService.loadUserByUsername()</code></li>
+    <li>Проверяет пароль через <code>PasswordEncoder.matches()</code></li>
+    <li>При успехе — кладёт <code>Authentication</code> в <code>SecurityContextHolder</code></li>
+    <li>Создаёт HTTP-сессию и привязывает к ней <code>SecurityContext</code></li>
+  </ol>
+</div>
+
+<div class="good">
+  <strong>✅ Используется в этом демо-проекте</strong> — Spring Security предоставляет
+  встроенную страницу логина по адресу <code>/login</code>.
+</div>
+
+<!-- ===== 2. HTTP Basic ===== -->
+<h3>2. HTTP Basic Authentication</h3>
+
+<p>
+  Логин и пароль передаются в каждом запросе в заголовке <code>Authorization</code>,
+  закодированные в Base64. Это <strong>не шифрование</strong> — Base64 легко декодируется.
+  Без HTTPS передавать пароли через HTTP Basic — опасно.
+</p>
+
+<pre><code>// Заголовок запроса
+Authorization: Basic YWRtaW46YWRtaW4xMjM=
+
+// Это Base64 от "admin:admin123"
+// Base64 — НЕ шифрование! Легко декодируется.</code></pre>
+
+<pre><code>// Spring Security конфигурация
+http.httpBasic(Customizer.withDefaults());
+
+// Использование через curl:
+curl -u admin:admin123 http://localhost:8892/api/users</code></pre>
+
+<div class="card">
+  <strong>Как это работает внутри:</strong>
+  <ol>
+    <li><code>BasicAuthenticationFilter</code> извлекает заголовок <code>Authorization: Basic ...</code></li>
+    <li>Декодирует Base64 → получает <code>username:password</code></li>
+    <li>Создаёт <code>UsernamePasswordAuthenticationToken</code></li>
+    <li>Передаёт в <code>AuthenticationManager</code> для проверки</li>
+    <li>При успехе — кладёт <code>Authentication</code> в <code>SecurityContext</code></li>
+  </ol>
+</div>
+
+<div class="warn">
+  <strong>⚠️ HTTP Basic без HTTPS = пароль в открытом виде!</strong><br/>
+  Base64("admin:admin123") = "YWRtaW46YWRtaW4xMjM=" — любой может декодировать.
+  Используйте только через HTTPS или для локального тестирования.
+</div>
+
+<div class="good">
+  <strong>✅ Используется в этом демо-проекте</strong> — удобно для тестирования через curl.
+</div>
+
+<!-- ===== 3. Token-based (JWT) ===== -->
+<h3>3. Token-based Authentication (JWT)</h3>
+
+<p>
+  Пользователь один раз отправляет логин/пароль, получает токен (обычно JWT),
+  и далее каждый запрос содержит этот токен в заголовке <code>Authorization: Bearer &lt;token&gt;</code>.
+  Сервер <strong>не хранит сессию</strong> — вся информация внутри токена.
+</p>
+
+<div class="note">
+  Подробно JWT разбирается в <a href="#section7">разделе 7. JSON Web Token (JWT)</a>.
+</div>
+
+<pre><code>// 1. Получаем токен
+POST /api/auth/login
+{ "username": "admin", "password": "admin123" }
+→ { "token": "eyJhbGciOiJIUzI1NiJ9..." }
+
+// 2. Используем токен в каждом запросе
+GET /api/users
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...</code></pre>
+
+<!-- ===== 4. OAuth 2.0 ===== -->
+<h3>4. OAuth 2.0 / OpenID Connect</h3>
+
+<p>
+  Протокол <strong>делегированной авторизации</strong>. Пользователь не даёт свой пароль
+  вашему приложению — он входит через <strong>провайдера</strong> (Google, GitHub, Keycloak),
+  который выдаёт вашему приложению токен доступа.
+</p>
+
+<div class="card">
+  <strong>Ключевые отличия:</strong>
+  <ul>
+    <li><strong>OAuth 2.0</strong> — про <em>авторизацию</em> (что приложению разрешено делать от имени пользователя)</li>
+    <li><strong>OpenID Connect (OIDC)</strong> — надстройка над OAuth 2.0 для <em>аутентификации</em> (кто этот пользователь)</li>
+  </ul>
+</div>
+
+<h4>Роли в OAuth 2.0</h4>
+<table>
+  <thead><tr><th>Роль</th><th>Описание</th><th>Пример</th></tr></thead>
+  <tbody>
+  <tr><td><strong>Resource Owner</strong></td><td>Пользователь, владеющий данными</td><td>Пользователь Google</td></tr>
+  <tr><td><strong>Client</strong></td><td>Ваше приложение</td><td>Ваш Spring Boot сервис</td></tr>
+  <tr><td><strong>Authorization Server</strong></td><td>Сервер, выдающий токены</td><td>Google, Keycloak, Auth0</td></tr>
+  <tr><td><strong>Resource Server</strong></td><td>API, защищённое токенами</td><td>Ваш REST API</td></tr>
+  </tbody>
+</table>
+
+<h4>Authorization Code Flow (самый безопасный)</h4>
+
+<div class="mermaid">
+  sequenceDiagram
+  autonumber
+  actor User as Пользователь
+  participant App as Ваше приложение
+  participant AuthServer as Authorization Server
+  participant API as Resource Server
+
+  User->>App: Нажимает "Войти через Google"
+  App->>AuthServer: Redirect на страницу входа Google
+  User->>AuthServer: Вводит свой Google логин/пароль
+  AuthServer->>App: Callback с authorization code
+  App->>AuthServer: Обменивает code на access_token
+  AuthServer-->>App: access_token + id_token
+  App->>API: GET /api/data + Bearer access_token
+  API-->>App: Данные
+</div>
+
+<pre><code>// Spring Security конфигурация для OAuth2 Login
+http
+    .oauth2Login(oauth -> oauth
+        .loginPage("/login")
+        .defaultSuccessUrl("/dashboard")
+    );
+
+// application.yaml
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: your-google-client-id
+            client-secret: your-google-client-secret
+            scope: openid, profile, email
+          github:
+            client-id: your-github-client-id
+            client-secret: your-github-client-secret</code></pre>
+
+<h4>Типы грантов (Grant Types)</h4>
+<table>
+  <thead><tr><th>Grant Type</th><th>Описание</th><th>Когда использовать</th></tr></thead>
+  <tbody>
+  <tr>
+    <td><strong>Authorization Code</strong></td>
+    <td>Самый безопасный, с обменом кода на токен</td>
+    <td>Веб-приложения с серверной частью</td>
+  </tr>
+  <tr>
+    <td><strong>Authorization Code + PKCE</strong></td>
+    <td>То же, но без client_secret</td>
+    <td>SPA, мобильные приложения</td>
+  </tr>
+  <tr>
+    <td><strong>Client Credentials</strong></td>
+    <td>Машина-к-машине (без пользователя)</td>
+    <td>Межсервисная связь (микросервисы)</td>
+  </tr>
+  <tr>
+    <td><strong>Refresh Token</strong></td>
+    <td>Обновление access_token без повторного логина</td>
+    <td>Долгоживущие сессии</td>
+  </tr>
+  <tr>
+    <td><strong style="color: #999">Implicit</strong></td>
+    <td style="color: #999">Токен сразу в redirect URI</td>
+    <td style="color: #999">❌ Устаревший, не рекомендуется</td>
+  </tr>
+  <tr>
+    <td><strong style="color: #999">Resource Owner Password</strong></td>
+    <td style="color: #999">Пароль прямо в запросе</td>
+    <td style="color: #999">❌ Устаревший, не рекомендуется</td>
+  </tr>
+  </tbody>
+</table>
+
+<!-- ===== 5. SAML ===== -->
+<h3>5. SAML 2.0</h3>
+
+<p>
+  <strong>Security Assertion Markup Language</strong> — XML-протокол для SSO в
+  корпоративных средах. Используется в интеграции с Active Directory Federation Services (ADFS),
+  Okta, OneLogin и другими enterprise IdP.
+</p>
+
+<div class="card">
+  <strong>OAuth 2.0 vs SAML:</strong>
+  <table>
+    <thead><tr><th>Аспект</th><th>OAuth 2.0 / OIDC</th><th>SAML 2.0</th></tr></thead>
+    <tbody>
+    <tr><td>Формат</td><td>JSON</td><td>XML</td></tr>
+    <tr><td>Протокол</td><td>REST / HTTP</td><td>SOAP / HTTP Redirect</td></tr>
+    <tr><td>Токен</td><td>JWT (компактный)</td><td>XML Assertion (громоздкий)</td></tr>
+    <tr><td>Где используется</td><td>Современные веб/мобильные приложения</td><td>Enterprise SSO, legacy системы</td></tr>
+    <tr><td>Spring Support</td><td>spring-security-oauth2-client</td><td>spring-security-saml2-service-provider</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===== 6. LDAP ===== -->
+<h3>6. LDAP Authentication</h3>
+
+<p>
+  <strong>Lightweight Directory Access Protocol</strong> — протокол для работы с каталогами
+  пользователей. Часто используется для интеграции с <strong>Active Directory</strong>
+  в корпоративных средах.
+</p>
+
+<pre><code>// Spring Security + LDAP конфигурация
+@Bean
+public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    http
+        .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
+        .formLogin(Customizer.withDefaults());
+    return http.build();
+}
+
+@Bean
+public LdapAuthoritiesPopulator authorities(BaseLdapPathContextSource ctx) {
+    return new DefaultLdapAuthoritiesPopulator(ctx, "ou=groups");
+}
+
+// application.yaml
+spring:
+  ldap:
+    urls: ldap://ldap.example.com:389
+    base: dc=example,dc=com
+    username: cn=admin,dc=example,dc=com
+    password: admin-password</code></pre>
+
+<!-- ===== 7. X.509 ===== -->
+<h3>7. X.509 Certificate Authentication</h3>
+
+<p>
+  Аутентификация через TLS-сертификат клиента (<strong>Mutual TLS</strong>).
+  Клиент предъявляет свой сертификат при установлении TLS-соединения,
+  и Spring Security извлекает из него имя пользователя.
+</p>
+
+<pre><code>// Spring Security конфигурация
+http
+    .x509(x509 -> x509
+        .subjectPrincipalRegex("CN=(.*?)(?:,|$)")  // Извлечь CN из сертификата
+        .userDetailsService(userDetailsService)
+    );</code></pre>
+
+<div class="note">
+  <strong>Где используется:</strong> межсервисная аутентификация в микросервисах,
+  банковские системы, VPN, government-системы.
+</div>
+
+<!-- ===== 8. API Key ===== -->
+<h3>8. API Key Authentication</h3>
+
+<p>
+  Простейший способ аутентификации для API — клиент передаёт секретный ключ
+  в заголовке или параметре запроса. Spring Security «из коробки» не поддерживает
+  API Key, но его легко реализовать через кастомный фильтр.
+</p>
+
+<pre><code>// Заголовок запроса
+X-API-Key: sk_live_abc123def456
+
+// Или как query parameter (менее безопасно)
+GET /api/data?api_key=sk_live_abc123def456</code></pre>
+
+<pre><code>// Кастомный фильтр для API Key
+public class ApiKeyFilter extends OncePerRequestFilter {
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain chain) throws ServletException, IOException {
+
+        String apiKey = request.getHeader("X-API-Key");
+
+        if (apiKey != null && isValidApiKey(apiKey)) {
+            // Создаём Authentication и кладём в SecurityContext
+            var auth = new ApiKeyAuthenticationToken(apiKey, getAuthorities(apiKey));
+            SecurityContextHolder.getContext().setAuthentication(auth);
+        }
+
+        chain.doFilter(request, response);
+    }
+}</code></pre>
+
+<!-- ===== 9. Remember-Me ===== -->
+<h3>9. Remember-Me Authentication</h3>
+
+<p>
+  Позволяет «запомнить» пользователя между сессиями. Spring Security ставит
+  специальный cookie, который используется для автоматической аутентификации
+  при следующем визите (даже после закрытия браузера).
+</p>
+
+<pre><code>http
+    .rememberMe(remember -> remember
+        .key("uniqueAndSecretKey")
+        .tokenValiditySeconds(86400 * 30)  // 30 дней
+        .rememberMeParameter("remember-me") // Имя чекбокса в форме
+    );</code></pre>
+
+<div class="warn">
+  <strong>⚠️ Безопасность:</strong> Remember-Me cookie может быть украден.
+  Для критических операций (смена пароля, платежи) всегда требуйте «полную» аутентификацию:
+  <code>@PreAuthorize("isFullyAuthenticated()")</code>
+</div>
+
+<!-- ===== Сравнительная таблица ===== -->
+<h3>Сравнительная таблица: когда что использовать</h3>
+
+<table>
+  <thead>
+  <tr><th>Сценарий</th><th>Рекомендуемый способ</th><th>Почему</th></tr>
+  </thead>
+  <tbody>
+  <tr>
+    <td>Обычный сайт с формой входа</td>
+    <td>Form Login + Session</td>
+    <td>Просто, встроенная поддержка CSRF</td>
+  </tr>
+  <tr>
+    <td>REST API для SPA / мобильного приложения</td>
+    <td>JWT</td>
+    <td>Stateless, масштабируемость</td>
+  </tr>
+  <tr>
+    <td>«Войти через Google / GitHub»</td>
+    <td>OAuth 2.0 + OIDC</td>
+    <td>Стандарт для социального логина</td>
+  </tr>
+  <tr>
+    <td>Корпоративный SSO</td>
+    <td>SAML 2.0 или OAuth 2.0 + Keycloak</td>
+    <td>Интеграция с Active Directory</td>
+  </tr>
+  <tr>
+    <td>Микросервис ↔ микросервис</td>
+    <td>OAuth 2.0 Client Credentials или mTLS</td>
+    <td>Нет пользователя, есть только сервис</td>
+  </tr>
+  <tr>
+    <td>Публичное API для партнёров</td>
+    <td>API Key + OAuth 2.0</td>
+    <td>Простая идентификация + fine-grained контроль</td>
+  </tr>
+  <tr>
+    <td>Внутреннее тестирование</td>
+    <td>HTTP Basic</td>
+    <td>Максимально просто</td>
+  </tr>
+  <tr>
+    <td>Корпоративная сеть с AD</td>
+    <td>LDAP</td>
+    <td>Единый каталог пользователей</td>
+  </tr>
+  </tbody>
+</table>
+
+<!-- ===== Stateful vs Stateless ===== -->
+<h3>Stateful vs Stateless аутентификация</h3>
+
+<div class="card">
+  <table>
+    <thead><tr><th>Аспект</th><th>Stateful (Session)</th><th>Stateless (Token)</th></tr></thead>
+    <tbody>
+    <tr>
+      <td><strong>Где хранится состояние</strong></td>
+      <td>На сервере (в памяти, Redis, БД)</td>
+      <td>В самом токене (у клиента)</td>
+    </tr>
+    <tr>
+      <td><strong>Идентификатор</strong></td>
+      <td>JSESSIONID (cookie)</td>
+      <td>JWT в заголовке Authorization</td>
+    </tr>
+    <tr>
+      <td><strong>Масштабирование</strong></td>
+      <td>Нужна синхронизация сессий (sticky sessions, Redis)</td>
+      <td>Любой сервер может проверить токен</td>
+    </tr>
+    <tr>
+      <td><strong>Отзыв доступа</strong></td>
+      <td>Удалить сессию — мгновенно</td>
+      <td>Сложнее: нужен blacklist или короткий TTL</td>
+    </tr>
+    <tr>
+      <td><strong>CSRF защита</strong></td>
+      <td>Нужна (cookie отправляется автоматически)</td>
+      <td>Не нужна (токен добавляется вручную)</td>
+    </tr>
+    <tr>
+      <td><strong>Размер</strong></td>
+      <td>Маленький cookie (~32 байта)</td>
+      <td>Большой токен (~800+ байт)</td>
+    </tr>
+    <tr>
+      <td><strong>Пример</strong></td>
+      <td>Form Login, JSESSIONID</td>
+      <td>JWT, OAuth2 access tokens</td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="mermaid">
+  graph LR
+  subgraph "Stateful (Session)"
+  A[Client] -->|Cookie: JSESSIONID=abc| B[Server]
+  B -->|Ищет сессию| C[(Session Store)]
+  end
+
+  subgraph "Stateless (JWT)"
+  D[Client] -->|Authorization: Bearer eyJ...| E[Server]
+  E -->|Проверяет подпись токена| E
+  end
+</div>
+
+<div class="endpoint"><a href="/api/security/concepts">GET /api/security/concepts</a></div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 7 ==================== -->
+<h2 id="section7">7. JSON Web Token (JWT)</h2>
+
+<p>
+  JWT — это компактный, самодостаточный способ безопасной передачи информации
+  между сторонами в виде JSON-объекта. Информация подписана цифровой подписью,
+  поэтому ей можно доверять и проверять. JWT широко используется для
+  <strong>stateless аутентификации</strong> в REST API.
+</p>
+
+<!-- ===== Структура JWT ===== -->
+<h3>Структура JWT</h3>
+
+<p>JWT состоит из трёх частей, разделённых точкой (<code>.</code>):</p>
+
+<pre><code>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsInJvbGVzIjpbIlJPTEVfQURNSU4iXSwiZXhwIjoxNzMyMDAwMDAwfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+|___________________________________|.|_______________________________________________________________|.|___________________________________|
+            HEADER                                           PAYLOAD                                               SIGNATURE</code></pre>
+
+<div class="card">
+  <table>
+    <thead><tr><th>Часть</th><th>Содержит</th><th>Кодировка</th></tr></thead>
+    <tbody>
+    <tr>
+      <td><strong>Header</strong> (заголовок)</td>
+      <td>Алгоритм подписи и тип токена</td>
+      <td>Base64Url</td>
+    </tr>
+    <tr>
+      <td><strong>Payload</strong> (полезная нагрузка)</td>
+      <td>Claims — данные о пользователе</td>
+      <td>Base64Url</td>
+    </tr>
+    <tr>
+      <td><strong>Signature</strong> (подпись)</td>
+      <td>Цифровая подпись для проверки целостности</td>
+      <td>Бинарная → Base64Url</td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<h4>Header (заголовок)</h4>
+<pre><code>{
+  "alg": "HS256",   // Алгоритм подписи (HMAC SHA-256)
+  "typ": "JWT"      // Тип токена
+}</code></pre>
+
+<h4>Payload (полезная нагрузка)</h4>
+<pre><code>{
+  "sub": "admin",                   // Subject — кто (идентификатор пользователя)
+  "roles": ["ROLE_ADMIN"],          // Кастомный claim — роли
+  "permissions": ["USER_READ"],     // Кастомный claim — разрешения
+  "iat": 1732000000,                // Issued At — когда выдан (Unix timestamp)
+  "exp": 1732086400,                // Expiration — когда истекает
+  "iss": "spring-security-demo"     // Issuer — кто выдал
+}</code></pre>
+
+<h4>Стандартные claims (registered claims)</h4>
+<table>
+  <thead><tr><th>Claim</th><th>Полное имя</th><th>Описание</th></tr></thead>
+  <tbody>
+  <tr><td><code>sub</code></td><td>Subject</td><td>Идентификатор субъекта (пользователя)</td></tr>
+  <tr><td><code>iss</code></td><td>Issuer</td><td>Кто выдал токен</td></tr>
+  <tr><td><code>aud</code></td><td>Audience</td><td>Для кого предназначен токен</td></tr>
+  <tr><td><code>exp</code></td><td>Expiration</td><td>Когда токен истекает (Unix timestamp)</td></tr>
+  <tr><td><code>iat</code></td><td>Issued At</td><td>Когда токен был выдан</td></tr>
+  <tr><td><code>nbf</code></td><td>Not Before</td><td>Токен не валиден до этого времени</td></tr>
+  <tr><td><code>jti</code></td><td>JWT ID</td><td>Уникальный идентификатор токена</td></tr>
+  </tbody>
+</table>
+
+<h4>Signature (подпись)</h4>
+<pre><code>// Подпись создаётся так:
+HMACSHA256(
+  base64UrlEncode(header) + "." + base64UrlEncode(payload),
+  secret_key
+)
+
+// Или для RSA:
+RSA_SHA256(
+  base64UrlEncode(header) + "." + base64UrlEncode(payload),
+  private_key
+)</code></pre>
+
+<div class="warn">
+  <strong>⚠️ Payload НЕ зашифрован!</strong><br/>
+  Base64 — это кодировка, не шифрование. Любой может декодировать payload и прочитать claims.
+  Подпись защищает только от <em>подделки</em>, но не от <em>чтения</em>.<br/><br/>
+  <strong>Никогда не кладите в JWT:</strong> пароли, номера кредитных карт, персональные данные.
+</div>
+
+<!-- ===== Алгоритмы подписи ===== -->
+<h3>Алгоритмы подписи</h3>
+
+<table>
+  <thead><tr><th>Алгоритм</th><th>Тип</th><th>Описание</th><th>Когда использовать</th></tr></thead>
+  <tbody>
+  <tr>
+    <td><strong>HS256</strong></td>
+    <td>Симметричный (HMAC)</td>
+    <td>Один секретный ключ для подписи и проверки</td>
+    <td>Монолитные приложения, один сервис выдаёт и проверяет</td>
+  </tr>
+  <tr>
+    <td><strong>RS256</strong></td>
+    <td>Асимметричный (RSA)</td>
+    <td>Приватный ключ подписывает, публичный проверяет</td>
+    <td>Микросервисы: один сервис выдаёт, остальные проверяют</td>
+  </tr>
+  <tr>
+    <td><strong>ES256</strong></td>
+    <td>Асимметричный (ECDSA)</td>
+    <td>Как RSA, но компактнее и быстрее</td>
+    <td>Высокопроизводительные системы, мобильные приложения</td>
+  </tr>
+  </tbody>
+</table>
+
+<!-- ===== Полный поток JWT ===== -->
+<h3>Полный поток аутентификации через JWT</h3>
+
+<div class="mermaid">
+  sequenceDiagram
+  autonumber
+  actor Client as Клиент
+  participant Auth as Auth Server
+  participant API as API Server
+  participant DB as База Данных
+
+  Note over Client,DB: ━━━ ЭТАП 1: ПОЛУЧЕНИЕ ТОКЕНА ━━━
+
+  Client->>Auth: POST /api/auth/login {username, password}
+  Auth->>DB: findByUsername("admin")
+  DB-->>Auth: User found
+  Auth->>Auth: passwordEncoder.matches() ✅
+  Auth->>Auth: Генерация JWT (sign with secret)
+  Auth-->>Client: { "token": "eyJhbGci...", "type": "Bearer" }
+
+  Note over Client,DB: ━━━ ЭТАП 2: ИСПОЛЬЗОВАНИЕ ТОКЕНА ━━━
+
+  Client->>API: GET /api/users + Authorization: Bearer eyJhbGci...
+  API->>API: JwtFilter: извлечь токен из заголовка
+  API->>API: Проверить подпись (verify signature)
+  API->>API: Проверить срок (exp > now)
+  API->>API: Извлечь claims (sub, roles)
+  API->>API: Создать Authentication и положить в SecurityContext
+  API-->>Client: 200 OK + данные
+
+  Note over Client,DB: ━━━ ЭТАП 3: ТОКЕН ИСТЁК ━━━
+
+  Client->>API: GET /api/users + Authorization: Bearer eyJ...(expired)
+  API->>API: exp < now → токен истёк
+  API-->>Client: 401 Unauthorized
+</div>
+
+<!-- ===== Access + Refresh Token ===== -->
+<h3>Access Token + Refresh Token</h3>
+
+<p>
+  В production-системах используется пара токенов для баланса
+  безопасности и удобства:
+</p>
+
+<div class="card">
+  <table>
+    <thead><tr><th>Аспект</th><th>Access Token</th><th>Refresh Token</th></tr></thead>
+    <tbody>
+    <tr>
+      <td><strong>Назначение</strong></td>
+      <td>Доступ к API</td>
+      <td>Получение нового access token</td>
+    </tr>
+    <tr>
+      <td><strong>Время жизни</strong></td>
+      <td>Короткое (5–30 минут)</td>
+      <td>Длинное (7–90 дней)</td>
+    </tr>
+    <tr>
+      <td><strong>Где хранится</strong></td>
+      <td>В памяти (JavaScript) или localStorage</td>
+      <td>httpOnly cookie или secure storage</td>
+    </tr>
+    <tr>
+      <td><strong>Отправляется</strong></td>
+      <td>С каждым запросом к API</td>
+      <td>Только при обновлении access token</td>
+    </tr>
+    <tr>
+      <td><strong>При компрометации</strong></td>
+      <td>Ущерб ограничен коротким TTL</td>
+      <td>Можно отозвать на сервере</td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="mermaid">
+  sequenceDiagram
+  autonumber
+  actor Client as Клиент
+  participant Auth as Auth Server
+  participant API as API Server
+
+  Client->>Auth: POST /login {username, password}
+  Auth-->>Client: access_token (15 min) + refresh_token (30 days)
+
+  loop Каждый запрос
+  Client->>API: GET /api/data + Bearer access_token
+  API-->>Client: 200 OK
+  end
+
+  Note over Client,API: Access token истёк (15 минут прошло)
+
+  Client->>API: GET /api/data + Bearer expired_access_token
+  API-->>Client: 401 Unauthorized
+
+  Client->>Auth: POST /api/auth/refresh + refresh_token
+  Auth->>Auth: Проверить refresh_token
+  Auth-->>Client: Новый access_token (15 min)
+
+  Client->>API: GET /api/data + Bearer new_access_token
+  API-->>Client: 200 OK
+</div>
+
+<!-- ===== JWT фильтр в Spring Security ===== -->
+<h3>JWT фильтр в Spring Security</h3>
+
+<p>
+  Spring Security не имеет встроенного JWT-фильтра «из коробки» для самоподписанных
+  токенов — его нужно реализовать самостоятельно. Вот типичная архитектура:
+</p>
+
+<pre><code>// Кастомный JWT фильтр
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    private final JwtTokenProvider tokenProvider;
+    private final UserDetailsService userDetailsService;
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain chain) throws ServletException, IOException {
+
+        // 1. Извлечь токен из заголовка
+        String token = extractToken(request);
+
+        // 2. Если токен есть и валиден
+        if (token != null && tokenProvider.validateToken(token)) {
+
+            // 3. Извлечь username из токена
+            String username = tokenProvider.getUsernameFromToken(token);
+
+            // 4. Загрузить UserDetails
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+            // 5. Создать Authentication и положить в SecurityContext
+            var authentication = new UsernamePasswordAuthenticationToken(
+                userDetails, null, userDetails.getAuthorities()
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
+
+        chain.doFilter(request, response);
+    }
+
+    private String extractToken(HttpServletRequest request) {
+        String header = request.getHeader("Authorization");
+        if (header != null && header.startsWith("Bearer ")) {
+            return header.substring(7);
+        }
+        return null;
+    }
+}</code></pre>
+
+<pre><code>// JwtTokenProvider — генерация и проверка токенов
+@Component
+public class JwtTokenProvider {
+
+    @Value("${jwt.secret}")
+    private String secret;
+
+    @Value("${jwt.expiration}")
+    private long expirationMs;
+
+    // Генерация токена
+    public String generateToken(Authentication authentication) {
+        return Jwts.builder()
+            .setSubject(authentication.getName())
+            .claim("roles", getRoles(authentication))
+            .setIssuedAt(new Date())
+            .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
+            .signWith(SignatureAlgorithm.HS256, secret)
+            .compact();
+    }
+
+    // Проверка токена
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    // Извлечение username
+    public String getUsernameFromToken(String token) {
+        return Jwts.parser()
+            .setSigningKey(secret)
+            .parseClaimsJws(token)
+            .getBody()
+            .getSubject();
+    }
+}</code></pre>
+
+<pre><code>// Подключение в SecurityConfiguration
+http
+    .csrf(AbstractHttpConfigurer::disable)
+    .sessionManagement(session ->
+        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Без сессий!
+    )
+    .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);</code></pre>
+
+<!-- ===== JWT: преимущества и недостатки ===== -->
+<h3>Преимущества и недостатки JWT</h3>
+
+<table>
+  <thead><tr><th>✅ Преимущества</th><th>❌ Недостатки</th></tr></thead>
+  <tbody>
+  <tr>
+    <td>Stateless — серверу не нужно хранить сессии</td>
+    <td>Нельзя отозвать токен до истечения срока</td>
+  </tr>
+  <tr>
+    <td>Горизонтальное масштабирование — любой сервер проверит</td>
+    <td>Payload не зашифрован — данные видны всем</td>
+  </tr>
+  <tr>
+    <td>Кросс-доменный — работает с любого origin</td>
+    <td>Размер больше, чем session ID (~800+ байт)</td>
+  </tr>
+  <tr>
+    <td>Самодостаточный — содержит всю нужную информацию</td>
+    <td>Обновление claims требует перевыпуска токена</td>
+  </tr>
+  <tr>
+    <td>Подходит для микросервисов и мобильных приложений</td>
+    <td>Сложнее реализовать правильно (refresh, blacklist)</td>
+  </tr>
+  </tbody>
+</table>
+
+<!-- ===== JWT: типичные ошибки ===== -->
+<h3>Типичные ошибки при работе с JWT</h3>
+
+<table>
+  <thead><tr><th>❌ Ошибка</th><th>✅ Правильно</th></tr></thead>
+  <tbody>
+  <tr>
+    <td>Хранить JWT в localStorage</td>
+    <td>Хранить в httpOnly cookie (защита от XSS) или в памяти</td>
+  </tr>
+  <tr>
+    <td>Делать access token на 30 дней</td>
+    <td>Access token: 5–30 минут, refresh token: 7–30 дней</td>
+  </tr>
+  <tr>
+    <td>Класть пароли и PII в payload</td>
+    <td>Только идентификатор и роли. Payload читается любым!</td>
+  </tr>
+  <tr>
+    <td>Использовать алгоритм «none»</td>
+    <td>Всегда проверять и явно указывать алгоритм подписи</td>
+  </tr>
+  <tr>
+    <td>Слабый secret key (например, «secret»)</td>
+    <td>Минимум 256 бит для HS256 (32+ символа случайных)</td>
+  </tr>
+  <tr>
+    <td>Не проверять <code>exp</code>, <code>iss</code>, <code>aud</code></td>
+    <td>Проверять все обязательные claims при каждой валидации</td>
+  </tr>
+  </tbody>
+</table>
+
+<div class="note">
+  <strong>В этом демо-проекте</strong> JWT не реализован как полноценный механизм — используются
+  HTTP Basic и Form Login для простоты. Эндпоинт <code>/api/auth/login</code> возвращает
+  mock-токен для демонстрации структуры ответа. Для production-реализации JWT потребуется
+  добавить библиотеку (например, <code>io.jsonwebtoken:jjwt</code>) и кастомный фильтр.
+</div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 8 ==================== -->
+<h2 id="section8">8. Password Encoding</h2>
 
 <p>
   Пароли никогда не должны храниться в открытом виде. Spring Security предоставляет интерфейс
@@ -752,7 +1704,7 @@ boolean matches = encoder.matches("password123", encodedPassword);</code></pre>
   - Широкая поддержка и проверка временем
 </div>
 
-<h3>Настройка strength (сильны)</h3>
+<h3>Настройка strength (силы)</h3>
 
 <p>
   По умолчанию BCrypt использует 10 rounds (итераций). Можно изменить силу:
@@ -767,8 +1719,8 @@ public PasswordEncoder passwordEncoder() {
 
 <hr class="section-divider"/>
 
-<!-- ==================== SECTION 7 ==================== -->
-<h2 id="section7">7. Пользователи, роли и разрешения (RBAC)</h2>
+<!-- ==================== SECTION 9 ==================== -->
+<h2 id="section9">9. Пользователи, роли и разрешения (RBAC)</h2>
 
 <p>
   Проект реализует RBAC (Role-Based Access Control) с тремя уровнями:
@@ -833,8 +1785,8 @@ public PasswordEncoder passwordEncoder() {
 
 <hr class="section-divider"/>
 
-<!-- ==================== SECTION 8 ==================== -->
-<h2 id="section8">8. Method Security</h2>
+<!-- ==================== SECTION 10 ==================== -->
+<h2 id="section10">10. Method Security</h2>
 
 <p>
   Spring Security обеспечивает безопасность на уровне методов с помощью аннотаций.
@@ -876,19 +1828,19 @@ public class UserController {
 
   @GetMapping
   @PreAuthorize("hasRole('ADMIN')")
-  public ApiResponse<List<UserDto>> getAllUsers() {
+  public ApiResponse&lt;List&lt;UserDto&gt;&gt; getAllUsers() {
       // Только администраторы могут видеть всех пользователей
   }
 
   @GetMapping("/{id}")
   @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
-  public ApiResponse<UserDto> getUserById(@PathVariable Long id) {
+  public ApiResponse&lt;UserDto&gt; getUserById(@PathVariable Long id) {
       // Админы или владелец профиля
   }
 
   @PostMapping
   @PreAuthorize("hasRole('ADMIN')")
-  public ApiResponse<UserDto> createUser(@RequestBody UserCreateRequest request) {
+  public ApiResponse&lt;UserDto&gt; createUser(@RequestBody UserCreateRequest request) {
       // Только админы создают пользователей
   }
 }</code></pre>
@@ -897,8 +1849,8 @@ public class UserController {
 
 <hr class="section-divider"/>
 
-<!-- ==================== SECTION 9 ==================== -->
-<h2 id="section9">9. Security Events</h2>
+<!-- ==================== SECTION 11 ==================== -->
+<h2 id="section11">11. Security Events</h2>
 
 <p>
   Spring Security предоставляет события, которые происходят при различных действиях безопасности.
@@ -932,8 +1884,8 @@ public class UserController {
 
 <hr class="section-divider"/>
 
-<!-- ==================== SECTION 10 ==================== -->
-<h2 id="section10">10. Глоссарий терминов</h2>
+<!-- ==================== SECTION 12 ==================== -->
+<h2 id="section12">12. Глоссарий терминов</h2>
 
 <table>
   <tr><th>Термин</th><th>Определение</th></tr>
@@ -948,8 +1900,16 @@ public class UserController {
   <tr><td><strong>PasswordEncoder</strong></td><td>Интерфейс для шифрования и проверки паролей</td></tr>
   <tr><td><strong>CSRF</strong></td><td>Защита от межсайтовой подделки запроса</td></tr>
   <tr><td><strong>CORS</strong></td><td>Разрешение междоменных запросов</td></tr>
-  <tr><td><strong>JWT</strong></td><td>JSON Web Token для stateless аутентификации</td></tr>
+  <tr><td><strong>JWT</strong></td><td>JSON Web Token — самодостаточный токен для stateless аутентификации</td></tr>
+  <tr><td><strong>OAuth 2.0</strong></td><td>Протокол делегированной авторизации (доступ через Google, GitHub и пр.)</td></tr>
+  <tr><td><strong>OpenID Connect</strong></td><td>Надстройка над OAuth 2.0 для аутентификации (идентификация пользователя)</td></tr>
+  <tr><td><strong>SAML</strong></td><td>XML-протокол SSO для корпоративных систем</td></tr>
+  <tr><td><strong>LDAP</strong></td><td>Протокол доступа к каталогам пользователей (Active Directory)</td></tr>
+  <tr><td><strong>mTLS</strong></td><td>Mutual TLS — двусторонняя аутентификация через сертификаты</td></tr>
   <tr><td><strong>RBAC</strong></td><td>Role-Based Access Control — доступ на основе ролей</td></tr>
+  <tr><td><strong>SSO</strong></td><td>Single Sign-On — единый вход во множество систем</td></tr>
+  <tr><td><strong>Access Token</strong></td><td>Короткоживущий токен для доступа к API</td></tr>
+  <tr><td><strong>Refresh Token</strong></td><td>Долгоживущий токен для обновления access token</td></tr>
   <tr><td><strong>@Secured</strong></td><td>Аннотация для простой роли-безопасности</td></tr>
   <tr><td><strong>@PreAuthorize</strong></td><td>Аннотация для SpEL-безопасности перед выполнением</td></tr>
   <tr><td><strong>BCrypt</strong></td><td>Алгоритм хеширования паролей с солью</td></tr>
@@ -959,8 +1919,8 @@ public class UserController {
 
 <hr class="section-divider"/>
 
-<!-- ==================== SECTION 11 ==================== -->
-<h2 id="section11">11. Структура проекта</h2>
+<!-- ==================== SECTION 13 ==================== -->
+<h2 id="section13">13. Структура проекта</h2>
 
 <div class="card">
 <pre><code>08-spring-security
@@ -972,7 +1932,8 @@ public class UserController {
     │   │   ├── config
     │   │   │   ├── DemoDataInitializer.java
     │   │   │   ├── SecurityConfiguration.java
-    │   │   │   └── SecurityEventsCollector.java
+    │   │   │   ├── SecurityEventsCollector.java
+    │   │   │   └── SecurityTraceFilter.java
     │   │   ├── controller
     │   │   │   ├── AuthController.java
     │   │   │   ├── DemoController.java
@@ -995,6 +1956,7 @@ public class UserController {
     │   │   │   ├── RoleRepository.java
     │   │   │   └── UserRepository.java
     │   │   └── service
+    │   │       ├── CustomUserDetailsService.java
     │   │       ├── PermissionService.java
     │   │       ├── RoleService.java
     │   │       ├── SpringSecurityDemoService.java
@@ -1017,8 +1979,8 @@ public class UserController {
 
 <hr class="section-divider"/>
 
-<!-- ==================== SECTION 12 ==================== -->
-<h2 id="section12">12. Endpoint'ы API</h2>
+<!-- ==================== SECTION 14 ==================== -->
+<h2 id="section14">14. Endpoint'ы API</h2>
 
 <table>
   <thead><tr><th>Метод</th><th>Путь</th><th>Описание</th><th>Auth</th></tr></thead>
@@ -1094,8 +2056,8 @@ public class UserController {
 
 <hr class="section-divider"/>
 
-<!-- ==================== SECTION 13 ==================== -->
-<h2 id="section13">13. Быстрый старт (curl)</h2>
+<!-- ==================== SECTION 15 ==================== -->
+<h2 id="section15">15. Быстрый старт (curl)</h2>
 
 <p>Примеры запросов для быстрого тестирования API после запуска приложения:</p>
 
@@ -1110,6 +2072,12 @@ public class UserController {
 <h4>Получить всех пользователей (HTTP Basic auth)</h4>
 <pre><code>curl -u admin:admin123 \
   http://localhost:8892/api/users | jq</code></pre>
+
+<h4>Попытка без аутентификации (→ 401)</h4>
+<pre><code>curl -i http://localhost:8892/api/users</code></pre>
+
+<h4>USER пытается зайти в ADMIN endpoint (→ 403)</h4>
+<pre><code>curl -i -u user:user123 http://localhost:8892/api/users</code></pre>
 
 <h4>Создать пользователя</h4>
 <pre><code>curl -X POST http://localhost:8892/api/users \
@@ -1134,18 +2102,18 @@ public class UserController {
   -u admin:admin123 | jq</code></pre>
 
 <h4>Получить все роли</h4>
-<pre><code>curl http://localhost:8892/api/roles | jq</code></pre>
+<pre><code>curl -u user:user123 http://localhost:8892/api/roles | jq</code></pre>
 
 <h4>Получить все разрешения</h4>
-<pre><code>curl http://localhost:8892/api/permissions | jq</code></pre>
+<pre><code>curl -u user:user123 http://localhost:8892/api/permissions | jq</code></pre>
 
 <h4>Получить события безопасности</h4>
 <pre><code>curl http://localhost:8892/api/security/events | jq</code></pre>
 
 <hr class="section-divider"/>
 
-<!-- ==================== SECTION 14 ==================== -->
-<h2 id="section14">14. Тесты</h2>
+<!-- ==================== SECTION 16 ==================== -->
+<h2 id="section16">16. Тесты</h2>
 
 <p>
   Каждый ключевой аспект покрыт интеграционными тестами, разбитыми по секциям:
@@ -1174,6 +2142,8 @@ public class UserController {
   в Spring-приложениях. Этот проект демонстрирует все ключевые возможности:
   RBAC с пользователями, ролями и разрешениями, method security, password encoding,
   security events, конфигурацию цепочки фильтров и полноценный REST API.
+  Различные способы аутентификации (Form Login, HTTP Basic, JWT, OAuth 2.0, SAML, LDAP)
+  покрывают весь спектр задач — от простого демо до enterprise SSO.
 </p>
 
 </body>
