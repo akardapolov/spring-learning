@@ -368,41 +368,226 @@ Cache-Control: no-cache
   end
 </div>
 
-<h3>Как Spring Boot обрабатывает HTTP</h3>
+<!-- ==================== HTTP/3 и QUIC ==================== -->
+<h3>HTTP/3 и QUIC</h3>
 
-<p>Spring Boot использует встроенный веб-сервер (Tomcat по умолчанию). Tomcat слушает TCP-порт, принимает соединения и передаёт HTTP-запросы в Spring MVC.</p>
+<p><strong>HTTP/3</strong> — третья основная версия протокола HTTP, стандартизированная в <a href="https://datatracker.ietf.org/doc/html/rfc9114">RFC 9114</a> (июнь 2022). Главное отличие: HTTP/3 работает <strong>не поверх TCP</strong>, а поверх <strong>QUIC</strong> — нового транспортного протокола на базе UDP.</p>
+
+<h4>Что такое QUIC</h4>
+
+<p><strong>QUIC</strong> (Quick UDP Internet Connections) — транспортный протокол, изначально разработанный в Google (2012), стандартизированный в <a href="https://datatracker.ietf.org/doc/html/rfc9000">RFC 9000</a> (май 2021). QUIC объединяет функции TCP и TLS в одном протоколе поверх UDP.</p>
+
+<div class="mermaid">
+  graph TB
+  subgraph "HTTP/1.1 и HTTP/2"
+  H12_APP["HTTP"]
+  H12_TLS["TLS 1.2 / 1.3"]
+  H12_TCP["TCP"]
+  H12_IP["IP"]
+  H12_APP --> H12_TLS --> H12_TCP --> H12_IP
+  end
+
+  subgraph "HTTP/3"
+  H3_APP["HTTP/3"]
+  H3_QUIC["QUIC\nтранспорт + шифрование\nвстроенный TLS 1.3"]
+  H3_UDP["UDP"]
+  H3_IP["IP"]
+  H3_APP --> H3_QUIC --> H3_UDP --> H3_IP
+  end
+
+  style H12_TCP fill:#ffcccc,stroke:#cc0000,color:#333
+  style H12_TLS fill:#fff3cd,stroke:#ffc107,color:#333
+  style H3_QUIC fill:#d4edda,stroke:#28a745,color:#333
+  style H3_UDP fill:#cce5ff,stroke:#0066cc,color:#333
+</div>
+
+<h4>Проблема Head-of-Line Blocking</h4>
+
+<p>Ключевая проблема, которую решает QUIC. В HTTP/2 множество потоков (streams) мультиплексируются в <strong>одном TCP-соединении</strong>. Если <strong>один TCP-пакет</strong> теряется, TCP блокирует <strong>все</strong> потоки до его повторной доставки — даже те, которые не зависят от потерянных данных.</p>
+
+<div class="mermaid">
+  graph TD
+  subgraph "HTTP/2 over TCP — Head-of-Line Blocking"
+  TCP_CONN["Одно TCP-соединение"]
+  S1_H2["Stream 1 — CSS"]
+  S2_H2["Stream 2 — JS"]
+  S3_H2["Stream 3 — Image"]
+  TCP_CONN --> S1_H2
+  TCP_CONN --> S2_H2
+  TCP_CONN --> S3_H2
+  LOSS_H2["Потерян пакет Stream 2"]
+  LOSS_H2 -.->|"TCP блокирует ВСЕ потоки\nпока пакет не доставлен повторно"| S1_H2
+  LOSS_H2 -.->|"заблокирован"| S3_H2
+  end
+
+  subgraph "HTTP/3 over QUIC — нет блокировки"
+  QUIC_CONN["Одно QUIC-соединение"]
+  S1_H3["Stream 1 — CSS ✅"]
+  S2_H3["Stream 2 — JS ⏳"]
+  S3_H3["Stream 3 — Image ✅"]
+  QUIC_CONN --> S1_H3
+  QUIC_CONN --> S2_H3
+  QUIC_CONN --> S3_H3
+  LOSS_H3["Потерян пакет Stream 2"]
+  LOSS_H3 -.->|"блокируется ТОЛЬКО Stream 2"| S2_H3
+  end
+
+  style LOSS_H2 fill:#f8d7da,stroke:#dc3545,color:#333
+  style LOSS_H3 fill:#fff3cd,stroke:#ffc107,color:#333
+  style S1_H3 fill:#d4edda,stroke:#28a745,color:#333
+  style S3_H3 fill:#d4edda,stroke:#28a745,color:#333
+</div>
+
+<p>QUIC решает это: каждый поток (stream) внутри QUIC-соединения <strong>независим</strong>. Потеря пакета в одном потоке не блокирует остальные.</p>
+
+<h4>Установка соединения: TCP+TLS vs QUIC</h4>
+
+<p>QUIC объединяет транспортный и криптографический хэндшейк в один шаг, что значительно ускоряет установку соединения.</p>
+
+<div class="mermaid">
+  sequenceDiagram
+  participant C as Client
+  participant S as Server
+
+  Note over C,S: TCP + TLS 1.3 — 2 RTT (Round-Trip Times)
+
+  rect rgb(255, 235, 235)
+  C->>S: SYN
+  S-->>C: SYN-ACK
+  C->>S: ACK
+  Note over C,S: TCP установлен (1 RTT)
+  end
+
+  rect rgb(255, 249, 230)
+  C->>S: ClientHello
+  S-->>C: ServerHello + Finished
+  C->>S: Finished
+  Note over C,S: TLS установлен (1 RTT)
+  end
+
+  C->>S: HTTP Request (первый запрос после 2 RTT)
+
+  Note over C,S: QUIC — 1 RTT (или 0-RTT при повторном подключении)
+
+  rect rgb(220, 245, 220)
+  C->>S: QUIC Initial (ClientHello + транспорт)
+  S-->>C: QUIC Handshake (ServerHello + транспорт)
+  Note over C,S: QUIC + TLS установлены за 1 RTT
+  end
+
+  C->>S: HTTP/3 Request (первый запрос после 1 RTT)
+
+  Note over C,S: QUIC 0-RTT (повторное подключение к известному серверу)
+
+  rect rgb(200, 230, 255)
+  C->>S: QUIC 0-RTT + HTTP/3 Request (сразу данные!)
+  S-->>C: HTTP/3 Response
+  Note over C,S: Данные отправлены без ожидания хэндшейка
+  end
+</div>
+
+<table>
+  <tr><th>Характеристика</th><th>TCP + TLS 1.3</th><th>QUIC</th></tr>
+  <tr><td>Новое соединение</td><td>2 RTT (TCP handshake + TLS handshake)</td><td>1 RTT (объединённый handshake)</td></tr>
+  <tr><td>Повторное соединение</td><td>1–2 RTT (TLS session resumption)</td><td>0 RTT — данные отправляются сразу*</td></tr>
+</table>
+
+<p><em>* 0-RTT подвержен replay-атакам, поэтому подходит только для идемпотентных запросов (GET).</em></p>
+
+<h4>Connection Migration</h4>
+
+<p>TCP-соединение привязано к четвёрке <code>(srcIP, srcPort, dstIP, dstPort)</code>. Если клиент меняет сеть (Wi-Fi → мобильная), TCP-соединение разрывается и нужно устанавливать новое (с хэндшейком).</p>
+
+<p>QUIC использует <strong>Connection ID</strong> вместо IP-адресов для идентификации соединения. При смене сети соединение <strong>мигрирует</strong> без разрыва.</p>
 
 <div class="mermaid">
   graph LR
-  Client["Client"] -->|"TCP :8891"| Tomcat["Embedded Tomcat\nслушает порт"]
-  Tomcat -->|"HttpServletRequest"| DS["DispatcherServlet"]
-  DS -->|"маршрутизация"| HM["HandlerMapping"]
-  HM -->|"найден контроллер"| Ctrl["@RestController"]
-  Ctrl -->|"Java object"| MC["HttpMessageConverter\nJackson JSON"]
-  MC -->|"JSON bytes"| Tomcat
-  Tomcat -->|"HTTP Response"| Client
+  subgraph "TCP: смена сети = разрыв"
+  Phone1["Телефон\nWi-Fi: 192.168.1.5"] -->|"TCP-соединение"| Server1["Сервер"]
+  Phone1 -.->|"Переключение\nна 4G"| Phone2["Телефон\n4G: 10.0.0.42"]
+  Phone2 -->|"НОВОЕ TCP + TLS\n2 RTT заново"| Server1
+  end
+
+  subgraph "QUIC: смена сети = миграция"
+  Phone3["Телефон\nWi-Fi: 192.168.1.5"] -->|"QUIC conn ID: abc123"| Server2["Сервер"]
+  Phone3 -.->|"Переключение\nна 4G"| Phone4["Телефон\n4G: 10.0.0.42"]
+  Phone4 -->|"Тот же QUIC conn ID: abc123\nбез разрыва!"| Server2
+  end
+
+  style Phone2 fill:#f8d7da,stroke:#dc3545
+  style Phone4 fill:#d4edda,stroke:#28a745
 </div>
 
-<div class="note">
-  <strong>Настройка в application.properties:</strong>
-  <pre><code># Порт
-server.port=8891
+<h4>Сводная таблица: HTTP/1.1 vs HTTP/2 vs HTTP/3</h4>
 
-# HTTPS (для production)
-server.ssl.key-store=classpath:keystore.p12
-server.ssl.key-store-password=changeit
-server.ssl.key-store-type=PKCS12
+<table>
+  <tr><th>Аспект</th><th>HTTP/1.1</th><th>HTTP/2</th><th>HTTP/3</th></tr>
+  <tr><td>Год стандартизации</td><td>1997 (RFC 2068)</td><td>2015 (RFC 7540)</td><td>2022 (RFC 9114)</td></tr>
+  <tr><td>Транспорт</td><td>TCP</td><td>TCP</td><td>QUIC (поверх UDP)</td></tr>
+  <tr><td>Шифрование</td><td>Опционально (HTTPS)</td><td>Фактически обязательно</td><td>Всегда (TLS 1.3 встроен в QUIC)</td></tr>
+  <tr><td>Формат</td><td>Текстовый</td><td>Бинарный</td><td>Бинарный</td></tr>
+  <tr><td>Мультиплексирование</td><td>❌ Нет (1 запрос за раз по соединению)</td><td>✅ Да, но с HOL blocking на уровне TCP</td><td>✅ Да, без HOL blocking</td></tr>
+  <tr><td>Head-of-Line Blocking</td><td>На уровне HTTP</td><td>На уровне TCP</td><td>❌ Отсутствует</td></tr>
+  <tr><td>Установка соединения</td><td>1 RTT (TCP) + 1–2 RTT (TLS)</td><td>1 RTT (TCP) + 1 RTT (TLS 1.3)</td><td>1 RTT (0-RTT при повторном)</td></tr>
+  <tr><td>Миграция соединения</td><td>❌ Нет</td><td>❌ Нет</td><td>✅ Connection Migration</td></tr>
+  <tr><td>Сжатие заголовков</td><td>❌ Нет</td><td>HPACK</td><td>QPACK</td></tr>
+  <tr><td>Server Push</td><td>❌ Нет</td><td>✅ Да (редко используется)</td><td>✅ Да (редко используется)</td></tr>
+  <tr><td>Поддержка</td><td>Все браузеры и серверы</td><td>Все современные браузеры</td><td>Chrome, Firefox, Safari, Edge; Nginx, Cloudflare, LiteSpeed</td></tr>
+</table>
 
-# HTTP/2
-server.http2.enabled=true</code></pre>
+<h4>Поддержка HTTP/3 в Java и Spring Boot</h4>
+
+<div class="warn">
+  <strong>Текущее состояние (2026):</strong> Поддержка HTTP/3 в Java-экосистеме активно развивается, но ещё не полностью зрелая.<br/><br/>
+  <strong>Jetty</strong> — поддержка HTTP/3 с версии 12.x через <code>quiche</code> (библиотеку от Cloudflare). Статус — experimental, не рекомендуется для production.<br/>
+  <strong>Reactor Netty</strong> — HTTP/3 поддержка через <code>netty-incubator-codec-http3</code>. С версии 1.3 (Reactor 2025.0) — production-ready. Работает в Spring Boot WebFlux и Spring Cloud Gateway.<br/>
+  <strong>Netty</strong> — поддержка QUIC через <code>netty-incubator-codec-quic</code> (на базе <code>quiche</code>).<br/>
+  <strong>Tomcat</strong> — поддержка HTTP/3 отсутствует (на момент Tomcat 11).<br/>
+  <strong>JDK 26</strong> — JEP 517 добавляет HTTP/3 в стандартный <code>java.net.http.HttpClient</code> (только клиентская часть, с автоматическим fallback на HTTP/2).<br/>
+  <strong>Spring Boot</strong> — нет встроенной поддержки HTTP/3 «из коробки». Возможна через Jetty или Reactor Netty (WebFlux) как embedded server.
+</div>
+
+<pre><code># Для production HTTP/3 обычно обеспечивается на уровне
+# reverse proxy / CDN, а не на уровне Java-приложения:
+
+# Nginx (с патчем от Cloudflare или OpenResty)
+server {
+    listen 443 quic reuseport;   # HTTP/3 через QUIC
+    listen 443 ssl;               # HTTP/2 fallback
+    http2 on;
+
+    ssl_certificate     /etc/ssl/cert.pem;
+    ssl_certificate_key /etc/ssl/key.pem;
+
+    # Сообщить браузеру о поддержке HTTP/3
+    add_header Alt-Svc 'h3=":443"; ma=86400';
+
+    location / {
+        proxy_pass http://localhost:8891;  # Spring Boot приложение
+    }
+}
+
+# Или через CDN (Cloudflare, AWS CloudFront, Fastly)
+# которые автоматически поддерживают HTTP/3 для клиентов</code></pre>
+
+<div class="mermaid">
+  graph LR
+  Browser["Браузер\nHTTP/3 + QUIC"] -->|"UDP :443"| CDN["CDN / Nginx\nHTTP/3 termination"]
+  CDN -->|"TCP :8891\nHTTP/1.1 или HTTP/2"| Spring["Spring Boot\nEmbedded Tomcat"]
+
+  style Browser fill:#cce5ff,stroke:#0066cc
+  style CDN fill:#fff3cd,stroke:#ffc107
+  style Spring fill:#d4edda,stroke:#28a745
 </div>
 
 <div class="good">
-  <strong>Ключевые выводы:</strong><br/>
-  — HTTP — текстовый протокол поверх TCP, состоит из Request Line + Headers + Body<br/>
-  — HTTPS — тот же HTTP, но внутри зашифрованного TLS-канала<br/>
-  — REST API работает поверх HTTP(S), используя его методы, заголовки и статус-коды<br/>
-  — Spring Boot встраивает Tomcat, который слушает порт и передаёт запросы в DispatcherServlet
+  <strong>Практический вывод для Spring-разработчика:</strong><br/>
+  — HTTP/3 ускоряет доставку для конечных пользователей (браузеры, мобильные приложения), особенно в сетях с потерями пакетов и при смене сетей<br/>
+  — Для REST API между сервисами (backend-to-backend) преимущества HTTP/3 минимальны в стабильной сети, но заметны при cross-region вызовах и в средах с потерями пакетов (Kubernetes, облако под нагрузкой)<br/>
+  — В 2025–2026 HTTP/3 терминируется на уровне reverse proxy (Nginx, Envoy) или CDN, а Spring Boot приложение продолжает работать по HTTP/1.1 или HTTP/2<br/>
+  — Для WebFlux-приложений: Reactor Netty 1.3+ позволяет поднять HTTP/3 сервер напрямую (production-ready)<br/>
+  — В JDK 26 стандартный <code>HttpClient</code> поддерживает HTTP/3 — для исходящих вызовов к внешним HTTP/3 серверам<br/>
+  — Для включения на уровне прокси: добавьте заголовок <code>Alt-Svc: h3=":443"; ma=86400</code>
 </div>
 
 <hr class="section-divider"/>
@@ -2383,11 +2568,19 @@ public ResponseEntity&lt;ProblemDetail&gt; handleNotFound(ProductNotFoundExcepti
   <tr><td><strong>HTTP</strong></td><td>HyperText Transfer Protocol — текстовый протокол прикладного уровня для передачи данных в вебе. Работает поверх TCP. Определяет формат запросов (Request Line + Headers + Body) и ответов (Status Line + Headers + Body).</td></tr>
   <tr><td><strong>HTTPS</strong></td><td>HTTP over TLS — тот же HTTP, но внутри зашифрованного TLS-канала. Обеспечивает конфиденциальность (шифрование), целостность (MAC) и аутентификацию сервера (сертификат X.509).</td></tr>
   <tr><td><strong>TLS/SSL</strong></td><td>Transport Layer Security — криптографический протокол, обеспечивающий шифрование TCP-соединения. SSL — устаревшее название (SSLv3 заменён на TLS 1.0+). Текущая версия — TLS 1.3.</td></tr>
-  <tr><td><strong>TCP</strong></td><td>Transmission Control Protocol — протокол транспортного уровня с гарантированной доставкой, порядком пакетов и контролем потока. HTTP работает поверх TCP.</td></tr>
+  <tr><td><strong>TCP</strong></td><td>Transmission Control Protocol — протокол транспортного уровня с гарантированной доставкой, порядком пакетов и контролем потока. HTTP/1.1 и HTTP/2 работают поверх TCP.</td></tr>
+  <tr><td><strong>UDP</strong></td><td>User Datagram Protocol — протокол транспортного уровня без гарантии доставки и порядка пакетов. Легковесный и быстрый. QUIC (и, следовательно, HTTP/3) работает поверх UDP.</td></tr>
+  <tr><td><strong>QUIC</strong></td><td>Quick UDP Internet Connections — транспортный протокол поверх UDP, разработанный Google и стандартизированный в RFC 9000 (2021). Объединяет функции TCP (надёжная доставка, контроль потока) и TLS 1.3 (шифрование) в одном протоколе. Устраняет Head-of-Line blocking, поддерживает 0-RTT и миграцию соединений.</td></tr>
+  <tr><td><strong>HTTP/2</strong></td><td>Бинарный протокол (в отличие от текстового HTTP/1.1) с мультиплексированием (множество запросов параллельно по одному TCP-соединению), сжатием заголовков (HPACK) и server push. Стандартизирован в RFC 7540 (2015). Страдает от Head-of-Line blocking на уровне TCP.</td></tr>
+  <tr><td><strong>HTTP/3</strong></td><td>Третья основная версия HTTP, стандартизированная в RFC 9114 (2022). Работает поверх QUIC (UDP) вместо TCP. Устраняет Head-of-Line blocking, обеспечивает быструю установку соединения (1 RTT, 0-RTT при повторном), поддерживает миграцию соединений при смене сети. Использует QPACK для сжатия заголовков.</td></tr>
+  <tr><td><strong>Head-of-Line Blocking</strong></td><td>Проблема, при которой потеря одного пакета блокирует обработку всех последующих данных. В HTTP/2 over TCP потеря пакета одного потока блокирует все потоки в соединении. QUIC/HTTP/3 решает это — каждый поток независим.</td></tr>
+  <tr><td><strong>0-RTT</strong></td><td>Zero Round-Trip Time — режим QUIC, при котором клиент отправляет данные вместе с первым пакетом при повторном подключении к известному серверу, без ожидания хэндшейка. Подвержен replay-атакам, поэтому подходит только для идемпотентных запросов.</td></tr>
+  <tr><td><strong>Connection Migration</strong></td><td>Возможность QUIC сохранять соединение при смене IP-адреса клиента (например, переключение Wi-Fi → 4G). TCP этого не поддерживает — соединение привязано к IP-адресам. QUIC использует Connection ID для идентификации.</td></tr>
+  <tr><td><strong>Alt-Svc</strong></td><td>HTTP-заголовок (Alternative Services, RFC 7838), через который сервер сообщает клиенту о поддержке альтернативных протоколов. Используется для перехода на HTTP/3: <code>Alt-Svc: h3=":443"; ma=86400</code>.</td></tr>
+  <tr><td><strong>QPACK</strong></td><td>Алгоритм сжатия HTTP-заголовков для HTTP/3, аналог HPACK в HTTP/2. Адаптирован для работы с QUIC, где пакеты могут приходить в произвольном порядке.</td></tr>
   <tr><td><strong>TCP Handshake</strong></td><td>Трёхстороннее рукопожатие (SYN → SYN-ACK → ACK) для установления TCP-соединения перед обменом данными.</td></tr>
   <tr><td><strong>TLS Handshake</strong></td><td>Процесс согласования шифрования между клиентом и сервером: обмен сертификатами, выбор шифров, генерация сессионного ключа. Происходит после TCP-хэндшейка.</td></tr>
   <tr><td><strong>Keep-Alive</strong></td><td>Режим HTTP/1.1, при котором TCP-соединение переиспользуется для нескольких запросов, избегая накладных расходов на повторные TCP/TLS-хэндшейки.</td></tr>
-  <tr><td><strong>HTTP/2</strong></td><td>Бинарный протокол (в отличие от текстового HTTP/1.1) с мультиплексированием (множество запросов параллельно по одному TCP-соединению), сжатием заголовков (HPACK) и server push.</td></tr>
   <tr><td><strong>REST</strong></td><td>Representational State Transfer — архитектурный стиль, описанный Роем Филдингом (2000). Набор из 6 ограничений для построения масштабируемых распределённых систем.</td></tr>
   <tr><td><strong>RESTful</strong></td><td>API, соблюдающее все ограничения REST (включая HATEOAS). На практике термин часто используется для API уровня 2 по Ричардсону.</td></tr>
   <tr><td><strong>Resource</strong></td><td>Ресурс — любая сущность, к которой можно обратиться по URI (продукт, пользователь, заказ).</td></tr>

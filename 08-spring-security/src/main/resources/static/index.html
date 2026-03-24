@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Spring REST Demo — Документация</title>
+  <title>Spring Security — теория и демо</title>
   <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
   <script>mermaid.initialize({startOnLoad: true, theme: 'default'});</script>
   <style>
@@ -27,7 +27,7 @@
         padding-left: 12px;
     }
     h3 {
-        color: #27ae60;
+        color: #16a085;
         margin-top: 28px;
     }
     h4 {
@@ -73,7 +73,7 @@
         vertical-align: top;
     }
     th {
-        background: #3498db;
+        background: #2980b9;
         color: white;
     }
     a {
@@ -129,6 +129,13 @@
         font-family: monospace;
         font-size: 13px;
     }
+    .endpoint a {
+        text-decoration: none;
+        color: #2563eb;
+    }
+    .endpoint a:hover {
+        text-decoration: underline;
+    }
     .section-divider {
         margin: 35px 0;
         border: none;
@@ -141,2576 +148,1033 @@
         padding: 18px 18px 16px;
         margin: 16px 0;
     }
-    .principle-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-        margin: 16px 0;
-    }
-    .principle-card {
-        background: white;
-        border: 1px solid #dcdcdc;
-        border-radius: 8px;
-        padding: 14px;
-    }
-    .principle-card h4 {
-        margin-top: 0;
-        color: #2980b9;
-    }
-    @media (max-width: 768px) {
-        .principle-grid {
-            grid-template-columns: 1fr;
-        }
-    }
   </style>
 </head>
 <body>
 
-<h1>Spring REST Demo</h1>
-<p>Теория, работающий код, тесты и HTTP endpoint'ы для демонстрации Spring Web MVC и REST API.</p>
+<h1>Spring Security — теория и демо</h1>
+<p>Теория, работающий код, тесты и HTTP endpoint'ы для демонстрации Spring Security — мощного фреймворка для аутентификации и авторизации в приложениях на Spring.</p>
 
 <div class="good">
-  <strong>Документация:</strong> <code>http://localhost:8891/</code><br/>
-  <strong>Swagger UI:</strong> <a href="/swagger-ui.html">/swagger-ui.html</a><br/>
+  <strong>Документация:</strong> <code>http://localhost:8892/</code><br/>
   <strong>H2 Console:</strong> <a href="/h2-console">/h2-console</a><br/>
-  <strong>JDBC URL:</strong> <code>jdbc:h2:mem:springrest</code><br/>
+  <strong>JDBC URL:</strong> <code>jdbc:h2:mem:springsecurity</code><br/>
   <strong>User:</strong> <code>sa</code><br/>
   <strong>Password:</strong> пустой
+</div>
+
+<div class="note">
+  <strong>Тестовые пользователи:</strong><br/>
+  admin/admin123 (ROLE_ADMIN)<br/>
+  user/user123 (ROLE_USER)<br/>
+  moderator/moderator123 (ROLE_MODERATOR)<br/>
+  disabled_user/disabled123 (ROLE_USER, disabled)
 </div>
 
 <div class="toc">
   <h3>Содержание</h3>
   <ul>
-    <li><a href="#section-http-transport">1. Транспорт HTTP/HTTPS — как работает</a></li>
-    <li><a href="#section1">2. Введение в Spring REST</a></li>
-    <li><a href="#section-rest-principles">3. Принципы REST (ограничения Филдинга)</a></li>
-    <li><a href="#section-rest-maturity">4. Модель зрелости Ричардсона</a></li>
-    <li><a href="#section2">5. HTTP методы и маппинг</a></li>
-    <li><a href="#section-idempotency">6. Идемпотентность и безопасность методов</a></li>
-    <li><a href="#section3">7. Параметры запроса</a></li>
-    <li><a href="#section4">8. Обработка ответов</a></li>
-    <li><a href="#section5">9. Обработка исключений</a></li>
-    <li><a href="#section6">10. Валидация</a></li>
-    <li><a href="#section7">11. DTO vs Entity</a></li>
-    <li><a href="#section8">12. Пагинация и сортировка</a></li>
-    <li><a href="#section9">13. CRUD операции</a></li>
-    <li><a href="#section-patch">14. PATCH: JSON Merge Patch vs JSON Patch</a></li>
-    <li><a href="#section-hateoas">15. HATEOAS и гипермедиа</a></li>
-    <li><a href="#section-versioning">16. Версионирование API</a></li>
-    <li><a href="#section-code-api-first">17. Code First vs API First</a></li>
-    <li><a href="#section-problem-details">17. RFC 7807 — Problem Details</a></li>
-    <li><a href="#section-best-practices">18. Best Practices проектирования REST API</a></li>
-    <li><a href="#section10">19. Глоссарий терминов</a></li>
-    <li><a href="#section11">20. Endpoint'ы API</a></li>
+    <li><a href="#section1">1. Что такое Spring Security</a></li>
+    <li><a href="#section2">2. Идентификация, Аутентификация и Авторизация</a></li>
+    <li><a href="#section3">3. Архитектура Spring Security</a></li>
+    <li><a href="#section4">4. Security Filter Chain</a></li>
+    <li><a href="#section5">5. Конфигурация безопасности</a></li>
+    <li><a href="#section6">6. Password Encoding</a></li>
+    <li><a href="#section7">7. Пользователи, роли и разрешения (RBAC)</a></li>
+    <li><a href="#section8">8. Method Security</a></li>
+    <li><a href="#section9">9. Security Events</a></li>
+    <li><a href="#section10">10. Глоссарий терминов</a></li>
+    <li><a href="#section11">11. Структура проекта</a></li>
+    <li><a href="#section12">12. Endpoint'ы API</a></li>
+    <li><a href="#section13">13. Быстрый старт (curl)</a></li>
+    <li><a href="#section14">14. Тесты</a></li>
   </ul>
 </div>
 
 <hr class="section-divider"/>
 
-<!-- ==================== HTTP/HTTPS TRANSPORT ==================== -->
-<h2 id="section-http-transport">1. Транспорт HTTP/HTTPS — как работает</h2>
-
-<p><strong>HTTP</strong> (HyperText Transfer Protocol) — протокол прикладного уровня, основа взаимодействия в вебе. <strong>HTTPS</strong> — тот же HTTP, но внутри зашифрованного TLS-канала. Понимание того, как HTTP-запрос путешествует от клиента до сервера — фундамент для работы с REST API.</p>
-
-<h3>Место HTTP в сетевой модели</h3>
-
-<p>HTTP работает поверх TCP (а TCP — поверх IP). Каждый HTTP-запрос — это текстовое сообщение, которое TCP доставляет как поток байтов.</p>
-
-<div class="mermaid">
-  graph TB
-  subgraph "Сетевые уровни"
-  APP["Application Layer\nHTTP / HTTPS"]
-  TLS["TLS / SSL\nтолько для HTTPS"]
-  TCP["Transport Layer\nTCP"]
-  IP["Network Layer\nIP"]
-  PHY["Link Layer\nEthernet / Wi-Fi"]
-  end
-
-  APP -->|"plaintext или зашифровано"| TLS
-  TLS -->|"зашифрованный поток"| TCP
-  APP -.->|"HTTP без шифрования"| TCP
-  TCP -->|"сегменты"| IP
-  IP -->|"пакеты"| PHY
-
-  style TLS fill:#fff3cd,stroke:#ffc107,color:#333
-</div>
-
-<h3>Жизненный цикл HTTP-запроса</h3>
-
-<p>Что происходит, когда клиент отправляет <code>GET http://localhost:8891/api/rest/products</code>:</p>
-
-<div class="mermaid">
-  sequenceDiagram
-  participant Client as Client (curl / browser)
-  participant DNS as DNS Resolver
-  participant Server as Server :8891
-
-  Note over Client: 1. Парсинг URL
-  Client->>Client: Разбор URL на host, port, path
-
-  Note over Client,DNS: 2. DNS-резолвинг
-  Client->>DNS: Какой IP у localhost?
-  DNS-->>Client: 127.0.0.1
-
-  Note over Client,Server: 3. TCP Handshake
-  Client->>Server: SYN
-  Server-->>Client: SYN-ACK
-  Client->>Server: ACK
-  Note over Client,Server: TCP-соединение установлено
-
-  Note over Client,Server: 4. HTTP Request
-  Client->>Server: GET /api/rest/products HTTP/1.1\nHost: localhost:8891\nAccept: application/json
-
-  Note over Server: 5. Обработка
-  Server->>Server: DispatcherServlet\nController\nService\nRepository
-
-  Note over Client,Server: 6. HTTP Response
-  Server-->>Client: HTTP/1.1 200 OK\nContent-Type: application/json\n\n[{"id":1,"name":"Phone"...}]
-
-  Note over Client,Server: 7. Закрытие (или keep-alive)
-  Client->>Server: FIN
-  Server-->>Client: FIN-ACK
-</div>
-
-<h3>Структура HTTP-запроса и ответа</h3>
-
-<p>HTTP-сообщение — это обычный текст (до HTTP/2, где используется бинарный формат).</p>
-
-<pre><code>--- HTTP REQUEST ---
-GET /api/rest/products?type=DEVICE HTTP/1.1    ← Request Line (метод, путь, версия)
-Host: localhost:8891                            ← Заголовки (headers)
-Accept: application/json
-Authorization: Bearer eyJhbGciOi...
-User-Agent: curl/8.4.0
-                                                ← Пустая строка = конец заголовков
-                                                ← Тело (body) — у GET обычно нет
-
---- HTTP RESPONSE ---
-HTTP/1.1 200 OK                                 ← Status Line (версия, код, причина)
-Content-Type: application/json                  ← Заголовки
-Content-Length: 245
-Cache-Control: no-cache
-                                                ← Пустая строка
-[{"id":1,"name":"Phone","price":999.00}]        ← Тело (body)</code></pre>
-
-<div class="mermaid">
-  graph LR
-  subgraph "HTTP Request"
-  RL["Request Line\nGET /path HTTP/1.1"]
-  RH["Headers\nHost, Accept,\nContent-Type,\nAuthorization"]
-  RB["Body\nJSON / Form / пусто"]
-  end
-
-  subgraph "HTTP Response"
-  SL["Status Line\nHTTP/1.1 200 OK"]
-  RSH["Headers\nContent-Type,\nContent-Length,\nCache-Control"]
-  RSB["Body\nJSON / HTML / пусто"]
-  end
-
-  RL --> RH --> RB
-  SL --> RSH --> RSB
-</div>
-
-<h3>HTTP vs HTTPS</h3>
-
-<p><strong>HTTPS</strong> = HTTP + TLS (Transport Layer Security). Данные шифруются <strong>до</strong> отправки по TCP. Сервер подтверждает свою подлинность сертификатом.</p>
-
-<div class="mermaid">
-  sequenceDiagram
-  participant Client
-  participant Server
-
-  Note over Client,Server: TLS Handshake (упрощённо)
-
-  Client->>Server: ClientHello (поддерживаемые шифры, версия TLS)
-  Server-->>Client: ServerHello + сертификат + выбранный шифр
-  Client->>Client: Проверка сертификата (CA, срок, домен)
-  Client->>Server: Обмен ключами (Pre-Master Secret)
-  Note over Client,Server: Обе стороны вычисляют сессионный ключ
-
-  Client->>Server: Finished (зашифровано)
-  Server-->>Client: Finished (зашифровано)
-  Note over Client,Server: TLS-канал установлен
-
-  Note over Client,Server: Теперь HTTP внутри шифрованного канала
-  Client->>Server: GET /api/products (зашифровано)
-  Server-->>Client: 200 OK + JSON (зашифровано)
-</div>
-
-<table>
-  <tr><th>Аспект</th><th>HTTP</th><th>HTTPS</th></tr>
-  <tr><td>Порт по умолчанию</td><td>80</td><td>443</td></tr>
-  <tr><td>Шифрование</td><td>❌ Нет — данные передаются открытым текстом</td><td>✅ TLS — весь трафик зашифрован</td></tr>
-  <tr><td>Аутентификация сервера</td><td>❌ Нет</td><td>✅ Сертификат X.509 подтверждает, что сервер — тот, за кого себя выдаёт</td></tr>
-  <tr><td>Целостность</td><td>❌ Данные могут быть изменены на лету (MITM)</td><td>✅ MAC/HMAC гарантирует целостность</td></tr>
-  <tr><td>Производительность</td><td>Быстрее (нет TLS-хэндшейка)</td><td>Чуть медленнее (TLS-хэндшейк + шифрование). TLS 1.3 значительно ускорил процесс</td></tr>
-  <tr><td>Использование</td><td>Только для разработки (localhost)</td><td>Обязательно для production</td></tr>
-</table>
-
-<h3>Keep-Alive и HTTP/2</h3>
-
-<p>В HTTP/1.0 каждый запрос требовал нового TCP-соединения. Начиная с HTTP/1.1, соединение <strong>переиспользуется</strong> (keep-alive). HTTP/2 идёт дальше — <strong>мультиплексирование</strong>: множество запросов по одному TCP-соединению параллельно.</p>
-
-<div class="mermaid">
-  graph LR
-  subgraph "HTTP/1.0"
-  A1["TCP open"] --> R1["Request 1"] --> C1["TCP close"]
-  A2["TCP open"] --> R2["Request 2"] --> C2["TCP close"]
-  A3["TCP open"] --> R3["Request 3"] --> C3["TCP close"]
-  end
-
-  subgraph "HTTP/1.1 Keep-Alive"
-  A4["TCP open"] --> R4["Request 1"] --> R5["Request 2"] --> R6["Request 3"] --> C4["TCP close"]
-  end
-
-  subgraph "HTTP/2 Multiplexing"
-  A5["TCP open"] --> MUX["Req 1 + Req 2 + Req 3\nпараллельно в одном соединении"] --> C5["TCP close"]
-  end
-</div>
-
-<!-- ==================== HTTP/3 и QUIC ==================== -->
-<h3>HTTP/3 и QUIC</h3>
-
-<p><strong>HTTP/3</strong> — третья основная версия протокола HTTP, стандартизированная в <a href="https://datatracker.ietf.org/doc/html/rfc9114">RFC 9114</a> (июнь 2022). Главное отличие: HTTP/3 работает <strong>не поверх TCP</strong>, а поверх <strong>QUIC</strong> — нового транспортного протокола на базе UDP.</p>
-
-<h4>Что такое QUIC</h4>
-
-<p><strong>QUIC</strong> (Quick UDP Internet Connections) — транспортный протокол, изначально разработанный в Google (2012), стандартизированный в <a href="https://datatracker.ietf.org/doc/html/rfc9000">RFC 9000</a> (май 2021). QUIC объединяет функции TCP и TLS в одном протоколе поверх UDP.</p>
-
-<div class="mermaid">
-  graph TB
-  subgraph "HTTP/1.1 и HTTP/2"
-  H12_APP["HTTP"]
-  H12_TLS["TLS 1.2 / 1.3"]
-  H12_TCP["TCP"]
-  H12_IP["IP"]
-  H12_APP --> H12_TLS --> H12_TCP --> H12_IP
-  end
-
-  subgraph "HTTP/3"
-  H3_APP["HTTP/3"]
-  H3_QUIC["QUIC\nтранспорт + шифрование\nвстроенный TLS 1.3"]
-  H3_UDP["UDP"]
-  H3_IP["IP"]
-  H3_APP --> H3_QUIC --> H3_UDP --> H3_IP
-  end
-
-  style H12_TCP fill:#ffcccc,stroke:#cc0000,color:#333
-  style H12_TLS fill:#fff3cd,stroke:#ffc107,color:#333
-  style H3_QUIC fill:#d4edda,stroke:#28a745,color:#333
-  style H3_UDP fill:#cce5ff,stroke:#0066cc,color:#333
-</div>
-
-<h4>Проблема Head-of-Line Blocking</h4>
-
-<p>Ключевая проблема, которую решает QUIC. В HTTP/2 множество потоков (streams) мультиплексируются в <strong>одном TCP-соединении</strong>. Если <strong>один TCP-пакет</strong> теряется, TCP блокирует <strong>все</strong> потоки до его повторной доставки — даже те, которые не зависят от потерянных данных.</p>
-
-<div class="mermaid">
-  graph TD
-  subgraph "HTTP/2 over TCP — Head-of-Line Blocking"
-  TCP_CONN["Одно TCP-соединение"]
-  S1_H2["Stream 1 — CSS"]
-  S2_H2["Stream 2 — JS"]
-  S3_H2["Stream 3 — Image"]
-  TCP_CONN --> S1_H2
-  TCP_CONN --> S2_H2
-  TCP_CONN --> S3_H2
-  LOSS_H2["Потерян пакет Stream 2"]
-  LOSS_H2 -.->|"TCP блокирует ВСЕ потоки\nпока пакет не доставлен повторно"| S1_H2
-  LOSS_H2 -.->|"заблокирован"| S3_H2
-  end
-
-  subgraph "HTTP/3 over QUIC — нет блокировки"
-  QUIC_CONN["Одно QUIC-соединение"]
-  S1_H3["Stream 1 — CSS ✅"]
-  S2_H3["Stream 2 — JS ⏳"]
-  S3_H3["Stream 3 — Image ✅"]
-  QUIC_CONN --> S1_H3
-  QUIC_CONN --> S2_H3
-  QUIC_CONN --> S3_H3
-  LOSS_H3["Потерян пакет Stream 2"]
-  LOSS_H3 -.->|"блокируется ТОЛЬКО Stream 2"| S2_H3
-  end
-
-  style LOSS_H2 fill:#f8d7da,stroke:#dc3545,color:#333
-  style LOSS_H3 fill:#fff3cd,stroke:#ffc107,color:#333
-  style S1_H3 fill:#d4edda,stroke:#28a745,color:#333
-  style S3_H3 fill:#d4edda,stroke:#28a745,color:#333
-</div>
-
-<p>QUIC решает это: каждый поток (stream) внутри QUIC-соединения <strong>независим</strong>. Потеря пакета в одном потоке не блокирует остальные.</p>
-
-<h4>Установка соединения: TCP+TLS vs QUIC</h4>
-
-<p>QUIC объединяет транспортный и криптографический хэндшейк в один шаг, что значительно ускоряет установку соединения.</p>
-
-<div class="mermaid">
-  sequenceDiagram
-  participant C as Client
-  participant S as Server
-
-  Note over C,S: TCP + TLS 1.3 — 2 RTT (Round-Trip Times)
-
-  rect rgb(255, 235, 235)
-  C->>S: SYN
-  S-->>C: SYN-ACK
-  C->>S: ACK
-  Note over C,S: TCP установлен (1 RTT)
-  end
-
-  rect rgb(255, 249, 230)
-  C->>S: ClientHello
-  S-->>C: ServerHello + Finished
-  C->>S: Finished
-  Note over C,S: TLS установлен (1 RTT)
-  end
-
-  C->>S: HTTP Request (первый запрос после 2 RTT)
-
-  Note over C,S: QUIC — 1 RTT (или 0-RTT при повторном подключении)
-
-  rect rgb(220, 245, 220)
-  C->>S: QUIC Initial (ClientHello + транспорт)
-  S-->>C: QUIC Handshake (ServerHello + транспорт)
-  Note over C,S: QUIC + TLS установлены за 1 RTT
-  end
-
-  C->>S: HTTP/3 Request (первый запрос после 1 RTT)
-
-  Note over C,S: QUIC 0-RTT (повторное подключение к известному серверу)
-
-  rect rgb(200, 230, 255)
-  C->>S: QUIC 0-RTT + HTTP/3 Request (сразу данные!)
-  S-->>C: HTTP/3 Response
-  Note over C,S: Данные отправлены без ожидания хэндшейка
-  end
-</div>
-
-<table>
-  <tr><th>Характеристика</th><th>TCP + TLS 1.3</th><th>QUIC</th></tr>
-  <tr><td>Новое соединение</td><td>2 RTT (TCP handshake + TLS handshake)</td><td>1 RTT (объединённый handshake)</td></tr>
-  <tr><td>Повторное соединение</td><td>1–2 RTT (TLS session resumption)</td><td>0 RTT — данные отправляются сразу*</td></tr>
-</table>
-
-<p><em>* 0-RTT подвержен replay-атакам, поэтому подходит только для идемпотентных запросов (GET).</em></p>
-
-<h4>Connection Migration</h4>
-
-<p>TCP-соединение привязано к четвёрке <code>(srcIP, srcPort, dstIP, dstPort)</code>. Если клиент меняет сеть (Wi-Fi → мобильная), TCP-соединение разрывается и нужно устанавливать новое (с хэндшейком).</p>
-
-<p>QUIC использует <strong>Connection ID</strong> вместо IP-адресов для идентификации соединения. При смене сети соединение <strong>мигрирует</strong> без разрыва.</p>
-
-<div class="mermaid">
-  graph LR
-  subgraph "TCP: смена сети = разрыв"
-  Phone1["Телефон\nWi-Fi: 192.168.1.5"] -->|"TCP-соединение"| Server1["Сервер"]
-  Phone1 -.->|"Переключение\nна 4G"| Phone2["Телефон\n4G: 10.0.0.42"]
-  Phone2 -->|"НОВОЕ TCP + TLS\n2 RTT заново"| Server1
-  end
-
-  subgraph "QUIC: смена сети = миграция"
-  Phone3["Телефон\nWi-Fi: 192.168.1.5"] -->|"QUIC conn ID: abc123"| Server2["Сервер"]
-  Phone3 -.->|"Переключение\nна 4G"| Phone4["Телефон\n4G: 10.0.0.42"]
-  Phone4 -->|"Тот же QUIC conn ID: abc123\nбез разрыва!"| Server2
-  end
-
-  style Phone2 fill:#f8d7da,stroke:#dc3545
-  style Phone4 fill:#d4edda,stroke:#28a745
-</div>
-
-<h4>Сводная таблица: HTTP/1.1 vs HTTP/2 vs HTTP/3</h4>
-
-<table>
-  <tr><th>Аспект</th><th>HTTP/1.1</th><th>HTTP/2</th><th>HTTP/3</th></tr>
-  <tr><td>Год стандартизации</td><td>1997 (RFC 2068)</td><td>2015 (RFC 7540)</td><td>2022 (RFC 9114)</td></tr>
-  <tr><td>Транспорт</td><td>TCP</td><td>TCP</td><td>QUIC (поверх UDP)</td></tr>
-  <tr><td>Шифрование</td><td>Опционально (HTTPS)</td><td>Фактически обязательно</td><td>Всегда (TLS 1.3 встроен в QUIC)</td></tr>
-  <tr><td>Формат</td><td>Текстовый</td><td>Бинарный</td><td>Бинарный</td></tr>
-  <tr><td>Мультиплексирование</td><td>❌ Нет (1 запрос за раз по соединению)</td><td>✅ Да, но с HOL blocking на уровне TCP</td><td>✅ Да, без HOL blocking</td></tr>
-  <tr><td>Head-of-Line Blocking</td><td>На уровне HTTP</td><td>На уровне TCP</td><td>❌ Отсутствует</td></tr>
-  <tr><td>Установка соединения</td><td>1 RTT (TCP) + 1–2 RTT (TLS)</td><td>1 RTT (TCP) + 1 RTT (TLS 1.3)</td><td>1 RTT (0-RTT при повторном)</td></tr>
-  <tr><td>Миграция соединения</td><td>❌ Нет</td><td>❌ Нет</td><td>✅ Connection Migration</td></tr>
-  <tr><td>Сжатие заголовков</td><td>❌ Нет</td><td>HPACK</td><td>QPACK</td></tr>
-  <tr><td>Server Push</td><td>❌ Нет</td><td>✅ Да (редко используется)</td><td>✅ Да (редко используется)</td></tr>
-  <tr><td>Поддержка</td><td>Все браузеры и серверы</td><td>Все современные браузеры</td><td>Chrome, Firefox, Safari, Edge; Nginx, Cloudflare, LiteSpeed</td></tr>
-</table>
-
-<h4>Поддержка HTTP/3 в Java и Spring Boot</h4>
-
-<div class="warn">
-  <strong>Текущее состояние (2026):</strong> Поддержка HTTP/3 в Java-экосистеме активно развивается, но ещё не полностью зрелая.<br/><br/>
-  <strong>Jetty</strong> — поддержка HTTP/3 с версии 12.x через <code>quiche</code> (библиотеку от Cloudflare). Статус — experimental, не рекомендуется для production.<br/>
-  <strong>Reactor Netty</strong> — HTTP/3 поддержка через <code>netty-incubator-codec-http3</code>. С версии 1.3 (Reactor 2025.0) — production-ready. Работает в Spring Boot WebFlux и Spring Cloud Gateway.<br/>
-  <strong>Netty</strong> — поддержка QUIC через <code>netty-incubator-codec-quic</code> (на базе <code>quiche</code>).<br/>
-  <strong>Tomcat</strong> — поддержка HTTP/3 отсутствует (на момент Tomcat 11).<br/>
-  <strong>JDK 26</strong> — JEP 517 добавляет HTTP/3 в стандартный <code>java.net.http.HttpClient</code> (только клиентская часть, с автоматическим fallback на HTTP/2).<br/>
-  <strong>Spring Boot</strong> — нет встроенной поддержки HTTP/3 «из коробки». Возможна через Jetty или Reactor Netty (WebFlux) как embedded server.
-</div>
-
-<pre><code># Для production HTTP/3 обычно обеспечивается на уровне
-# reverse proxy / CDN, а не на уровне Java-приложения:
-
-# Nginx (с патчем от Cloudflare или OpenResty)
-server {
-    listen 443 quic reuseport;   # HTTP/3 через QUIC
-    listen 443 ssl;               # HTTP/2 fallback
-    http2 on;
-
-    ssl_certificate     /etc/ssl/cert.pem;
-    ssl_certificate_key /etc/ssl/key.pem;
-
-    # Сообщить браузеру о поддержке HTTP/3
-    add_header Alt-Svc 'h3=":443"; ma=86400';
-
-    location / {
-        proxy_pass http://localhost:8891;  # Spring Boot приложение
-    }
-}
-
-# Или через CDN (Cloudflare, AWS CloudFront, Fastly)
-# которые автоматически поддерживают HTTP/3 для клиентов</code></pre>
-
-<div class="mermaid">
-  graph LR
-  Browser["Браузер\nHTTP/3 + QUIC"] -->|"UDP :443"| CDN["CDN / Nginx\nHTTP/3 termination"]
-  CDN -->|"TCP :8891\nHTTP/1.1 или HTTP/2"| Spring["Spring Boot\nEmbedded Tomcat"]
-
-  style Browser fill:#cce5ff,stroke:#0066cc
-  style CDN fill:#fff3cd,stroke:#ffc107
-  style Spring fill:#d4edda,stroke:#28a745
-</div>
-
-<div class="good">
-  <strong>Практический вывод для Spring-разработчика:</strong><br/>
-  — HTTP/3 ускоряет доставку для конечных пользователей (браузеры, мобильные приложения), особенно в сетях с потерями пакетов и при смене сетей<br/>
-  — Для REST API между сервисами (backend-to-backend) преимущества HTTP/3 минимальны в стабильной сети, но заметны при cross-region вызовах и в средах с потерями пакетов (Kubernetes, облако под нагрузкой)<br/>
-  — В 2025–2026 HTTP/3 терминируется на уровне reverse proxy (Nginx, Envoy) или CDN, а Spring Boot приложение продолжает работать по HTTP/1.1 или HTTP/2<br/>
-  — Для WebFlux-приложений: Reactor Netty 1.3+ позволяет поднять HTTP/3 сервер напрямую (production-ready)<br/>
-  — В JDK 26 стандартный <code>HttpClient</code> поддерживает HTTP/3 — для исходящих вызовов к внешним HTTP/3 серверам<br/>
-  — Для включения на уровне прокси: добавьте заголовок <code>Alt-Svc: h3=":443"; ma=86400</code>
-</div>
-
-<hr class="section-divider"/>
-
 <!-- ==================== SECTION 1 ==================== -->
-<h2 id="section1">2. Введение в Spring REST</h2>
+<h2 id="section1">1. Что такое Spring Security</h2>
 
-<p><strong>REST</strong> (Representational State Transfer) — архитектурный стиль, описанный Роем Филдингом в его докторской диссертации (2000 год). REST определяет набор ограничений (constraints) для построения масштабируемых и слабосвязанных распределённых систем. Spring MVC предоставляет мощный инструментарий для создания REST API.</p>
-
-<h3>@RestController vs @Controller + @ResponseBody</h3>
-
-<table>
-  <tr><th>Аннотация</th><th>Когда использовать</th><th>Особенности</th></tr>
-  <tr>
-    <td><code>@RestController</code></td>
-    <td>Все методы возвращают данные (JSON/XML)</td>
-    <td>Комбинация <code>@Controller</code> + <code>@ResponseBody</code></td>
-  </tr>
-  <tr>
-    <td><code>@Controller</code></td>
-    <td>Нужны HTML-представления (Thymeleaf, JSP) или смешанный подход</td>
-    <td>Для REST-методов нужна <code>@ResponseBody</code> на каждом</td>
-  </tr>
-</table>
-
-<pre><code>// Эквивалентно @Controller + @ResponseBody на каждом методе
-@RestController
-public class ProductController {
-    @GetMapping("/products")
-    public List&lt;ProductDto&gt; getProducts() {
-        return productService.getAll();
-    }
-}</code></pre>
-
-<h3>Общая архитектура</h3>
-<div class="mermaid">
-  graph LR
-  C["Client"] -->|"HTTP request"| Ctrl["REST Controller"]
-  Ctrl -->|"calls"| Svc["Service"]
-  Svc -->|"loads/saves Entity"| Repo["JPA Repository"]
-  Repo --> DB[("Database")]
-  Repo -->|"Entity"| Svc
-  Svc -->|"maps Entity to DTO"| Svc
-  Svc -->|"DTO"| Ctrl
-  Ctrl -->|"JSON response"| C
-</div>
-
-<h3>Как Spring обрабатывает REST-запрос</h3>
-
-<div class="mermaid">
-  sequenceDiagram
-  participant Client
-  participant DispatcherServlet
-  participant HandlerMapping
-  participant Controller
-  participant MessageConverter as HttpMessageConverter
-
-  Client->>DispatcherServlet: HTTP Request
-  DispatcherServlet->>HandlerMapping: Find handler
-  HandlerMapping-->>DispatcherServlet: Controller + method
-  DispatcherServlet->>MessageConverter: Deserialize @RequestBody
-  MessageConverter-->>DispatcherServlet: Java object
-  DispatcherServlet->>Controller: Invoke method with args
-  Controller-->>DispatcherServlet: Return object
-  DispatcherServlet->>MessageConverter: Serialize to JSON
-  MessageConverter-->>DispatcherServlet: JSON string
-  DispatcherServlet-->>Client: HTTP Response + JSON
-</div>
-
-<h3>@RequestMapping и вариации</h3>
-
-<table>
-  <tr><th>Аннотация</th><th>HTTP метод</th><th>Типичное использование</th></tr>
-  <tr><td><code>@GetMapping</code></td><td>GET</td><td>Получение ресурса</td></tr>
-  <tr><td><code>@PostMapping</code></td><td>POST</td><td>Создание ресурса</td></tr>
-  <tr><td><code>@PutMapping</code></td><td>PUT</td><td>Полная замена ресурса</td></tr>
-  <tr><td><code>@PatchMapping</code></td><td>PATCH</td><td>Частичное обновление</td></tr>
-  <tr><td><code>@DeleteMapping</code></td><td>DELETE</td><td>Удаление ресурса</td></tr>
-</table>
-
-<pre><code>@RestController
-@RequestMapping("/api/rest")
-public class DemoController {
-
-    @GetMapping("/basics")
-    public ApiModels.ControllerBasicsResult getBasics() {
-        return demoService.getControllerBasics();
-    }
-}</code></pre>
-
-<div class="endpoint">GET /api/rest/basics</div>
-
-<h3>📁 Связанный код</h3>
-<ul>
-  <li><span class="file-link">SpringRestApplication.java</span></li>
-  <li><span class="file-link">DemoController.java</span></li>
-  <li><span class="file-link">RestDemoService.java</span></li>
-</ul>
+<p>
+  Spring Security — это мощный и настраиваемый фреймворк аутентификации и контроля доступа
+  для приложений Java. Он обеспечивает комплексную защиту для приложений Spring.
+</p>
 
 <div class="note">
-  <strong>Тест:</strong> <span class="file-link">Section1_ControllerBasicsTest</span>
-</div>
-
-<hr class="section-divider"/>
-
-<!-- ==================== REST PRINCIPLES ==================== -->
-<h2 id="section-rest-principles">3. Принципы REST (ограничения Филдинга)</h2>
-
-<p>REST — это не протокол и не стандарт, а набор из <strong>6 архитектурных ограничений</strong>. API, которое соблюдает все ограничения, называется <strong>RESTful</strong>.</p>
-
-<div class="principle-grid">
-  <div class="principle-card">
-    <h4>1. Client-Server</h4>
-    <p>Клиент и сервер разделены и развиваются независимо. Клиент не знает, как хранятся данные. Сервер не знает, как выглядит UI.</p>
-  </div>
-  <div class="principle-card">
-    <h4>2. Stateless</h4>
-    <p>Каждый запрос от клиента содержит <strong>всю</strong> информацию для обработки. Сервер не хранит сессию между запросами. Аутентификация — через токены (JWT, OAuth) в каждом запросе.</p>
-  </div>
-  <div class="principle-card">
-    <h4>3. Cacheable</h4>
-    <p>Ответы должны явно или неявно указывать, можно ли их кэшировать. Заголовки: <code>Cache-Control</code>, <code>ETag</code>, <code>Last-Modified</code>, <code>Expires</code>.</p>
-  </div>
-  <div class="principle-card">
-    <h4>4. Uniform Interface</h4>
-    <p>Ключевое ограничение. Ресурсы идентифицируются URI. Работа через представления (JSON/XML). Самоописательные сообщения (Content-Type, статусы). HATEOAS (ссылки на связанные действия).</p>
-  </div>
-  <div class="principle-card">
-    <h4>5. Layered System</h4>
-    <p>Клиент не знает, обращается ли он напрямую к серверу или через прокси, балансировщик, API Gateway. Каждый слой видит только соседний.</p>
-  </div>
-  <div class="principle-card">
-    <h4>6. Code on Demand</h4>
-    <p><em>Опциональное.</em> Сервер может передавать исполняемый код клиенту (например, JavaScript). В REST API практически не используется.</p>
-  </div>
+  <strong>Ключевые возможности:</strong> аутентификация, авторизация, защита от атак (CSRF, XSS, session fixation),
+  интеграция с OAuth2, SAML, LDAP, JWT и многое другое.
 </div>
 
 <div class="mermaid">
   graph TB
-  subgraph "REST Constraints"
-  CS["Client-Server"]
-  ST["Stateless"]
-  CA["Cacheable"]
-  UI["Uniform Interface"]
-  LS["Layered System"]
-  CD["Code on Demand - optional"]
-  end
-
-  subgraph "Uniform Interface"
-  RI["Resource identification via URI"]
-  RM["Manipulation through representations"]
-  SM["Self-descriptive messages"]
-  HA["HATEOAS"]
-  end
-
-  UI --> RI
-  UI --> RM
-  UI --> SM
-  UI --> HA
+  Client[Client] --> FilterChain[Security Filter Chain]
+  FilterChain --> Auth[Authentication Manager]
+  FilterChain --> Authz[Access Decision Manager]
+  Auth --> Provider[Authentication Provider]
+  Provider --> DB[(Database)]
+  Authz --> Voting[Access Decision Voting]
 </div>
 
-<div class="warn">
-  <strong>Распространённое заблуждение:</strong> Многие считают, что любой HTTP API с JSON — это REST. На самом деле REST — это именно соблюдение всех ограничений Филдинга, включая HATEOAS. Большинство реальных API являются «REST-like» или «HTTP API», соответствуя Level 2 по модели Ричардсона.
-</div>
+<p>
+  Проект использует <strong>H2</strong> в качестве in-memory базы данных, схема создаётся
+  автоматически через JPA (ddl-auto=create-drop), начальные данные загружаются через
+  <span class="file-link">DemoDataInitializer.java</span>.
+</p>
 
-<hr class="section-divider"/>
-
-<!-- ==================== RICHARDSON MATURITY MODEL ==================== -->
-<h2 id="section-rest-maturity">4. Модель зрелости Ричардсона</h2>
-
-<p>Леонард Ричардсон предложил модель из 4 уровней, описывающую степень «RESTfulness» API.</p>
-
-<div class="mermaid">
-  graph BT
-  L0["Level 0: The Swamp of POX\nОдин URL, один метод POST, RPC по HTTP"]
-  L1["Level 1: Resources\nОтдельные URL для ресурсов"]
-  L2["Level 2: HTTP Verbs\nGET, POST, PUT, DELETE + статус-коды"]
-  L3["Level 3: Hypermedia Controls\nHATEOAS - ссылки на действия в ответах"]
-
-  L0 --> L1
-  L1 --> L2
-  L2 --> L3
-
-  style L0 fill:#ffcccc,stroke:#cc0000,color:#333
-  style L1 fill:#fff3cc,stroke:#cc9900,color:#333
-  style L2 fill:#ccffcc,stroke:#009900,color:#333
-  style L3 fill:#cce5ff,stroke:#0066cc,color:#333
-</div>
-
-<table>
-  <tr><th>Уровень</th><th>Описание</th><th>Пример</th></tr>
-  <tr>
-    <td><strong>Level 0</strong></td>
-    <td>Один endpoint, все действия через POST с разными телами</td>
-    <td><code>POST /api</code> с <code>{"action": "getProduct", "id": 1}</code></td>
-  </tr>
-  <tr>
-    <td><strong>Level 1</strong></td>
-    <td>Отдельные URI для ресурсов, но всё ещё один метод</td>
-    <td><code>POST /api/products/1</code> для получения</td>
-  </tr>
-  <tr>
-    <td><strong>Level 2</strong></td>
-    <td>Используются HTTP-методы и статус-коды по назначению</td>
-    <td><code>GET /api/products/1</code> → 200 OK</td>
-  </tr>
-  <tr>
-    <td><strong>Level 3</strong></td>
-    <td>HATEOAS — ответы содержат гиперссылки на доступные действия</td>
-    <td>Ответ содержит <code>"_links": {"self": {"href": "/products/1"}}</code></td>
-  </tr>
-</table>
-
-<div class="good">
-  <strong>Этот проект</strong> реализует <strong>Level 2</strong> — корректное использование HTTP-методов, статус-кодов и URI для ресурсов.
-</div>
+<div class="endpoint"><a href="/api/security/concepts">GET /api/security/concepts</a></div>
 
 <hr class="section-divider"/>
 
 <!-- ==================== SECTION 2 ==================== -->
-<h2 id="section2">5. HTTP методы и маппинг</h2>
+<h2 id="section2">2. Идентификация, Аутентификация и Авторизация</h2>
 
-<p>Каждый HTTP метод имеет свою семантику, определённую в <a href="https://datatracker.ietf.org/doc/html/rfc7231">RFC 7231</a>.</p>
+<p>
+  Три ключевых процесса безопасности, которые часто путают, но выполняют <strong>принципиально разные функции</strong>.
+  Различие между аутентификацией и авторизацией возвращается эндпоинтом <code>/api/security/auth-vs-authorization</code>
+  и проверяется тестом <span class="file-link">Section3_AuthVsAuthorizationTest.java</span>.
+</p>
 
-<h3>GET — чтение</h3>
-<p>Используется для получения ресурсов. <strong>Безопасный</strong> (safe) и <strong>идемпотентный</strong> — не изменяет состояние сервера.</p>
+<h3>Аналогия из реальной жизни</h3>
 
-<pre><code>@GetMapping("/products")
-public List&lt;ProductDto&gt; getAllProducts() {
-    return demoService.getAllProducts();
+<div class="card">
+  <strong>🏢 Вход в офисное здание:</strong>
+  <table>
+    <thead><tr><th>Этап</th><th>Действие</th><th>Вопрос</th></tr></thead>
+    <tbody>
+    <tr><td>1. <strong>Идентификация</strong></td><td>«Меня зовут Иван Петров»</td><td>Кто ты?</td></tr>
+    <tr><td>2. <strong>Аутентификация</strong></td><td><em>показывает паспорт с фото</em></td><td>Докажи это!</td></tr>
+    <tr><td>3. <strong>Авторизация</strong></td><td><em>охранник проверяет список допуска</em></td><td>Что тебе разрешено?</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===== Идентификация ===== -->
+<h3>Идентификация (Identification) — «Кто ты?»</h3>
+
+<p>
+  Идентификация — процесс <strong>заявления</strong> о своей личности.
+  Пользователь <strong>называет себя</strong>, но ещё <strong>ничего не доказывает</strong>.
+  Система ищет предъявленный идентификатор в своей базе данных.
+</p>
+
+<div class="card">
+  <strong>Типичные идентификаторы:</strong>
+  <ul>
+    <li>Логин (username)</li>
+    <li>Email-адрес</li>
+    <li>Номер телефона</li>
+    <li>ID карты / badge</li>
+    <li>Номер паспорта</li>
+    <li>Отпечаток пальца (при поиске по базе — это тоже идентификация)</li>
+  </ul>
+</div>
+
+<div class="warn">
+  <strong>⚠️ На этапе идентификации доверия ещё нет!</strong>
+  Любой может заявить: «Я — admin». Это не значит, что система ему поверит.
+</div>
+
+<pre><code>// Пользователь вводит логин — это ИДЕНТИФИКАЦИЯ
+POST /api/auth/login
+{
+    "username": "ivan_petrov",   // ← Идентификация: "Я — ivan_petrov"
+    "password": "***"            // ← Это уже для аутентификации (следующий шаг)
 }
 
-@GetMapping("/products/{id}")
-public ProductDto getProductById(@PathVariable Long id) {
-    return demoService.getProductById(id);
+// Сервер: "Ок, я нашёл такого пользователя. Теперь докажи, что это ты."</code></pre>
+
+<h4>Идентификация в Spring Security</h4>
+
+<p>
+  В Spring Security идентификация происходит внутри <code>UserDetailsService.loadUserByUsername()</code> —
+  система ищет пользователя по предъявленному идентификатору:
+</p>
+
+<pre><code>@Service
+public class CustomUserDetailsService implements UserDetailsService {
+
+    @Override
+    public UserDetails loadUserByUsername(String username)
+            throws UsernameNotFoundException {
+
+        // ← Это ИДЕНТИФИКАЦИЯ: поиск пользователя по заявленному имени
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new UsernameNotFoundException(
+                "Пользователь не найден: " + username  // Идентификация не прошла
+            ));
+
+        return buildUserDetails(user);
+        // Далее AuthenticationProvider проверит пароль — это уже АУТЕНТИФИКАЦИЯ
+    }
 }</code></pre>
 
-<h3>POST — создание</h3>
-<p>Используется для создания новых ресурсов. <strong>Не идемпотентен</strong> — повторный вызов создаст дубликат. Должен возвращать <strong>201 Created</strong> с заголовком <code>Location</code>, содержащим URI нового ресурса.</p>
+<!-- ===== Аутентификация ===== -->
+<h3>Аутентификация (Authentication) — «Докажи, что ты — тот, за кого себя выдаёшь!»</h3>
 
-<pre><code>@PostMapping("/products")
-public ResponseEntity&lt;CrudOperationResult&gt; createProduct(
-        @Valid @RequestBody ProductCreateRequest request) {
+<p>
+  Аутентификация — процесс <strong>подтверждения</strong> заявленной личности.
+  Пользователь предоставляет <strong>доказательства</strong> (credentials),
+  что он действительно тот, кем представился на этапе идентификации.
+</p>
 
-    CrudOperationResult result = demoService.createProduct(request);
-
-    URI location = ServletUriComponentsBuilder
-            .fromCurrentRequest()
-            .path("/{id}")
-            .buildAndExpand(result.product().id())
-            .toUri();
-
-    return ResponseEntity.created(location).body(result);
-    // Ответ: 201 Created + Location: /api/rest/products/7
-}</code></pre>
-
-<h3>PUT — полная замена ресурса</h3>
-<p><strong>Идемпотентен</strong> — повторный вызов с теми же данными даёт тот же результат. Клиент должен отправить <strong>все</strong> поля ресурса; отсутствующие поля будут обнулены. Создание через PUT возможно только если API явно это поддерживает (клиент задаёт URI ресурса).</p>
-
-<pre><code>@PutMapping("/products/{id}")
-public CrudOperationResult updateProduct(
-        @PathVariable Long id,
-        @Valid @RequestBody ProductUpdateRequest request) {
-    return demoService.updateProduct(id, request);
-}</code></pre>
-
-<h3>PATCH — частичное обновление</h3>
-<p>Обновляет <strong>только указанные</strong> поля ресурса. В отличие от PUT, не требует отправки всех полей. Формально может быть не идемпотентным по <a href="https://datatracker.ietf.org/doc/html/rfc5789">RFC 5789</a>, но на практике обычно реализуется идемпотентно. Подробнее о форматах PATCH — в <a href="#section-patch">секции 14</a>.</p>
-
-<pre><code>@PatchMapping("/products/{id}")
-public CrudOperationResult patchProduct(
-        @PathVariable Long id,
-        @RequestBody ProductUpdateRequest request) {
-    // Обновляем только не-null поля (Merge Patch семантика)
-    return demoService.patchProduct(id, request);
-}</code></pre>
-
-<h3>DELETE — удаление</h3>
-<p><strong>Идемпотентен</strong> — повторное удаление уже удалённого ресурса не должно вызывать ошибку (хотя на практике часто возвращают 404). Возвращает <strong>204 No Content</strong>.</p>
-
-<pre><code>@DeleteMapping("/products/{id}")
-public ResponseEntity&lt;Void&gt; deleteProduct(@PathVariable Long id) {
-    demoService.deleteProduct(id);
-    return ResponseEntity.noContent().build();
-}</code></pre>
-
-<h3>HEAD и OPTIONS</h3>
-<ul>
-  <li><strong>HEAD</strong> — идентичен GET, но возвращает только заголовки (без тела). Используется для проверки существования ресурса или получения метаданных (Content-Length, Last-Modified).</li>
-  <li><strong>OPTIONS</strong> — возвращает разрешённые методы для ресурса в заголовке <code>Allow</code>. Используется в CORS preflight-запросах.</li>
-</ul>
-
-<pre><code># HEAD — получить только заголовки (без тела)
-curl -I http://localhost:8891/api/rest/products
-
-# OPTIONS — узнать разрешённые методы
-curl -X OPTIONS -i http://localhost:8891/api/rest/products
-# Ответ: Allow: GET, POST, HEAD, OPTIONS</code></pre>
-
-<div class="note">
-  <strong>Важно:</strong> HEAD и OPTIONS — это <strong>HTTP-методы</strong>, а не отдельные URL-пути. Spring MVC автоматически поддерживает HEAD для любого GET-эндпоинта и OPTIONS для всех маппингов.
+<div class="card">
+  <strong>Три фактора аутентификации:</strong>
+  <table>
+    <thead><tr><th>Фактор</th><th>Тип</th><th>Примеры</th></tr></thead>
+    <tbody>
+    <tr><td>🔑 Знание</td><td>Что-то, что вы <em>знаете</em></td><td>Пароль, PIN-код, секретный вопрос</td></tr>
+    <tr><td>📱 Владение</td><td>Что-то, что вы <em>имеете</em></td><td>Телефон (SMS/TOTP), смарт-карта, USB-токен</td></tr>
+    <tr><td>🧬 Свойство</td><td>Что-то, что вы <em>есть</em></td><td>Отпечаток пальца, распознавание лица, сетчатка</td></tr>
+    </tbody>
+  </table>
 </div>
 
-<h3>Сводная таблица свойств HTTP-методов</h3>
-
+<h4>Уровни аутентификации</h4>
 <table>
-  <tr><th>Метод</th><th>CRUD</th><th>Безопасный</th><th>Идемпотентный</th><th>Тело запроса</th><th>Типичный ответ</th></tr>
-  <tr><td>GET</td><td>Read</td><td>✅ Да</td><td>✅ Да</td><td>Нет</td><td>200 OK</td></tr>
-  <tr><td>POST</td><td>Create</td><td>❌ Нет</td><td>❌ Нет</td><td>Да</td><td>201 Created + Location</td></tr>
-  <tr><td>PUT</td><td>Replace</td><td>❌ Нет</td><td>✅ Да</td><td>Да</td><td>200 OK</td></tr>
-  <tr><td>PATCH</td><td>Partial update</td><td>❌ Нет</td><td>Зависит*</td><td>Да</td><td>200 OK</td></tr>
-  <tr><td>DELETE</td><td>Delete</td><td>❌ Нет</td><td>✅ Да</td><td>Обычно нет</td><td>204 No Content</td></tr>
-  <tr><td>HEAD</td><td>Read (мета)</td><td>✅ Да</td><td>✅ Да</td><td>Нет</td><td>200 OK (без тела)</td></tr>
-  <tr><td>OPTIONS</td><td>—</td><td>✅ Да</td><td>✅ Да</td><td>Нет</td><td>200 OK + Allow</td></tr>
+  <thead><tr><th>Уровень</th><th>Описание</th><th>Пример</th></tr></thead>
+  <tbody>
+  <tr><td>Однофакторная (1FA)</td><td>Один фактор</td><td>Только пароль</td></tr>
+  <tr><td>Двухфакторная (2FA)</td><td>Два разных фактора</td><td>Пароль + SMS-код</td></tr>
+  <tr><td>Многофакторная (MFA)</td><td>Два и более факторов</td><td>Пароль + Отпечаток + Смарт-карта</td></tr>
+  </tbody>
 </table>
 
-<p><em>* PATCH формально не обязан быть идемпотентным по RFC 5789, но на практике обычно реализуется идемпотентно.</em></p>
+<h4>Аутентификация в Spring Security</h4>
 
-<div class="note">
-  <strong>Основные статус-коды:</strong><br/>
-  <strong>2xx — Успех:</strong> 200 OK, 201 Created, 204 No Content<br/>
-  <strong>3xx — Перенаправление:</strong> 301 Moved Permanently, 304 Not Modified<br/>
-  <strong>4xx — Ошибка клиента:</strong> 400 Bad Request, 401 Unauthorized, 403 Forbidden, 404 Not Found, 405 Method Not Allowed, 406 Not Acceptable, 409 Conflict, 422 Unprocessable Entity, 429 Too Many Requests<br/>
-  <strong>5xx — Ошибка сервера:</strong> 500 Internal Server Error, 502 Bad Gateway, 503 Service Unavailable
+<pre><code>// Полный путь: Идентификация → Аутентификация
+public Authentication authenticate(Authentication authentication) {
+
+    String username = authentication.getName();
+    String password = authentication.getCredentials().toString();
+
+    // 1. ИДЕНТИФИКАЦИЯ — поиск пользователя
+    UserDetails user = userDetailsService.loadUserByUsername(username);
+    //   └── Если не найден → UsernameNotFoundException
+
+    // 2. АУТЕНТИФИКАЦИЯ — проверка пароля
+    if (!passwordEncoder.matches(password, user.getPassword())) {
+        throw new BadCredentialsException("Неверный пароль");
+        //   └── Идентификация прошла, но аутентификация НЕТ
+    }
+
+    // ✅ Оба этапа пройдены — личность подтверждена
+    return new UsernamePasswordAuthenticationToken(
+        user, null, user.getAuthorities()
+    );
+}</code></pre>
+
+<!-- ===== Авторизация ===== -->
+<h3>Авторизация (Authorization) — «Что тебе разрешено делать?»</h3>
+
+<p>
+  Авторизация — процесс определения <strong>прав доступа</strong> уже подтверждённого пользователя.
+  Система проверяет, какие ресурсы доступны и какие действия разрешены.
+</p>
+
+<div class="card">
+  <strong>Авторизация определяет:</strong>
+  <ul>
+    <li>Какие ресурсы доступны?</li>
+    <li>Какие действия разрешены (чтение, запись, удаление)?</li>
+    <li>Какой уровень доступа у пользователя?</li>
+  </ul>
 </div>
 
-<div class="endpoint">GET /api/rest/http-methods</div>
-<div class="endpoint">POST /api/rest/http-methods</div>
-<div class="endpoint">PUT /api/rest/http-methods</div>
-<div class="endpoint">HEAD /api/rest/http-methods</div>
-<div class="endpoint">OPTIONS /api/rest/http-methods</div>
+<h4>Авторизация в Spring Security</h4>
 
-<h3>📁 Связанный код</h3>
-<ul>
-  <li><span class="file-link">DemoController.java</span></li>
-  <li><span class="file-link">ProductController.java</span></li>
-</ul>
+<pre><code>@GetMapping("/api/users")
+@PreAuthorize("hasRole('ADMIN')")  // ← АВТОРИЗАЦИЯ: только админы
+public List&lt;UserDto&gt; getAllUsers() { ... }
 
-<div class="note">
-  <strong>Тест:</strong> <span class="file-link">Section2_RequestParametersTest</span>
-</div>
+@GetMapping("/api/users/{id}")
+@PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
+public UserDto getUserById(@PathVariable Long id) { ... }
+// ↑ АВТОРИЗАЦИЯ: админ ИЛИ владелец профиля</code></pre>
 
-<hr class="section-divider"/>
+<!-- ===== Сравнительная таблица ===== -->
+<h3>Сравнительная таблица</h3>
 
-<!-- ==================== IDEMPOTENCY ==================== -->
-<h2 id="section-idempotency">6. Идемпотентность и безопасность методов</h2>
+<table>
+  <thead>
+  <tr><th>Аспект</th><th>Идентификация</th><th>Аутентификация</th><th>Авторизация</th></tr>
+  </thead>
+  <tbody>
+  <tr>
+    <td><strong>Вопрос</strong></td>
+    <td>Кто ты?</td>
+    <td>Ты точно он? Докажи!</td>
+    <td>Что тебе можно делать?</td>
+  </tr>
+  <tr>
+    <td><strong>Действие пользователя</strong></td>
+    <td>Предъявить идентификатор</td>
+    <td>Предоставить доказательство</td>
+    <td>Запросить ресурс</td>
+  </tr>
+  <tr>
+    <td><strong>Действие системы</strong></td>
+    <td>Найти пользователя в базе</td>
+    <td>Проверить credentials</td>
+    <td>Проверить права доступа</td>
+  </tr>
+  <tr>
+    <td><strong>Пример</strong></td>
+    <td>Ввести логин</td>
+    <td>Ввести пароль + SMS-код</td>
+    <td>Открыть страницу /admin</td>
+  </tr>
+  <tr>
+    <td><strong>HTTP-код при ошибке</strong></td>
+    <td>404 (пользователь не найден)</td>
+    <td>401 Unauthorized</td>
+    <td>403 Forbidden</td>
+  </tr>
+  <tr>
+    <td><strong>Порядок</strong></td>
+    <td>1-й шаг</td>
+    <td>2-й шаг</td>
+    <td>3-й шаг</td>
+  </tr>
+  <tr>
+    <td><strong>Доверие</strong></td>
+    <td>Нет — только заявление</td>
+    <td>Да — личность подтверждена</td>
+    <td>Да — права определены</td>
+  </tr>
+  <tr>
+    <td><strong>Аналогия</strong></td>
+    <td>«Я — Иван Петров»</td>
+    <td><em>показ паспорта</em></td>
+    <td><em>пропуск на нужный этаж</em></td>
+  </tr>
+  <tr>
+    <td><strong>Spring Security классы</strong></td>
+    <td>UserDetailsService, UserRepository</td>
+    <td>AuthenticationManager, AuthenticationProvider</td>
+    <td>AccessDecisionManager, @PreAuthorize, @Secured</td>
+  </tr>
+  <tr>
+    <td><strong>Механизмы</strong></td>
+    <td>Поиск по username, email, телефону</td>
+    <td>Password, JWT, OAuth2, SAML, биометрия</td>
+    <td>Роли, разрешения, SpEL-выражения</td>
+  </tr>
+  </tbody>
+</table>
 
-<p>Два ключевых свойства HTTP-методов, определённых в спецификации HTTP.</p>
-
-<h3>Безопасность (Safe Methods)</h3>
-
-<p><strong>Безопасный метод</strong> — не изменяет состояние ресурса на сервере. Клиент может вызывать безопасные методы сколько угодно без побочных эффектов. Браузер может автоматически повторять безопасные запросы.</p>
-
-<pre><code>// GET — безопасный: только чтение
-GET /api/rest/products        → Не изменяет данные
-GET /api/rest/products/1      → Не изменяет данные
-
-// POST — НЕ безопасный: создаёт ресурс
-POST /api/rest/products       → Создаёт новую запись в БД</code></pre>
-
-<h3>Идемпотентность (Idempotent Methods)</h3>
-
-<p><strong>Идемпотентный метод</strong> — повторный вызов с теми же параметрами даёт тот же результат (состояние сервера не меняется после первого вызова). Это критически важно для обработки сетевых сбоев.</p>
-
-<pre><code>// PUT — идемпотентный
-PUT /products/1 {"name": "Phone", "price": 999}  → Устанавливает состояние
-PUT /products/1 {"name": "Phone", "price": 999}  → То же состояние
-
-// DELETE — идемпотентный
-DELETE /products/1   → Удаляет продукт
-DELETE /products/1   → Результат тот же — продукта нет
-
-// POST — НЕ идемпотентный
-POST /products {"name": "Phone"}   → Создаёт продукт с id=1
-POST /products {"name": "Phone"}   → Создаёт ДУБЛИКАТ с id=2</code></pre>
+<!-- ===== Полный поток ===== -->
+<h3>Полный поток: все три этапа</h3>
 
 <div class="mermaid">
-  graph TD
-  subgraph "Safe + Idempotent"
-  GET["GET - Read"]
-  HEAD["HEAD - Metadata"]
-  OPTIONS["OPTIONS - Allowed methods"]
-  end
+  sequenceDiagram
+  autonumber
+  actor Client as Клиент
+  participant Server as Сервер
+  participant DB as База Данных
 
-  subgraph "Not Safe + Idempotent"
-  PUT["PUT - Full replace"]
-  DELETE["DELETE - Remove"]
-  end
+  Note over Client,DB: ━━━ ЭТАП 1: ИДЕНТИФИКАЦИЯ ━━━
 
-  subgraph "Not Safe + Not Idempotent"
-  POST["POST - Create"]
-  PATCH["PATCH - Partial update*"]
-  end
+  Client->>Server: POST /login { username: "ivan" }
+  Server->>DB: findByUsername("ivan")
+  DB-->>Server: User found ✅
 
-  style GET fill:#d4edda,stroke:#28a745
-  style HEAD fill:#d4edda,stroke:#28a745
-  style OPTIONS fill:#d4edda,stroke:#28a745
-  style PUT fill:#fff3cd,stroke:#ffc107
-  style DELETE fill:#fff3cd,stroke:#ffc107
-  style POST fill:#f8d7da,stroke:#dc3545
-  style PATCH fill:#f8d7da,stroke:#dc3545
+  Note over Client,DB: ━━━ ЭТАП 2: АУТЕНТИФИКАЦИЯ ━━━
+
+  Client->>Server: password: "MyS3cret!", otp: "482916"
+  Server->>Server: passwordEncoder.matches()
+  Server->>Server: verifyOTP()
+  Server-->>Client: ✅ Token: "eyJhbGci..."
+
+  Note over Client,DB: ━━━ ЭТАП 3: АВТОРИЗАЦИЯ (каждый запрос) ━━━
+
+  Client->>Server: GET /admin/users (Bearer token)
+  Server->>Server: Роль = USER, требуется ADMIN
+  Server-->>Client: ❌ 403 Forbidden
 </div>
 
-<h3>Idempotency-Key для POST</h3>
+<!-- ===== Пример: банкомат ===== -->
+<h3>Практический пример: банкомат</h3>
 
-<p>Поскольку POST не идемпотентен, при сетевых сбоях повтор может создать дубликат. Решение — заголовок <code>Idempotency-Key</code>:</p>
+<div class="card">
+  <table>
+    <thead><tr><th>Шаг</th><th>Действие</th><th>Процесс</th></tr></thead>
+    <tbody>
+    <tr>
+      <td><strong>1. Идентификация</strong></td>
+      <td>Вставить карту (номер карты = идентификатор)</td>
+      <td>«Я — владелец карты ****1234»</td>
+    </tr>
+    <tr>
+      <td><strong>2. Аутентификация</strong></td>
+      <td>Ввести PIN-код (секрет = доказательство)</td>
+      <td>«Вот моё доказательство — PIN»</td>
+    </tr>
+    <tr>
+      <td><strong>3. Авторизация</strong></td>
+      <td>Запрос на снятие 50 000 ₽ (лимит 30 000 ₽)</td>
+      <td>❌ «Превышен дневной лимит» — авторизация отклонена</td>
+    </tr>
+    </tbody>
+  </table>
+</div>
 
-<pre><code>POST /api/rest/orders
-Idempotency-Key: 550e8400-e29b-41d4-a716-446655440000
-Content-Type: application/json
-
-{"productId": 1, "quantity": 2}
-
-// Сервер запоминает Idempotency-Key.
-// При повторном запросе с тем же ключом — возвращает кэшированный ответ,
-// а не создаёт дубликат заказа.</code></pre>
+<!-- ===== Биометрия: особый случай ===== -->
+<h3>Особый случай: биометрия</h3>
 
 <div class="note">
-  <strong>Почему это важно для API?</strong><br/>
-  — Клиент может <strong>безопасно повторить</strong> идемпотентный запрос при сетевой ошибке<br/>
-  — Прокси и балансировщики могут <strong>кэшировать</strong> безопасные методы<br/>
-  — Браузеры автоматически повторяют GET при ошибке, но показывают предупреждение для POST
+  <strong>Биометрия может выступать в двух ролях:</strong><br/><br/>
+  <strong>Как идентификация</strong> — система ищет лицо в базе всех сотрудников
+  (поиск «один ко многим»: <em>«Чьё это лицо?»</em>)<br/><br/>
+  <strong>Как аутентификация</strong> — система сравнивает отпечаток с конкретным
+  пользователем, который уже назвал своё имя
+  (сравнение «один к одному»: <em>«Это действительно Иван?»</em>)
 </div>
+
+<!-- ===== Типичные ошибки ===== -->
+<h3>Типичные ошибки в понимании</h3>
+
+<table>
+  <thead><tr><th>❌ Неправильно</th><th>✅ Правильно</th></tr></thead>
+  <tbody>
+  <tr>
+    <td>«Логин и пароль — это аутентификация»</td>
+    <td>Логин — идентификация, пароль — аутентификация</td>
+  </tr>
+  <tr>
+    <td>«401 и 403 — одно и то же»</td>
+    <td>401 — не аутентифицирован, 403 — не авторизован</td>
+  </tr>
+  <tr>
+    <td>«Авторизация = вход в систему»</td>
+    <td>Вход = идентификация + аутентификация. Авторизация = проверка прав</td>
+  </tr>
+  <tr>
+    <td>«Идентификация не нужна, хватит аутентификации»</td>
+    <td>Без идентификации система не знает, <em>чьи</em> учётные данные проверять</td>
+  </tr>
+  <tr>
+    <td>«Биометрия — это только аутентификация»</td>
+    <td>Биометрия может быть и идентификацией (поиск по базе лиц), и аутентификацией (подтверждение конкретного пользователя)</td>
+  </tr>
+  </tbody>
+</table>
+
+<!-- ===== Резюме ===== -->
+<h3>Резюме</h3>
+
+<div class="good">
+  <strong>Строгая последовательность:</strong><br/><br/>
+  <strong>Идентификация</strong> → <strong>Аутентификация</strong> → <strong>Авторизация</strong><br/><br/>
+  Нельзя аутентифицировать того, кто не идентифицирован.<br/>
+  Нельзя авторизовать того, кто не аутентифицирован.<br/><br/>
+  <code>«Я — Иван»</code> → <code>«Вот мой пароль»</code> → <code>«Могу ли я сюда?»</code>
+</div>
+
+<div class="endpoint"><a href="/api/security/auth-vs-authorization">GET /api/security/auth-vs-authorization</a></div>
 
 <hr class="section-divider"/>
 
 <!-- ==================== SECTION 3 ==================== -->
-<h2 id="section3">7. Параметры запроса</h2>
+<h2 id="section3">3. Архитектура Spring Security</h2>
 
-<p>Spring MVC предоставляет удобные аннотации для извлечения данных из различных частей HTTP-запроса.</p>
+<p>
+  Spring Security построен на цепочке фильтров (Security Filter Chain), через которую проходит
+  каждый HTTP-запрос перед тем, как достичь вашего контроллера.
+</p>
 
-<h3>@PathVariable — переменные пути</h3>
+<h3>Ключевые компоненты</h3>
 
-<pre><code>GET /api/rest/products/123
-
-@GetMapping("/products/{id}")
-public ProductDto getProductById(@PathVariable Long id) {
-    return demoService.getProductById(id);
-}
-
-// Несколько переменных
-@GetMapping("/categories/{catId}/products/{prodId}")
-public ProductDto getProductInCategory(
-        @PathVariable Long catId,
-        @PathVariable Long prodId) {
-    // ...
-}</code></pre>
-
-<div class="good">
-  <strong>Совет:</strong> Используйте <code>@PathVariable</code> для идентификаторов ресурсов и обязательных частей URL, которые определяют конкретный ресурс.
-</div>
-
-<h3>@RequestParam — query параметры</h3>
-
-<pre><code>GET /api/rest/products/paginated?page=0&amp;size=10&amp;sortBy=name
-
-@GetMapping("/paginated")
-public PaginationResult getPaginatedProducts(
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int size,
-        @RequestParam(defaultValue = "name") String sortBy,
-        @RequestParam(defaultValue = "asc") String sortDir) {
-    return demoService.getPaginatedProducts(page, size, sortBy, sortDir);
-}
-
-// Обязательный параметр (по умолчанию required = true)
-@GetMapping("/search")
-public List&lt;ProductDto&gt; search(@RequestParam String query) { ... }
-
-// Опциональный параметр
-@GetMapping("/filter")
-public List&lt;ProductDto&gt; filter(@RequestParam(required = false) String type) { ... }</code></pre>
-
-<h3>@RequestBody — тело запроса</h3>
-
-<pre><code>POST /api/rest/products
-Content-Type: application/json
-{
-  "name": "New Product",
-  "type": "DEVICE",
-  "price": 999.99
-}
-
-@PostMapping
-public ResponseEntity&lt;CrudOperationResult&gt; createProduct(
-        @Valid @RequestBody ProductCreateRequest request) {
-    // Jackson автоматически десериализует JSON в объект
-    // через MappingJackson2HttpMessageConverter
-}</code></pre>
-
-<h3>@RequestHeader — заголовки</h3>
-
-<pre><code>// Конкретный заголовок
-@GetMapping("/info")
-public ResponseEntity&lt;String&gt; getInfo(
-        @RequestHeader("Accept-Language") String lang,
-        @RequestHeader(value = "X-Request-Id", required = false) String requestId) {
-    // ...
-}
-
-// Все заголовки — лучше использовать HttpHeaders вместо Map
-// HttpHeaders сохраняет множественные значения и нормализацию
-@GetMapping("/debug")
-public Map&lt;String, String&gt; debug(@RequestHeader HttpHeaders headers) {
-    String auth = headers.getFirst(HttpHeaders.AUTHORIZATION);
-    List&lt;MediaType&gt; accept = headers.getAccept();
-    return Map.of("auth", String.valueOf(auth));
-}</code></pre>
-
-<div class="warn">
-  <strong>Не используйте <code>Map&lt;String, String&gt;</code> для заголовков</strong> — он теряет множественные значения (например, несколько <code>Accept</code>) и регистронезависимую нормализацию. Используйте <code>HttpHeaders</code>.
-</div>
-
-<h3>@CookieValue — куки</h3>
-
-<pre><code>@GetMapping("/info")
-public String getInfo(
-        @CookieValue(name = "sessionId", defaultValue = "") String sessionId) {
-    // ...
-}</code></pre>
-
-<div class="mermaid">
-  flowchart TD
-  A["HTTP Request"] --> B{"Controller method arguments"}
-
-  B --> PV["@PathVariable"]
-  B --> RP["@RequestParam"]
-  B --> RH["@RequestHeader / HttpHeaders"]
-  B --> CK["@CookieValue"]
-  B --> RB["@RequestBody"]
-
-  RB --> CONV["HttpMessageConverter\nJSON to Java via Jackson"]
-
-  PV --> V{"Bean Validation\n@Valid"}
-  RP --> V
-  RH --> V
-  CK --> V
-  CONV --> V
-
-  V -->|"ok"| M["Controller method executes"]
-  V -->|"fail"| EX["MethodArgumentNotValidException\nConstraintViolationException"]
-  EX --> AD["@RestControllerAdvice\nGlobalExceptionHandler"]
-</div>
-
-<div class="endpoint">GET /api/rest/parameters/path/{id}?queryParam=value</div>
-<div class="endpoint">POST /api/rest/parameters/body</div>
-
-<h3>📁 Связанный код</h3>
 <ul>
-  <li><span class="file-link">DemoController.java</span></li>
-  <li><span class="file-link">ProductController.java</span></li>
+  <li><strong>SecurityContext</strong> — хранит информацию о текущем аутентифицированном пользователе (Principal).</li>
+  <li><strong>SecurityContextHolder</strong> — статический класс для доступа к SecurityContext текущего потока.</li>
+  <li><strong>Authentication</strong> — представляет токен аутентификации (credentials, principal, authorities).</li>
+  <li><strong>AuthenticationManager</strong> — интерфейс для обработки аутентификации.</li>
+  <li><strong>UserDetailsService</strong> — загрузка пользовательских данных по username.</li>
+  <li><strong>PasswordEncoder</strong> — шифрование и проверка паролей (BCrypt, Argon2, etc.).</li>
 </ul>
 
-<div class="note">
-  <strong>Тест:</strong> <span class="file-link">Section2_RequestParametersTest</span>
+<h3>Диаграмма архитектуры</h3>
+
+<div class="mermaid">
+  sequenceDiagram
+  autonumber
+  actor Client as Клиент
+  participant FilterChain as Security Filter Chain
+  participant AuthManager as AuthenticationManager
+  participant Provider as AuthenticationProvider
+  participant DB as База Данных
+
+  Client->>FilterChain: HTTP Request
+  FilterChain->>AuthManager: authenticate(Authentication)
+  AuthManager->>Provider: authenticate(Authentication)
+  Provider->>DB: loadUserByUsername()
+  DB-->>Provider: UserDetails
+  Provider->>Provider: check password
+  Provider-->>AuthManager: Authentication (success)
+  AuthManager-->>FilterChain: Authentication
+  FilterChain->>FilterChain: SecurityContextHolder.setContext()
+  FilterChain-->>Client: HTTP Response
 </div>
+
+<div class="endpoint"><a href="/api/security/architecture">GET /api/security/architecture</a></div>
 
 <hr class="section-divider"/>
 
 <!-- ==================== SECTION 4 ==================== -->
-<h2 id="section4">8. Обработка ответов</h2>
+<h2 id="section4">4. Security Filter Chain</h2>
 
-<p>Spring MVC предоставляет несколько способов формирования ответа клиенту.</p>
+<p>
+  Цепочка фильтров (Filter Chain) — это ядро Spring Security. Каждый фильтр
+  выполняет определённую задачу: проверку CSRF, базовую аутентификацию, обработку формы логина и т.д.
+</p>
 
-<h3>ResponseEntity</h3>
+<p>
+  Фильтры выполняются в определённом порядке. Если фильтр не может обработать запрос,
+  он передаёт управление следующему фильтру в цепочке.
+</p>
 
-<p><code>ResponseEntity&lt;T&gt;</code> позволяет полностью контролировать HTTP-ответ: статус-код, заголовки и тело.</p>
-
-<pre><code>// 201 Created с Location header
-@PostMapping("/products")
-public ResponseEntity&lt;CrudOperationResult&gt; createProduct(
-        @Valid @RequestBody ProductCreateRequest request) {
-
-    CrudOperationResult result = demoService.createProduct(request);
-
-    URI location = ServletUriComponentsBuilder
-            .fromCurrentRequest()
-            .path("/{id}")
-            .buildAndExpand(result.product().id())
-            .toUri();
-
-    return ResponseEntity
-            .created(location)
-            .header("X-Custom-Header", "value")
-            .body(result);
-}
-
-// 204 No Content
-@DeleteMapping("/products/{id}")
-public ResponseEntity&lt;Void&gt; deleteProduct(@PathVariable Long id) {
-    demoService.deleteProduct(id);
-    return ResponseEntity.noContent().build();
-}
-
-// 200 OK или 404 Not Found
-@GetMapping("/products/{id}")
-public ResponseEntity&lt;ProductDto&gt; getProduct(@PathVariable Long id) {
-    return demoService.findById(id)
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.notFound().build());
-}</code></pre>
-
-<h3>@ResponseStatus</h3>
-
-<p>Устанавливает статус-код по умолчанию. Используйте <strong>либо</strong> <code>@ResponseStatus</code>, <strong>либо</strong> <code>ResponseEntity</code> — не оба одновременно.</p>
-
-<pre><code>// Вариант 1: @ResponseStatus (простой)
-@ExceptionHandler(ProductNotFoundException.class)
-@ResponseStatus(HttpStatus.NOT_FOUND)
-public ErrorResponse handleNotFound(ProductNotFoundException ex,
-                                     HttpServletRequest request) {
-    return new ErrorResponse(404, "Not Found", ex.getMessage(),
-            LocalDateTime.now(), request.getRequestURI(), null);
-}
-
-// Вариант 2: ResponseEntity (гибкий)
-@ExceptionHandler(ProductNotFoundException.class)
-public ResponseEntity&lt;ErrorResponse&gt; handleNotFound(ProductNotFoundException ex,
-                                                      HttpServletRequest request) {
-    ErrorResponse body = new ErrorResponse(404, "Not Found", ex.getMessage(),
-            LocalDateTime.now(), request.getRequestURI(), null);
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
-}
-
-// ⚠️ НЕ используйте оба варианта одновременно!</code></pre>
-
-<h3>Полная таблица статус-кодов для REST</h3>
+<h3>Основные фильтры в цепочке</h3>
 
 <table>
-  <tr><th>Код</th><th>Название</th><th>Когда использовать</th></tr>
-  <tr><td>200</td><td>OK</td><td>Успешный GET, PUT, PATCH</td></tr>
-  <tr><td>201</td><td>Created</td><td>Успешный POST (ресурс создан), должен содержать Location header</td></tr>
-  <tr><td>204</td><td>No Content</td><td>Успешный DELETE или PUT без тела ответа</td></tr>
-  <tr><td>301</td><td>Moved Permanently</td><td>Ресурс переехал навсегда</td></tr>
-  <tr><td>304</td><td>Not Modified</td><td>Ресурс не изменился (кэширование, ETag)</td></tr>
-  <tr><td>400</td><td>Bad Request</td><td>Ошибка валидации, неверный формат запроса</td></tr>
-  <tr><td>401</td><td>Unauthorized</td><td>Не предоставлены credentials (требуется аутентификация)</td></tr>
-  <tr><td>403</td><td>Forbidden</td><td>Аутентифицирован, но нет прав доступа</td></tr>
-  <tr><td>404</td><td>Not Found</td><td>Ресурс не найден</td></tr>
-  <tr><td>405</td><td>Method Not Allowed</td><td>Метод не поддерживается для данного ресурса</td></tr>
-  <tr><td>406</td><td>Not Acceptable</td><td>Сервер не может вернуть данные в запрошенном формате (Accept header)</td></tr>
-  <tr><td>409</td><td>Conflict</td><td>Конфликт (дублирование, устаревшая версия, optimistic lock)</td></tr>
-  <tr><td>422</td><td>Unprocessable Entity</td><td>Синтаксически верный, но семантически ошибочный запрос</td></tr>
-  <tr><td>429</td><td>Too Many Requests</td><td>Rate limiting — превышен лимит запросов</td></tr>
-  <tr><td>500</td><td>Internal Server Error</td><td>Необработанная ошибка сервера</td></tr>
-  <tr><td>502</td><td>Bad Gateway</td><td>Upstream-сервер вернул ошибку</td></tr>
-  <tr><td>503</td><td>Service Unavailable</td><td>Сервис временно недоступен</td></tr>
+  <thead><tr><th>Порядок</th><th>Фильтр</th><th>Описание</th></tr></thead>
+  <tbody>
+  <tr><td>1</td><td>ChannelProcessingFilter</td><td>Проверяет, должен ли запрос быть по HTTPS</td></tr>
+  <tr><td>3</td><td>SecurityContextPersistenceFilter</td><td>Загружает/сохраняет SecurityContext</td></tr>
+  <tr><td>4</td><td>HeaderWriterFilter</td><td>Добавляет security headers</td></tr>
+  <tr><td>5</td><td>CorsFilter</td><td>Обрабатывает CORS запросы</td></tr>
+  <tr><td>6</td><td>CsrfFilter</td><td>Защита от CSRF атак</td></tr>
+  <tr><td>8</td><td>UsernamePasswordAuthenticationFilter</td><td>Обрабатывает форму логина</td></tr>
+  <tr><td>9</td><td>BasicAuthenticationFilter</td><td>Обрабатывает HTTP Basic</td></tr>
+  <tr><td>14</td><td>ExceptionTranslationFilter</td><td>Преобразует исключения в HTTP ответы</td></tr>
+  <tr><td>15</td><td>FilterSecurityInterceptor</td><td>Авторизует запросы</td></tr>
+  </tbody>
 </table>
 
-<h3>Content Negotiation</h3>
-
-<p>Spring определяет формат ответа на основе заголовка <code>Accept</code>. Jackson (JSON) подключён по умолчанию; для XML нужна зависимость <code>jackson-dataformat-xml</code>.</p>
-
-<pre><code>// Клиент указывает желаемый формат
-GET /api/rest/products
-Accept: application/json      // → Jackson сериализует в JSON
-Accept: application/xml       // → Нужен jackson-dataformat-xml
-Accept: text/html             // → 406 Not Acceptable (нет конвертера!)
-
-// Ограничение форматов на уровне контроллера
-@GetMapping(value = "/products", produces = MediaType.APPLICATION_JSON_VALUE)
-public List&lt;ProductDto&gt; getProducts() { ... }
-
-@PostMapping(value = "/products",
-    consumes = MediaType.APPLICATION_JSON_VALUE,   // принимаем только JSON
-    produces = MediaType.APPLICATION_JSON_VALUE)    // отдаём только JSON
-public ResponseEntity&lt;CrudOperationResult&gt; create(
-        @Valid @RequestBody ProductCreateRequest r) { ... }</code></pre>
-
-<div class="warn">
-  <strong>406 Not Acceptable:</strong> Если клиент запросил формат через <code>Accept</code>, для которого нет <code>HttpMessageConverter</code> (например, <code>text/html</code> для <code>@RestController</code>), Spring вернёт 406. Убедитесь, что нужные конвертеры подключены.
-</div>
-
-<div class="endpoint">GET /api/rest/response/ok</div>
-<div class="endpoint">GET /api/rest/response/created</div>
-<div class="endpoint">GET /api/rest/response/no_content</div>
-<div class="endpoint">GET /api/rest/response/custom-headers</div>
-
-<h3>📁 Связанный код</h3>
-<ul>
-  <li><span class="file-link">DemoController.java</span></li>
-  <li><span class="file-link">GlobalExceptionHandler.java</span></li>
-</ul>
-
 <div class="note">
-  <strong>Тест:</strong> <span class="file-link">Section3_ResponseHandlingTest</span>
+  В проекте <span class="file-link">SecurityConfiguration.java</span> настраивает SecurityFilterChain,
+  отключает CSRF для REST API и определяет правила доступа к endpoint'ам.
 </div>
+
+<div class="endpoint"><a href="/api/security/filter-chain">GET /api/security/filter-chain</a></div>
 
 <hr class="section-divider"/>
 
 <!-- ==================== SECTION 5 ==================== -->
-<h2 id="section5">9. Обработка исключений</h2>
+<h2 id="section5">5. Конфигурация безопасности</h2>
 
-<p>Spring MVC позволяет централизованно обрабатывать исключения через <code>@ControllerAdvice</code>, избегая дублирования try-catch в каждом контроллере.</p>
+<p>
+  Основная конфигурация безопасности определена в классе
+  <span class="file-link">SecurityConfiguration.java</span>.
+  Она настраивает SecurityFilterChain, PasswordEncoder и AuthenticationManager.
+</p>
 
-<h3>@ControllerAdvice и @ExceptionHandler</h3>
+<h3>Основные настройки конфигурации</h3>
 
-<pre><code>@RestControllerAdvice
-public class GlobalExceptionHandler {
+<pre><code>@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity
+public class SecurityConfiguration {
 
-    @ExceptionHandler(ProductNotFoundException.class)
-    public ResponseEntity&lt;ErrorResponse&gt; handleProductNotFound(
-            ProductNotFoundException ex, HttpServletRequest request) {
-
-        ErrorResponse body = new ErrorResponse(
-            HttpStatus.NOT_FOUND.value(),
-            "Not Found",
-            ex.getMessage(),
-            LocalDateTime.now(),
-            request.getRequestURI(),
-            null
+  @Bean
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    http
+        .csrf(AbstractHttpConfigurer::disable)
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/api/auth/**", "/api/security/**").permitAll()
+            .anyRequest().authenticated()
+        )
+        .httpBasic(Customizer.withDefaults())
+        .formLogin(form -> form
+            .loginPage("/login")
+            .permitAll()
         );
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
-    }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity&lt;ErrorResponse&gt; handleValidation(
-            MethodArgumentNotValidException ex, HttpServletRequest request) {
+    return http.build();
+  }
 
-        List&lt;ValidationError&gt; errors = ex.getBindingResult().getFieldErrors().stream()
-            .map(e -> new ValidationError(e.getField(),
-                e.getRejectedValue() != null ? e.getRejectedValue().toString() : "null",
-                e.getDefaultMessage()))
-            .toList();
-
-        ErrorResponse body = new ErrorResponse(400, "Validation Failed",
-            "Request validation failed", LocalDateTime.now(),
-            request.getRequestURI(), errors);
-        return ResponseEntity.badRequest().body(body);
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity&lt;ErrorResponse&gt; handleGenericException(
-            Exception ex, HttpServletRequest request) {
-
-        log.error("Unhandled exception at {}", request.getRequestURI(), ex);
-
-        ErrorResponse body = new ErrorResponse(
-            500,
-            "Internal Server Error",
-            "An unexpected error occurred",
-            LocalDateTime.now(),
-            request.getRequestURI(),
-            null
-        );
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
-    }
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
 }</code></pre>
 
-<h3>Иерархия обработки исключений</h3>
+<h3>Пояснение настроек</h3>
 
-<div class="mermaid">
-  flowchart TD
-  Req["Client request"] --> Ctrl["Controller"]
-  Ctrl --> Svc["Service"]
-  Svc --> Repo["Repository"]
-  Repo --> DB[("Database")]
-
-  DB --> Repo
-  Repo --> Svc
-  Svc --> Ctrl
-  Ctrl -->|"200/201/204"| OK["Normal response"]
-
-  Ctrl -. "throws" .-> Ex["Exception"]
-  Svc -. "throws" .-> Ex
-  Repo -. "throws" .-> Ex
-
-  Ex --> Adv["@RestControllerAdvice"]
-  Adv -->|"400"| BadReq["Validation error body"]
-  Adv -->|"404"| NotFound["Not found body"]
-  Adv -->|"500"| ServerErr["Unexpected error body"]
-  BadReq --> Resp["JSON error response"]
-  NotFound --> Resp
-  ServerErr --> Resp
-  Resp --> Req
-</div>
-
-<h3>Порядок выбора @ExceptionHandler</h3>
-
-<p>Spring выбирает обработчик по принципу <strong>наиболее точного совпадения</strong>:</p>
-
-<ol>
-  <li><code>@ExceptionHandler</code> <strong>в самом контроллере</strong> (локальный) — приоритет выше</li>
-  <li><code>@ExceptionHandler</code> в <code>@ControllerAdvice</code> с <strong>точным типом</strong> исключения</li>
-  <li><code>@ExceptionHandler</code> в <code>@ControllerAdvice</code> с <strong>родительским типом</strong> (например, <code>Exception.class</code>)</li>
-  <li>Стандартный обработчик Spring (<code>/error</code>)</li>
-</ol>
-
-<h3>ErrorResponse DTO</h3>
-
-<pre><code>public record ErrorResponse(
-    int status,
-    String error,
-    String message,
-    LocalDateTime timestamp,
-    String path,
-    List&lt;ValidationError&gt; validationErrors
-) {
-}
-
-public record ValidationError(
-    String field,
-    String rejectedValue,
-    String message
-) {
-}</code></pre>
-
-<h3>Пример ответа при ошибке</h3>
-
-<pre><code>GET /api/rest/products/999
-
-HTTP/1.1 404 Not Found
-Content-Type: application/json
-
-{
-  "status": 404,
-  "error": "Not Found",
-  "message": "Product not found with id: 999",
-  "timestamp": "2024-03-21T10:30:00",
-  "path": "/api/rest/products/999",
-  "validationErrors": null
-}</code></pre>
-
-<div class="endpoint">GET /api/rest/exception/not-found</div>
-<div class="endpoint">GET /api/rest/exception/bad-request</div>
-
-<h3>📁 Связанный код</h3>
 <ul>
-  <li><span class="file-link">GlobalExceptionHandler.java</span></li>
-  <li><span class="file-link">ProductNotFoundException.java</span></li>
-  <li><span class="file-link">CategoryNotFoundException.java</span></li>
+  <li><strong>@EnableWebSecurity</strong> — включает Spring Security веб-безопасность.</li>
+  <li><strong>@EnableMethodSecurity</strong> — включает аннотации для безопасности на уровне методов (@PreAuthorize, @Secured).</li>
+  <li><strong>csrf().disable()</strong> — отключает CSRF (для REST API с JWT).</li>
+  <li><strong>authorizeHttpRequests()</strong> — определяет правила доступа к endpoint'ам.</li>
+  <li><strong>httpBasic()</strong> — включает HTTP Basic аутентификацию.</li>
+  <li><strong>formLogin()</strong> — настраивает форму логина.</li>
+  <li><strong>passwordEncoder()</strong> — BCrypt для хеширования паролей.</li>
 </ul>
 
-<div class="note">
-  <strong>Тест:</strong> <span class="file-link">Section4_ExceptionHandlingTest</span>
+<div class="warn">
+  <strong>Важно:</strong> Для production приложений не отключайте CSRF без веских причин.
+  Используйте JWT или другой stateless механизм аутентификации вместе с CSRF защитой.
 </div>
+
+<div class="endpoint"><a href="/api/security/config">GET /api/security/config</a></div>
 
 <hr class="section-divider"/>
 
 <!-- ==================== SECTION 6 ==================== -->
-<h2 id="section6">10. Валидация</h2>
+<h2 id="section6">6. Password Encoding</h2>
 
-<p>Spring MVC интегрируется с Bean Validation (JSR 380 / Hibernate Validator) для декларативной проверки входных данных.</p>
+<p>
+  Пароли никогда не должны храниться в открытом виде. Spring Security предоставляет интерфейс
+  <code>PasswordEncoder</code> для шифрования паролей. Проект использует BCrypt — один из
+  самых популярных и безопасных алгоритмов.
+</p>
 
-<h3>@Valid и @Validated</h3>
+<h3>BCrypt Password Encoder</h3>
 
-<table>
-  <tr><th>Аннотация</th><th>Откуда</th><th>Отличие</th></tr>
-  <tr><td><code>@Valid</code></td><td>Jakarta Bean Validation (JSR 380)</td><td>Стандартная, поддерживает каскадную валидацию вложенных объектов</td></tr>
-  <tr><td><code>@Validated</code></td><td>Spring Framework</td><td>Поддерживает группы валидации (<code>groups</code>), валидацию параметров метода</td></tr>
-</table>
+<p>
+  BCrypt автоматически генерирует соль (salt) при каждом хешировании и включает её в результат.
+  Это делает каждый хеш уникальным, даже для одинаковых паролей.
+</p>
 
-<pre><code>@PostMapping("/products")
-public ResponseEntity&lt;CrudOperationResult&gt; createProduct(
-        @Valid @RequestBody ProductCreateRequest request) {
-    // Если валидация не пройдена, Spring выбросит MethodArgumentNotValidException
-    // до вызова метода контроллера
-}</code></pre>
+<pre><code>PasswordEncoder encoder = new BCryptPasswordEncoder();
 
-<h3>Аннотации валидации</h3>
+// Хеширование пароля
+String encodedPassword = encoder.encode("password123");
+// Результат: $2a$10$N9qo8uLOickgx2ZMRZoMy...
 
-<table>
-  <tr><th>Аннотация</th><th>Проверяет</th><th>Применяется к</th></tr>
-  <tr><td><code>@NotNull</code></td><td>Значение не null</td><td>Любой тип</td></tr>
-  <tr><td><code>@NotBlank</code></td><td>Не null, не пустая, не только пробелы</td><td>String</td></tr>
-  <tr><td><code>@NotEmpty</code></td><td>Не null и не пустая</td><td>String, Collection, Map, Array</td></tr>
-  <tr><td><code>@Size(min, max)</code></td><td>Размер в диапазоне</td><td>String, Collection, Map, Array</td></tr>
-  <tr><td><code>@Min(value)</code></td><td>Число ≥ value</td><td>Целочисленные типы</td></tr>
-  <tr><td><code>@Max(value)</code></td><td>Число ≤ value</td><td>Целочисленные типы</td></tr>
-  <tr><td><code>@DecimalMin</code></td><td>Число ≥ value (строковое представление)</td><td>BigDecimal, BigInteger, числа</td></tr>
-  <tr><td><code>@DecimalMax</code></td><td>Число ≤ value</td><td>BigDecimal, BigInteger, числа</td></tr>
-  <tr><td><code>@Positive</code></td><td>Число &gt; 0</td><td>Числовые типы</td></tr>
-  <tr><td><code>@PositiveOrZero</code></td><td>Число ≥ 0</td><td>Числовые типы</td></tr>
-  <tr><td><code>@Email</code></td><td>Корректный формат email</td><td>String</td></tr>
-  <tr><td><code>@Pattern(regexp)</code></td><td>Соответствие регулярному выражению</td><td>String</td></tr>
-  <tr><td><code>@Past</code> / <code>@Future</code></td><td>Дата в прошлом / будущем</td><td>Дата/время</td></tr>
-</table>
+// Проверка пароля
+boolean matches = encoder.matches("password123", encodedPassword);</code></pre>
 
-<h3>Пример DTO с валидацией</h3>
-
-<pre><code>public record ProductCreateRequest(
-    @NotBlank(message = "Name is required")
-    @Size(min = 2, max = 100, message = "Name must be between 2 and 100 characters")
-    String name,
-
-    @NotBlank(message = "Type is required")
-    String type,
-
-    @NotNull(message = "Price is required")
-    @DecimalMin(value = "0.01", message = "Price must be greater than 0")
-    BigDecimal price,
-
-    Long categoryId
-) {
-}</code></pre>
-
-<h3>Обработка ошибок валидации</h3>
-
-<pre><code>@ExceptionHandler(MethodArgumentNotValidException.class)
-public ResponseEntity&lt;ErrorResponse&gt; handleValidationException(
-        MethodArgumentNotValidException ex, HttpServletRequest request) {
-
-    List&lt;ValidationError&gt; errors = ex.getBindingResult().getFieldErrors().stream()
-        .map(error -> new ValidationError(
-            error.getField(),
-            error.getRejectedValue() != null ? error.getRejectedValue().toString() : "null",
-            error.getDefaultMessage()
-        ))
-        .toList();
-
-    ErrorResponse body = new ErrorResponse(
-        400, "Validation Failed", "Request validation failed",
-        LocalDateTime.now(), request.getRequestURI(), errors
-    );
-    return ResponseEntity.badRequest().body(body);
-}</code></pre>
-
-<h3>Пример ответа с ошибками валидации</h3>
-
-<pre><code>POST /api/rest/products
-Content-Type: application/json
-{"name": "", "price": 0}
-
-HTTP/1.1 400 Bad Request
-{
-  "status": 400,
-  "error": "Validation Failed",
-  "message": "Request validation failed",
-  "timestamp": "2024-03-21T10:30:00",
-  "path": "/api/rest/products",
-  "validationErrors": [
-    {
-      "field": "name",
-      "rejectedValue": "",
-      "message": "Name is required"
-    },
-    {
-      "field": "type",
-      "rejectedValue": "null",
-      "message": "Type is required"
-    },
-    {
-      "field": "price",
-      "rejectedValue": "0",
-      "message": "Price must be greater than 0"
-    }
-  ]
-}</code></pre>
-
-<div class="note">
-  <strong>Тест:</strong> <span class="file-link">Section5_ValidationTest</span>
+<div class="good">
+  <strong>Преимущества BCrypt:</strong><br/>
+  - Встроенная соль (не нужно хранить отдельно)<br/>
+  - Активная работа по замедлению (сложность можно настраивать)<br/>
+  - Широкая поддержка и проверка временем
 </div>
+
+<h3>Настройка strength (сильны)</h3>
+
+<p>
+  По умолчанию BCrypt использует 10 rounds (итераций). Можно изменить силу:
+</p>
+
+<pre><code>@Bean
+public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder(12); // Более безопасно, но медленнее
+}</code></pre>
+
+<div class="endpoint"><a href="/api/security/password-encoder">GET /api/security/password-encoder</a></div>
 
 <hr class="section-divider"/>
 
 <!-- ==================== SECTION 7 ==================== -->
-<h2 id="section7">11. DTO vs Entity</h2>
+<h2 id="section7">7. Пользователи, роли и разрешения (RBAC)</h2>
 
-<p><strong>DTO</strong> (Data Transfer Object) — объект для передачи данных между слоями приложения. Ключевой паттерн в REST API.</p>
+<p>
+  Проект реализует RBAC (Role-Based Access Control) с тремя уровнями:
+  <strong>Users</strong> (пользователи), <strong>Roles</strong> (роли) и <strong>Permissions</strong> (разрешения).
+</p>
 
-<h3>Почему важно разделять DTO и Entity</h3>
-
-<table>
-  <tr><th>Аспект</th><th>Entity</th><th>DTO</th></tr>
-  <tr><td>Назначение</td><td>Модель базы данных (ORM)</td><td>API контракт (входные/выходные данные)</td></tr>
-  <tr><td>Содержит</td><td>@Id, @Version, @ManyToOne, lazy-связи</td><td>Только нужные клиенту поля</td></tr>
-  <tr><td>Валидация</td><td>Ограничения БД (@Column, @UniqueConstraint)</td><td>Бизнес-валидация (@NotBlank, @Size)</td></tr>
-  <tr><td>Привязка</td><td>JPA, Hibernate</td><td>Независим от ORM</td></tr>
-  <tr><td>Жизненный цикл</td><td>Managed by EntityManager</td><td>Обычный POJO / record</td></tr>
-</table>
-
-<div class="warn">
-  <strong>Не используйте Entity напрямую в API:</strong><br/>
-  — Раскрытие внутренней структуры БД (имена полей, связи)<br/>
-  — <code>LazyInitializationException</code> при сериализации lazy-ассоциаций вне транзакции<br/>
-  — Циклические ссылки (Product → Category → List&lt;Product&gt; → ...)<br/>
-  — API жёстко связан со структурой БД — изменение таблицы ломает API<br/>
-  — Невозможно иметь разные представления для разных клиентов
-</div>
+<h3>Модель данных</h3>
 
 <div class="mermaid">
-  graph LR
-  subgraph "API Layer"
-  REQ["Request DTO\nProductCreateRequest"]
-  RES["Response DTO\nProductDto"]
-  end
+  classDiagram
+  class User {
+  Long id
+  String username
+  String password
+  String email
+  Boolean enabled
+  Set~Role~ roles
+  }
+  class Role {
+  Long id
+  String name
+  String description
+  Set~Permission~ permissions
+  Set~User~ users
+  }
+  class Permission {
+  Long id
+  String name
+  String description
+  Set~Role~ roles
+  }
 
-  subgraph "Service Layer"
-  SVC["Service\nMapping + Business logic"]
-  end
-
-  subgraph "Data Layer"
-  ENT["Entity\nProduct"]
-  REPO["Repository"]
-  DB[("Database")]
-  end
-
-  REQ -->|"@RequestBody"| SVC
-  SVC -->|"toEntity()"| ENT
-  ENT --> REPO
-  REPO --> DB
-  DB --> REPO
-  REPO --> ENT
-  ENT -->|"toDto()"| SVC
-  SVC --> RES
+  User "many" -- "many" Role : has
+  Role "many" -- "many" Permission : has
 </div>
 
-<h3>Пример маппинга</h3>
+<h3>Сущности в проекте</h3>
 
-<pre><code>// Entity — модель базы данных
-@Entity
-@Table(name = "products")
-public class Product {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String name;
-    private String type;
-    private BigDecimal price;
-    @Version
-    private Long version;
-    @Embedded
-    private ProductDetails details;
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Category category;
-    // getters, setters...
-}
+<ul>
+  <li><span class="file-link">User</span> — учётная запись пользователя с полями username, password, email, enabled, roles.</li>
+  <li><span class="file-link">Role</span> — роль (USER, MODERATOR, ADMIN) с набором разрешений.</li>
+  <li><span class="file-link">Permission</span> — детальное разрешение (USER_READ, USER_WRITE, ROLE_READ, etc.).</li>
+</ul>
 
-// Response DTO — то, что видит клиент (плоская структура)
-public record ProductDto(
-    Long id,
-    String name,
-    String type,
-    BigDecimal price,
-    Long version,
-    String manufacturer,  // из details.manufacturer
-    String sku,           // из details.sku
-    CategoryDto category
-) {
-}</code></pre>
+<h3>Иерархия прав в демо-данных</h3>
 
-<h3>Маппинг в сервисе</h3>
-
-<pre><code>private ProductDto toDto(Product product) {
-    CategoryDto category = product.getCategory() != null
-        ? toCategoryDto(product.getCategory())
-        : null;
-
-    return new ProductDto(
-        product.getId(),
-        product.getName(),
-        product.getType(),
-        product.getPrice(),
-        product.getVersion(),
-        product.getDetails() != null ? product.getDetails().getManufacturer() : null,
-        product.getDetails() != null ? product.getDetails().getSku() : null,
-        category
-    );
-}</code></pre>
+<table>
+  <thead><tr><th>Роль</th><th>Разрешения</th></tr></thead>
+  <tbody>
+  <tr><td>USER</td><td>USER_READ</td></tr>
+  <tr><td>MODERATOR</td><td>USER_READ, USER_WRITE, ROLE_READ</td></tr>
+  <tr><td>ADMIN</td><td>Все разрешения</td></tr>
+  </tbody>
+</table>
 
 <div class="note">
-  <strong>Альтернативы ручному маппингу:</strong><br/>
-  — <strong>MapStruct</strong> — генерация маппинга на этапе компиляции (самый производительный)<br/>
-  — <strong>ModelMapper</strong> — маппинг через рефлексию (удобнее, но медленнее)<br/>
-  — <strong>Spring Converter / ConversionService</strong> — встроенный механизм Spring
+  Демо-пользователи создаются в <span class="file-link">DemoDataInitializer.java</span>.
+  Пароли хешируются через BCrypt перед сохранением в базу.
 </div>
 
-<h3>Разные DTO для разных операций</h3>
-
-<pre><code>// Для создания — обязательные поля, строгая валидация
-public record ProductCreateRequest(
-    @NotBlank String name,
-    @NotBlank String type,
-    @NotNull @DecimalMin("0.01") BigDecimal price,
-    String manufacturer,
-    String sku,
-    Long categoryId
-) {
-}
-
-// Для обновления — все поля опциональные (для PATCH)
-public record ProductUpdateRequest(
-    @Size(min = 2, max = 100) String name,
-    @Size(min = 2, max = 50) String type,
-    @DecimalMin("0.01") BigDecimal price,
-    String manufacturer,
-    @Size(min = 2, max = 50) String sku,
-    Long categoryId
-) {
-}</code></pre>
-
-<div class="good">
-  <strong>Преимущества использования DTO:</strong><br/>
-  — Чёткое разделение ответственности (SRP)<br/>
-  — Гибкость API без изменения Entity<br/>
-  — Контроль валидации на входе<br/>
-  — Оптимизация объёма данных в ответе<br/>
-  — Версионирование API без изменения модели данных
-</div>
+<div class="endpoint"><a href="/api/security/user-details/admin">GET /api/security/user-details/{username}</a></div>
 
 <hr class="section-divider"/>
 
 <!-- ==================== SECTION 8 ==================== -->
-<h2 id="section8">12. Пагинация и сортировка в REST</h2>
+<h2 id="section8">8. Method Security</h2>
 
-<p>При больших объёмах данных необходимо возвращать результаты постранично. Spring Data предоставляет <code>Pageable</code> и <code>Page&lt;T&gt;</code>.</p>
+<p>
+  Spring Security обеспечивает безопасность на уровне методов с помощью аннотаций.
+  Это позволяет контролировать доступ к конкретным методам сервиса или контроллера.
+</p>
 
-<h3>Параметры пагинации</h3>
-
-<pre><code>GET /api/rest/products/paginated?page=0&amp;size=10&amp;sortBy=name&amp;sortDir=asc</code></pre>
+<h3>Аннотации метод-безопасности</h3>
 
 <table>
-  <tr><th>Параметр</th><th>Описание</th><th>По умолчанию</th></tr>
-  <tr><td><code>page</code></td><td>Номер страницы (0-based)</td><td>0</td></tr>
-  <tr><td><code>size</code></td><td>Количество элементов на странице</td><td>10</td></tr>
-  <tr><td><code>sortBy</code></td><td>Поле для сортировки</td><td>name</td></tr>
-  <tr><td><code>sortDir</code></td><td>Направление сортировки (asc/desc)</td><td>asc</td></tr>
+  <thead><tr><th>Аннотация</th><th>Описание</th><th>Пример</th></tr></thead>
+  <tbody>
+  <tr><td>@Secured</td><td>Простая проверка роли</td><td>@Secured("ROLE_ADMIN")</td></tr>
+  <tr><td>@PreAuthorize</td><td>SpEL-выражение до выполнения</td><td>@PreAuthorize("hasRole('ADMIN')")</td></tr>
+  <tr><td>@PostAuthorize</td><td>SpEL-выражение после выполнения</td><td>@PostAuthorize("returnObject.owner == authentication.name")</td></tr>
+  <tr><td>@PreFilter</td><td>Фильтрация коллекций до выполнения</td><td>@PreFilter("filterObject.owner == authentication.name")</td></tr>
+  <tr><td>@PostFilter</td><td>Фильтрация результата после выполнения</td><td>@PostFilter("filterObject.visible == true")</td></tr>
+  </tbody>
 </table>
 
-<h3>Контроллер</h3>
+<h3>SpEL-выражения</h3>
 
-<pre><code>@GetMapping("/paginated")
-public PaginationResult getPaginatedProducts(
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int size,
-        @RequestParam(defaultValue = "name") String sortBy,
-        @RequestParam(defaultValue = "asc") String sortDir) {
+<table>
+  <thead><tr><th>Выражение</th><th>Описание</th></tr></thead>
+  <tbody>
+  <tr><td>hasRole('ADMIN')</td><td>Проверка наличия роли (автоматически добавляет ROLE_)</td></tr>
+  <tr><td>hasAuthority('USER_WRITE')</td><td>Проверка наличия разрешения</td></tr>
+  <tr><td>isAuthenticated()</td><td>Проверка, что пользователь аутентифицирован</td></tr>
+  <tr><td>isAnonymous()</td><td>Проверка, что пользователь анонимный</td></tr>
+  <tr><td>permitAll()</td><td>Разрешить доступ всем</td></tr>
+  <tr><td>denyAll()</td><td>Запретить доступ всем</td></tr>
+  </tbody>
+</table>
 
-    return demoService.getPaginatedProducts(page, size, sortBy, sortDir);
+<h3>Примеры из проекта</h3>
+
+<pre><code>@RestController
+@RequestMapping("/api/users")
+public class UserController {
+
+  @GetMapping
+  @PreAuthorize("hasRole('ADMIN')")
+  public ApiResponse<List<UserDto>> getAllUsers() {
+      // Только администраторы могут видеть всех пользователей
+  }
+
+  @GetMapping("/{id}")
+  @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
+  public ApiResponse<UserDto> getUserById(@PathVariable Long id) {
+      // Админы или владелец профиля
+  }
+
+  @PostMapping
+  @PreAuthorize("hasRole('ADMIN')")
+  public ApiResponse<UserDto> createUser(@RequestBody UserCreateRequest request) {
+      // Только админы создают пользователей
+  }
 }</code></pre>
 
-<h3>Сервис</h3>
-
-<pre><code>public PaginationResult getPaginatedProducts(int page, int size,
-                                               String sortBy, String sortDir) {
-    Sort sort = Sort.by(
-        sortDir.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC,
-        sortBy
-    );
-    Pageable pageable = PageRequest.of(page, size, sort);
-    Page&lt;Product&gt; productPage = productRepository.findAll(pageable);
-
-    return new PaginationResult(
-        productPage.getNumber(),
-        productPage.getSize(),
-        productPage.getTotalElements(),
-        productPage.getTotalPages(),
-        productPage.getContent().stream().map(this::toDto).toList()
-    );
-}</code></pre>
-
-<h3>Пример ответа</h3>
-
-<pre><code>{
-  "page": 0,
-  "size": 3,
-  "totalElements": 6,
-  "totalPages": 2,
-  "content": [
-    {
-      "id": 1,
-      "name": "Headphones",
-      "type": "ACCESSORY",
-      "price": 149.00
-    },
-    {
-      "id": 3,
-      "name": "Laptop",
-      "type": "DEVICE",
-      "price": 1999.00
-    },
-    {
-      "id": 2,
-      "name": "Phone",
-      "type": "DEVICE",
-      "price": 999.00
-    }
-  ]
-}</code></pre>
-
-<div class="warn">
-  <strong>Ограничение размера страницы:</strong> Всегда устанавливайте максимальный размер страницы на сервере, чтобы клиент не мог запросить <code>?size=1000000</code> и перегрузить систему.
-  <pre><code>int safeSize = Math.min(size, MAX_PAGE_SIZE); // MAX_PAGE_SIZE = 100</code></pre>
-</div>
-
-<div class="endpoint">GET /api/rest/products/paginated?page=0&amp;size=3</div>
-
-<div class="note">
-  <strong>Тест:</strong> <span class="file-link">Section7_PaginationAndSortingTest</span>
-</div>
+<div class="endpoint"><a href="/api/security/method-security">GET /api/security/method-security</a></div>
 
 <hr class="section-divider"/>
 
 <!-- ==================== SECTION 9 ==================== -->
-<h2 id="section9">13. CRUD операции</h2>
+<h2 id="section9">9. Security Events</h2>
 
-<p>Полный набор операций для работы с ресурсами, реализующий Level 2 модели зрелости Ричардсона.</p>
+<p>
+  Spring Security предоставляет события, которые происходят при различных действиях безопасности.
+  Проект использует <span class="file-link">SecurityEventsCollector.java</span> для сбора
+  таких событий.
+</p>
 
-<div class="mermaid">
-  sequenceDiagram
-  participant C as Client
-  participant Ctrl as ProductController
-  participant S as Service
-  participant R as Repository
-  participant DB as Database
+<h3>Типы событий</h3>
 
-  Note over C,DB: CREATE
-  C->>Ctrl: POST /products (JSON)
-  Ctrl->>Ctrl: validate request
-  Ctrl->>S: createProduct(requestDto)
-  S->>R: save(entity)
-  R->>DB: INSERT
-  DB-->>R: generated id
-  R-->>S: entity
-  S-->>Ctrl: responseDto + id
-  Ctrl-->>C: 201 Created + Location header
+<ul>
+  <li><strong>AUTHENTICATION_SUCCESS</strong> — успешная аутентификация пользователя.</li>
+  <li><strong>AUTHENTICATION_FAILED</strong> — неудачная попытка входа.</li>
+  <li><strong>USER_CREATED</strong> — создание нового пользователя.</li>
+  <li><strong>USER_DELETED</strong> — удаление пользователя.</li>
+  <li><strong>USER_ENABLED</strong> / <strong>USER_DISABLED</strong> — включение/отключение учётной записи.</li>
+  <li><strong>ROLE_ASSIGNED</strong> / <strong>ROLE_REMOVED</strong> — назначение/удаление роли.</li>
+  <li><strong>PASSWORD_CHANGED</strong> — изменение пароля.</li>
+</ul>
 
-  Note over C,DB: READ
-  C->>Ctrl: GET /products/1
-  Ctrl->>S: getById(1)
-  S->>R: findById(1)
-  R->>DB: SELECT
-  DB-->>R: row
-  R-->>S: entity
-  S-->>Ctrl: dto
-  Ctrl-->>C: 200 OK (JSON)
+<h3>Пример события</h3>
 
-  Note over C,DB: DELETE
-  C->>Ctrl: DELETE /products/1
-  Ctrl->>S: deleteById(1)
-  S->>R: deleteById(1)
-  R->>DB: DELETE
-  DB-->>R: ok
-  Ctrl-->>C: 204 No Content
-</div>
-
-<h3>CREATE — создание</h3>
-
-<div class="endpoint">POST /api/rest/products</div>
-
-<pre><code>POST /api/rest/products
-Content-Type: application/json
-
-{
-  "name": "New Product",
-  "type": "DEVICE",
-  "price": 499.99,
-  "manufacturer": "TechCo",
-  "sku": "NEW-001",
-  "categoryId": 1
-}
-
-HTTP/1.1 201 Created
-Location: /api/rest/products/7
-
-{
-  "operation": "CREATE",
-  "product": {
-    "id": 7,
-    "name": "New Product",
-    "type": "DEVICE",
-    "price": 499.99,
-    ...
-  },
-  "message": "Product created successfully"
-}</code></pre>
-
-<h3>READ — чтение</h3>
-
-<div class="endpoint">GET /api/rest/products</div>
-<div class="endpoint">GET /api/rest/products/{id}</div>
-
-<pre><code>GET /api/rest/products/1
-
-HTTP/1.1 200 OK
-
-{
-  "id": 1,
-  "name": "Phone",
-  "type": "DEVICE",
-  "price": 999.00,
-  "version": 0,
-  "manufacturer": "Acme",
-  "sku": "SKU-PHONE-1",
-  "category": {
-    "id": 1,
-    "title": "Electronics"
-  }
-}</code></pre>
-
-<h3>UPDATE — полная замена (PUT)</h3>
-
-<div class="endpoint">PUT /api/rest/products/{id}</div>
-
-<pre><code>PUT /api/rest/products/1
-Content-Type: application/json
-
-{
-  "name": "Updated Phone",
-  "type": "DEVICE",
-  "price": 1099.00,
-  "manufacturer": "Acme Pro",
-  "sku": "SKU-PHONE-2",
-  "categoryId": 1
-}
-// Все поля обязательны — отсутствующие будут обнулены</code></pre>
-
-<h3>UPDATE — частичное обновление (PATCH)</h3>
-
-<div class="endpoint">PATCH /api/rest/products/{id}</div>
-
-<pre><code>PATCH /api/rest/products/1
-Content-Type: application/json
-
-{
-  "price": 899.99
-}
-// Обновляется только цена, остальные поля сохраняются</code></pre>
-
-<h3>DELETE — удаление</h3>
-
-<div class="endpoint">DELETE /api/rest/products/{id}</div>
-
-<pre><code>DELETE /api/rest/products/1
-
-HTTP/1.1 204 No Content
-(пустое тело ответа)</code></pre>
+<pre><code>eventsCollector.recordEvent("AUTHENTICATION_SUCCESS", username,
+    "User logged in successfully");</code></pre>
 
 <div class="note">
-  <strong>Тест:</strong> <span class="file-link">Section6_CrudOperationsTest</span>
+  В продакшене эти события могут быть отправлены в систему логирования, мониторинга,
+  аудита или использованы для уведомлений пользователей о подозрительной активности.
 </div>
 
-<hr class="section-divider"/>
-
-<!-- ==================== PATCH FORMATS ==================== -->
-<h2 id="section-patch">14. PATCH: JSON Merge Patch vs JSON Patch</h2>
-
-<p>Существует два стандартных формата для частичного обновления ресурса через PATCH.</p>
-
-<h3>JSON Merge Patch (RFC 7396)</h3>
-
-<p>Content-Type: <code>application/merge-patch+json</code></p>
-
-<p>Самый простой подход — отправляем частичный JSON, обновляются только указанные поля. Именно этот подход используется в данном проекте (через «обновление non-null полей»).</p>
-
-<pre><code>PATCH /api/rest/products/1
-Content-Type: application/merge-patch+json
-
-{
-  "price": 899.99,
-  "manufacturer": "NewCo"
-}
-// Обновятся только price и manufacturer</code></pre>
-
-<div class="warn">
-  <strong>Проблема Merge Patch:</strong> Как отличить «поле не передано» от «передано null» (то есть нужно обнулить)?<br/>
-  <pre><code>// Это значит "обнулить manufacturer" или "не менять manufacturer"?
-{"manufacturer": null}
-
-// В Merge Patch null означает "удалить поле" (обнулить).
-// Отсутствие поля означает "не менять".
-// Но в Java record/class null ≠ отсутствие поля!</code></pre>
-  <strong>Решения:</strong> использовать <code>Optional&lt;String&gt;</code>, <code>JsonNullable</code> (из библиотеки OpenAPI Jackson Nullable), или отдельный Map.
-</div>
-
-<h3>JSON Patch (RFC 6902)</h3>
-
-<p>Content-Type: <code>application/json-patch+json</code></p>
-
-<p>Массив операций над ресурсом. Более мощный, но сложнее в использовании.</p>
-
-<pre><code>PATCH /api/rest/products/1
-Content-Type: application/json-patch+json
-
-[
-  {"op": "replace", "path": "/price", "value": 899.99},
-  {"op": "remove", "path": "/manufacturer"},
-  {"op": "add", "path": "/tags/0", "value": "sale"},
-  {"op": "test", "path": "/version", "value": 3}
-]</code></pre>
-
-<table>
-  <tr><th>Операция</th><th>Описание</th></tr>
-  <tr><td><code>add</code></td><td>Добавить значение</td></tr>
-  <tr><td><code>remove</code></td><td>Удалить значение</td></tr>
-  <tr><td><code>replace</code></td><td>Заменить значение</td></tr>
-  <tr><td><code>move</code></td><td>Переместить значение</td></tr>
-  <tr><td><code>copy</code></td><td>Скопировать значение</td></tr>
-  <tr><td><code>test</code></td><td>Проверить значение (precondition)</td></tr>
-</table>
-
-<h3>Сравнение</h3>
-
-<table>
-  <tr><th>Аспект</th><th>Merge Patch</th><th>JSON Patch</th></tr>
-  <tr><td>Простота</td><td>✅ Очень просто</td><td>❌ Сложнее</td></tr>
-  <tr><td>Обнуление полей</td><td>⚠️ null = удалить</td><td>✅ Явная операция remove</td></tr>
-  <tr><td>Массивы</td><td>❌ Заменяет целиком</td><td>✅ Поэлементные операции</td></tr>
-  <tr><td>Атомарность</td><td>❌ Нет</td><td>✅ test + replace</td></tr>
-  <tr><td>Использование</td><td>Большинство REST API</td><td>Сложные документы</td></tr>
-</table>
-
-<div class="good">
-  <strong>В этом проекте</strong> используется подход, близкий к JSON Merge Patch: обновляются только не-null поля из тела запроса.
-</div>
-
-<hr class="section-divider"/>
-
-<!-- ==================== HATEOAS ==================== -->
-<h2 id="section-hateoas">15. HATEOAS и гипермедиа</h2>
-
-<p><strong>HATEOAS</strong> (Hypermedia As The Engine Of Application State) — ключевое ограничение REST уровня 3 по Ричардсону. Суть: ответы сервера содержат <strong>ссылки на связанные действия и ресурсы</strong>, позволяя клиенту навигировать по API без заранее «зашитых» URL. Клиент <strong>обнаруживает</strong> возможности API из ответов, а не из документации.</p>
-
-<h3>Аналогия: веб-сайт vs жёстко закодированный клиент</h3>
-
-<p>Обычный веб-сайт — это HATEOAS: пользователь открывает главную страницу, видит ссылки и переходит по ним. Ему не нужно знать URL заранее. Без HATEOAS — это как если бы пользователь вручную вбивал адреса страниц.</p>
-
-<div class="mermaid">
-  graph LR
-  subgraph "Без HATEOAS (Level 2)"
-  C1["Клиент знает все URL заранее"]
-  C1 -->|"GET /products/1"| S1["Сервер"]
-  S1 -->|"JSON без ссылок"| C1
-  C1 -->|"Клиент сам конструирует URL\nGET /categories/1"| S1
-  end
-
-  subgraph "С HATEOAS (Level 3)"
-  C2["Клиент знает только\nточку входа"]
-  C2 -->|"GET /api"| S2["Сервер"]
-  S2 -->|"JSON + ссылки"| C2
-  C2 -->|"Переходит по ссылке\nиз ответа"| S2
-  end
-</div>
-
-<h3>Пример без HATEOAS (Level 2)</h3>
-
-<pre><code>GET /api/products/1
-
-{
-  "id": 1,
-  "name": "Phone",
-  "price": 999.00,
-  "categoryId": 1,
-  "status": "IN_STOCK"
-}
-// Клиент должен ЗНАТЬ:
-// - категория по /api/categories/1
-// - обновить по PUT /api/products/1
-// - удалить по DELETE /api/products/1
-// - купить по POST /api/orders
-// Все URL зашиты в клиентском коде!</code></pre>
-
-<h3>Пример с HATEOAS (Level 3)</h3>
-
-<pre><code>GET /api/products/1
-
-{
-  "id": 1,
-  "name": "Phone",
-  "price": 999.00,
-  "status": "IN_STOCK",
-  "_links": {
-    "self": {
-      "href": "/api/products/1"
-    },
-    "update": {
-      "href": "/api/products/1",
-      "method": "PUT"
-    },
-    "delete": {
-      "href": "/api/products/1",
-      "method": "DELETE"
-    },
-    "category": {
-      "href": "/api/categories/1"
-    },
-    "purchase": {
-      "href": "/api/orders",
-      "method": "POST"
-    },
-    "all-products": {
-      "href": "/api/products"
-    }
-  }
-}
-// Клиент ОБНАРУЖИВАЕТ доступные действия из ответа.
-// Если товар закончился — ссылка "purchase" исчезает.</code></pre>
-
-<h3>Динамические ссылки — главная сила HATEOAS</h3>
-
-<p>Ссылки в ответе зависят от <strong>состояния ресурса</strong>. Это позволяет серверу управлять тем, какие действия доступны клиенту.</p>
-
-<div class="mermaid">
-  stateDiagram-v2
-  [*] --> DRAFT: Создан заказ
-  DRAFT --> CONFIRMED: confirm
-  DRAFT --> CANCELLED: cancel
-  CONFIRMED --> SHIPPED: ship
-  CONFIRMED --> CANCELLED: cancel
-  SHIPPED --> DELIVERED: deliver
-  DELIVERED --> [*]
-  CANCELLED --> [*]
-
-  note right of DRAFT
-  _links: confirm, cancel, self
-  end note
-
-  note right of CONFIRMED
-  _links: ship, cancel, self
-  end note
-
-  note right of SHIPPED
-  _links: deliver, self
-  (cancel уже недоступен!)
-  end note
-</div>
-
-<pre><code>// Заказ в статусе DRAFT — можно подтвердить или отменить
-GET /api/orders/42
-{
-  "id": 42, "status": "DRAFT", "total": 999.00,
-  "_links": {
-    "self":    {"href": "/api/orders/42"},
-    "confirm": {"href": "/api/orders/42/confirm", "method": "POST"},
-    "cancel":  {"href": "/api/orders/42/cancel",  "method": "POST"}
-  }
-}
-
-// Тот же заказ после подтверждения — отмена ещё доступна, добавилась отправка
-GET /api/orders/42
-{
-  "id": 42, "status": "CONFIRMED", "total": 999.00,
-  "_links": {
-    "self":   {"href": "/api/orders/42"},
-    "ship":   {"href": "/api/orders/42/ship",   "method": "POST"},
-    "cancel": {"href": "/api/orders/42/cancel", "method": "POST"}
-  }
-}
-
-// После отправки — отменить уже нельзя, ссылки cancel нет
-GET /api/orders/42
-{
-  "id": 42, "status": "SHIPPED", "total": 999.00,
-  "_links": {
-    "self":    {"href": "/api/orders/42"},
-    "deliver": {"href": "/api/orders/42/deliver", "method": "POST"}
-  }
-}</code></pre>
-
-<h3>Spring HATEOAS</h3>
-
-<p>Spring предоставляет модуль <code>spring-boot-starter-hateoas</code> с классами <code>EntityModel</code>, <code>CollectionModel</code> и утилитами для генерации ссылок.</p>
-
-<pre><code>// Зависимость в pom.xml:
-// &lt;dependency&gt;
-//   &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-//   &lt;artifactId&gt;spring-boot-starter-hateoas&lt;/artifactId&gt;
-// &lt;/dependency&gt;
-
-@GetMapping("/products/{id}")
-public EntityModel&lt;ProductDto&gt; getProduct(@PathVariable Long id) {
-    ProductDto product = service.getProductById(id);
-
-    return EntityModel.of(product,
-        // linkTo + methodOn — типобезопасная генерация ссылок
-        linkTo(methodOn(ProductController.class).getProduct(id)).withSelfRel(),
-        linkTo(methodOn(ProductController.class).getAllProducts()).withRel("products"),
-        linkTo(methodOn(CategoryController.class)
-            .getCategory(product.categoryId())).withRel("category")
-    );
-}
-
-// Для коллекций — CollectionModel
-@GetMapping("/products")
-public CollectionModel&lt;EntityModel&lt;ProductDto&gt;&gt; getAllProducts() {
-    List&lt;EntityModel&lt;ProductDto&gt;&gt; products = service.getAll().stream()
-        .map(p -> EntityModel.of(p,
-            linkTo(methodOn(ProductController.class).getProduct(p.id())).withSelfRel()))
-        .toList();
-
-    return CollectionModel.of(products,
-        linkTo(methodOn(ProductController.class).getAllProducts()).withSelfRel());
-}</code></pre>
-
-<h3>Форматы гипермедиа</h3>
-
-<table>
-  <tr><th>Формат</th><th>Content-Type</th><th>Описание</th></tr>
-  <tr><td><strong>HAL</strong></td><td><code>application/hal+json</code></td><td>Самый популярный. Ссылки в <code>_links</code>, вложенные ресурсы в <code>_embedded</code>. Поддерживается Spring HATEOAS по умолчанию.</td></tr>
-  <tr><td><strong>HAL-FORMS</strong></td><td><code>application/prs.hal-forms+json</code></td><td>Расширение HAL — описывает формы (какие поля нужны для POST/PUT).</td></tr>
-  <tr><td><strong>JSON:API</strong></td><td><code>application/vnd.api+json</code></td><td>Стандартизированный формат с <code>data</code>, <code>links</code>, <code>included</code>. Популярен в JavaScript-экосистеме.</td></tr>
-  <tr><td><strong>Siren</strong></td><td><code>application/vnd.siren+json</code></td><td>Описывает сущности, действия (actions) и ссылки.</td></tr>
-  <tr><td><strong>Collection+JSON</strong></td><td><code>application/vnd.collection+json</code></td><td>Специализирован для коллекций с шаблонами для создания/редактирования.</td></tr>
-</table>
-
-<h3>Когда HATEOAS нужен и когда — нет</h3>
-
-<div class="principle-grid">
-  <div class="principle-card">
-    <h4>✅ Полезен</h4>
-    <p>— Публичные API с множеством клиентов (клиенты не ломаются при изменении URL)<br/>
-      — Сложные workflow (заказы, согласования) — сервер управляет доступными действиями<br/>
-      — API, которое должно быть самодокументируемым<br/>
-      — Микросервисная архитектура — сервисы обнаруживают друг друга через ссылки</p>
-  </div>
-  <div class="principle-card">
-    <h4>❌ Избыточен</h4>
-    <p>— Внутренние API с одним клиентом (фронтенд = бэкенд одной команды)<br/>
-      — Простые CRUD без сложной бизнес-логики<br/>
-      — Мобильные приложения, где минимизация трафика важнее (ссылки увеличивают размер ответа)<br/>
-      — Когда клиент всё равно «зашивает» URL</p>
-  </div>
-</div>
-
-<div class="mermaid">
-  graph TB
-  A{"Нужен ли HATEOAS?"}
-  A -->|"Много клиентов,\nсложный workflow"| B["Да - Level 3"]
-  A -->|"Один клиент,\nпростой CRUD"| C["Нет - Level 2 достаточно"]
-  B --> D["Spring HATEOAS\nEntityModel + CollectionModel"]
-  C --> E["Обычный @RestController\nJSON без ссылок"]
-
-  style B fill:#d4edda,stroke:#28a745
-  style C fill:#fff3cd,stroke:#ffc107
-</div>
-
-<div class="note">
-  <strong>В этом проекте</strong> HATEOAS не реализован (используется Level 2). В реальных проектах полноценный HATEOAS применяется нечасто, но понимание концепции важно — оно помогает проектировать API, где сервер управляет навигацией клиента.
-</div>
-
-<hr class="section-divider"/>
-
-<!-- ==================== VERSIONING ==================== -->
-<h2 id="section-versioning">16. Версионирование API</h2>
-
-<p>При развитии API неизбежны обратно несовместимые изменения. Версионирование позволяет поддерживать старых клиентов при выпуске новой версии.</p>
-
-<h3>Стратегии версионирования</h3>
-
-<table>
-  <tr><th>Стратегия</th><th>Пример</th><th>Плюсы</th><th>Минусы</th></tr>
-  <tr>
-    <td><strong>В URI</strong></td>
-    <td><code>/api/v1/products</code><br/><code>/api/v2/products</code></td>
-    <td>Самый простой и наглядный. Легко тестировать в браузере.</td>
-    <td>Формально нарушает REST: URI = идентификатор ресурса, а не версии.</td>
-  </tr>
-  <tr>
-    <td><strong>В заголовке</strong></td>
-    <td><code>X-API-Version: 2</code><br/><code>Accept-Version: 2</code></td>
-    <td>URI остаётся чистым.</td>
-    <td>Менее наглядно, сложнее тестировать и кэшировать.</td>
-  </tr>
-  <tr>
-    <td><strong>В Accept (Content Negotiation)</strong></td>
-    <td><code>Accept: application/vnd.myapi.v2+json</code></td>
-    <td>Семантически правильно (разные представления ресурса).</td>
-    <td>Самый сложный в реализации и использовании.</td>
-  </tr>
-  <tr>
-    <td><strong>В query-параметре</strong></td>
-    <td><code>/api/products?version=2</code></td>
-    <td>Простой.</td>
-    <td>Смешивает фильтрацию и версионирование. Плохо кэшируется.</td>
-  </tr>
-</table>
-
-<pre><code>// Версионирование через URI (наиболее распространённый подход)
-@RestController
-@RequestMapping("/api/v1/products")
-public class ProductV1Controller { ... }
-
-@RestController
-@RequestMapping("/api/v2/products")
-public class ProductV2Controller { ... }
-
-// Версионирование через заголовок
-@GetMapping(value = "/products", headers = "X-API-Version=1")
-public List&lt;ProductV1Dto&gt; getProductsV1() { ... }
-
-@GetMapping(value = "/products", headers = "X-API-Version=2")
-public List&lt;ProductV2Dto&gt; getProductsV2() { ... }
-
-// Версионирование через Accept (Content Negotiation)
-@GetMapping(value = "/products", produces = "application/vnd.myapi.v1+json")
-public List&lt;ProductV1Dto&gt; getProductsV1() { ... }
-
-@GetMapping(value = "/products", produces = "application/vnd.myapi.v2+json")
-public List&lt;ProductV2Dto&gt; getProductsV2() { ... }</code></pre>
-
-<div class="good">
-  <strong>Рекомендация:</strong> Для большинства проектов подходит версионирование через URI (<code>/api/v1/...</code>) — оно самое простое и понятное. Используйте более сложные стратегии, только если у вас есть для этого веская причина.
-</div>
-
-<hr class="section-divider"/>
-
-<!-- ==================== CODE FIRST vs API FIRST ==================== -->
-<h2 id="section-code-api-first">17. Code First vs API First</h2>
-
-<p>Два подхода к разработке REST API, определяющие <strong>что создаётся первым</strong> — код или спецификация.</p>
-
-<h3>Code First</h3>
-
-<p>Сначала пишем контроллеры, DTO и аннотации — спецификация (OpenAPI/Swagger) <strong>генерируется из кода</strong>.</p>
-
-<pre><code>// 1. Пишем контроллер
-@RestController
-@RequestMapping("/api/products")
-public class ProductController {
-
-    @Operation(summary = "Get product by ID")        // Swagger-аннотация
-    @ApiResponse(responseCode = "200")
-    @ApiResponse(responseCode = "404")
-    @GetMapping("/{id}")
-    public ProductDto getProduct(@PathVariable Long id) {
-        return service.getProductById(id);
-    }
-}
-
-// 2. Подключаем springdoc-openapi
-// &lt;dependency&gt;
-//   &lt;groupId&gt;org.springdoc&lt;/groupId&gt;
-//   &lt;artifactId&gt;springdoc-openapi-starter-webmvc-ui&lt;/artifactId&gt;
-// &lt;/dependency&gt;
-
-// 3. Спецификация генерируется автоматически:
-//    GET /v3/api-docs        → OpenAPI JSON
-//    GET /swagger-ui.html    → Swagger UI</code></pre>
-
-<h3>API First (Contract First)</h3>
-
-<p>Сначала описываем API в спецификации OpenAPI (YAML/JSON) — код <strong>генерируется из спецификации</strong>.</p>
-
-<pre><code># 1. Пишем спецификацию openapi.yaml
-openapi: 3.0.3
-info:
-  title: Product API
-  version: 1.0.0
-paths:
-  /api/products/{id}:
-    get:
-      operationId: getProduct
-      summary: Get product by ID
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProductDto'
-        '404':
-          description: Not Found
-
-components:
-  schemas:
-    ProductDto:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-        name:
-          type: string
-        price:
-          type: number
-
-# 2. openapi-generator-maven-plugin генерирует:
-#    - интерфейс ProductApi с методом getProduct()
-#    - классы ProductDto
-#
-# 3. Разработчик реализует сгенерированный интерфейс:
-
-@RestController
-public class ProductController implements ProductApi {
-    @Override
-    public ResponseEntity&lt;ProductDto&gt; getProduct(Long id) {
-        return ResponseEntity.ok(service.getProductById(id));
-    }
-}</code></pre>
-
-<h3>Сравнение подходов</h3>
-
-<div class="mermaid">
-  graph LR
-  subgraph "Code First"
-  CF1["Java-код\n@RestController\n+ Swagger-аннотации"] -->|"springdoc-openapi\nгенерирует"| CF2["OpenAPI spec\nopenapi.json"]
-  CF2 --> CF3["Swagger UI\nДокументация"]
-  end
-
-  subgraph "API First"
-  AF1["OpenAPI spec\nopenapi.yaml"] -->|"openapi-generator\nгенерирует"| AF2["Java-интерфейсы\n+ DTO классы"]
-  AF2 -->|"разработчик\nреализует"| AF3["Java-код\nimplements ProductApi"]
-  end
-
-  style CF1 fill:#d4edda,stroke:#28a745
-  style AF1 fill:#cce5ff,stroke:#0066cc
-</div>
-
-<table>
-  <tr><th>Аспект</th><th>Code First</th><th>API First</th></tr>
-  <tr><td><strong>Что первично</strong></td><td>Java-код</td><td>OpenAPI-спецификация (YAML/JSON)</td></tr>
-  <tr><td><strong>Спецификация</strong></td><td>Генерируется из кода (springdoc-openapi)</td><td>Пишется вручную или в редакторе (Stoplight, Swagger Editor)</td></tr>
-  <tr><td><strong>Код</strong></td><td>Пишется вручную</td><td>Интерфейсы и DTO генерируются (openapi-generator)</td></tr>
-  <tr><td><strong>Контракт</strong></td><td>Следует за кодом — может «уехать»</td><td>Фиксирован — код обязан соответствовать</td></tr>
-  <tr><td><strong>Параллельная работа</strong></td><td>❌ Фронтенд ждёт, пока бэкенд напишет эндпоинты</td><td>✅ Фронтенд и бэкенд работают параллельно по контракту</td></tr>
-  <tr><td><strong>Согласованность</strong></td><td>⚠️ Документация может отстать от кода</td><td>✅ Код компилируется только если соответствует спецификации</td></tr>
-  <tr><td><strong>Простота старта</strong></td><td>✅ Быстро — просто пиши код</td><td>⚠️ Нужно настроить генератор и изучить OpenAPI</td></tr>
-  <tr><td><strong>Удобство</strong></td><td>✅ Всё в Java, привычные инструменты</td><td>⚠️ YAML-спецификация может быть громоздкой</td></tr>
-  <tr><td><strong>Инструменты</strong></td><td>springdoc-openapi, Springfox (устарел)</td><td>openapi-generator, Swagger Codegen, Stoplight</td></tr>
-</table>
-
-<h3>Процесс разработки</h3>
-
-<div class="mermaid">
-  graph TB
-  subgraph "Code First workflow"
-  C1["Разработчик пишет\nController + DTO"] --> C2["springdoc-openapi\nсканирует аннотации"]
-  C2 --> C3["Генерируется\nopenapi.json"]
-  C3 --> C4["Swagger UI\nдля тестирования"]
-  C3 --> C5["Фронтенд получает\nспецификацию"]
-  end
-
-  subgraph "API First workflow"
-  A1["Команда проектирует\nopenapi.yaml"] --> A2["Ревью спецификации\nфронтенд + бэкенд"]
-  A2 --> A3["openapi-generator\nгенерирует код"]
-  A3 --> A4["Бэкенд реализует\nинтерфейсы"]
-  A3 --> A5["Фронтенд генерирует\nтипы и клиент"]
-  A4 --> A6["CI проверяет\nсоответствие контракту"]
-  end
-</div>
-
-<h3>Когда что выбирать</h3>
-
-<div class="principle-grid">
-  <div class="principle-card">
-    <h4>✅ Code First подходит</h4>
-    <p>— Небольшая команда (1–3 бэкендера)<br/>
-      — Быстрый прототип или MVP<br/>
-      — Внутренний API без внешних потребителей<br/>
-      — Фронтенд и бэкенд — одна команда<br/>
-      — Простое CRUD-приложение</p>
-  </div>
-  <div class="principle-card">
-    <h4>✅ API First подходит</h4>
-    <p>— Много команд и потребителей API<br/>
-      — Публичное API (партнёры, мобильные клиенты)<br/>
-      — Фронтенд и бэкенд — разные команды<br/>
-      — Микросервисы (контракт между сервисами)<br/>
-      — Строгие требования к обратной совместимости</p>
-  </div>
-</div>
-
-<div class="good">
-  <strong>В этом проекте</strong> используется <strong>Code First</strong> — контроллеры и DTO написаны вручную. Для production-проектов с несколькими командами рекомендуется рассмотреть API First.
-</div>
-
-<hr class="section-divider"/>
-
-<!-- ==================== PROBLEM DETAILS ==================== -->
-<h2 id="section-problem-details">17. RFC 7807 — Problem Details</h2>
-
-<p><strong>Problem Details for HTTP APIs</strong> (<a href="https://datatracker.ietf.org/doc/html/rfc7807">RFC 7807</a>) — стандартный формат ответов об ошибках. Spring 6+ / Spring Boot 3+ имеет встроенную поддержку через <code>ProblemDetail</code>.</p>
-
-<h3>Формат по стандарту</h3>
-
-<pre><code>HTTP/1.1 404 Not Found
-Content-Type: application/problem+json
-
-{
-  "type": "https://api.example.com/problems/product-not-found",
-  "title": "Not Found",
-  "status": 404,
-  "detail": "Product not found with id: 999",
-  "instance": "/api/rest/products/999"
-}</code></pre>
-
-<table>
-  <tr><th>Поле</th><th>Описание</th><th>Обязательное</th></tr>
-  <tr><td><code>type</code></td><td>URI, идентифицирующий тип проблемы</td><td>Нет (default: "about:blank")</td></tr>
-  <tr><td><code>title</code></td><td>Краткое описание типа проблемы</td><td>Нет</td></tr>
-  <tr><td><code>status</code></td><td>HTTP статус-код</td><td>Нет</td></tr>
-  <tr><td><code>detail</code></td><td>Подробное описание конкретной проблемы</td><td>Нет</td></tr>
-  <tr><td><code>instance</code></td><td>URI конкретного запроса, вызвавшего ошибку</td><td>Нет</td></tr>
-</table>
-
-<h3>Использование в Spring Boot 3+</h3>
-
-<pre><code>@ExceptionHandler(ProductNotFoundException.class)
-public ResponseEntity&lt;ProblemDetail&gt; handleNotFound(ProductNotFoundException ex) {
-    ProblemDetail pd = ProblemDetail.forStatusAndDetail(
-        HttpStatus.NOT_FOUND, ex.getMessage());
-    pd.setTitle("Product Not Found");
-    pd.setType(URI.create("https://api.example.com/problems/product-not-found"));
-    // Можно добавлять кастомные поля
-    pd.setProperty("productId", ex.getProductId());
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(pd);
-}
-
-// Или включить глобально в application.properties:
-// spring.mvc.problemdetails.enabled=true</code></pre>
-
-<div class="note">
-  <strong>В этом проекте</strong> используется собственный <code>ErrorResponse</code> DTO. При переходе на Spring Boot 3+ рекомендуется рассмотреть <code>ProblemDetail</code> как промышленный стандарт.
-</div>
-
-<hr class="section-divider"/>
-
-<!-- ==================== BEST PRACTICES ==================== -->
-<h2 id="section-best-practices">18. Best Practices проектирования REST API</h2>
-
-<h3>Именование ресурсов</h3>
-
-<table>
-  <tr><th>✅ Правильно</th><th>❌ Неправильно</th><th>Почему</th></tr>
-  <tr><td><code>/api/products</code></td><td><code>/api/getProducts</code></td><td>URI = существительное (ресурс), HTTP-метод = глагол (действие)</td></tr>
-  <tr><td><code>/api/products/1</code></td><td><code>/api/product/1</code></td><td>Коллекции во множественном числе</td></tr>
-  <tr><td><code>/api/products/1/reviews</code></td><td><code>/api/getProductReviews?id=1</code></td><td>Вложенные ресурсы через путь</td></tr>
-  <tr><td><code>/api/order-items</code></td><td><code>/api/orderItems</code></td><td>Kebab-case в URL (не camelCase)</td></tr>
-  <tr><td><code>/api/products?status=active</code></td><td><code>/api/active-products</code></td><td>Фильтрация через query-параметры</td></tr>
-  <tr><td><code>/api/products</code></td><td><code>/api/products/</code></td><td>Без trailing slash</td></tr>
-</table>
-
-<h3>Чек-лист хорошего REST API</h3>
-
-<div class="good">
-  <strong>Дизайн:</strong><br/>
-  ☑ Существительные во множественном числе для коллекций<br/>
-  ☑ HTTP-методы по назначению (GET = чтение, POST = создание, ...)<br/>
-  ☑ Корректные статус-коды (201 для создания, 204 для удаления)<br/>
-  ☑ Query-параметры для фильтрации, сортировки и пагинации<br/>
-  ☑ POST возвращает заголовок <code>Location</code> с URI нового ресурса<br/>
-  ☑ HEAD и OPTIONS как HTTP-методы, а не отдельные пути<br/>
-  <br/>
-  <strong>Структура ответов:</strong><br/>
-  ☑ Единообразный формат ответов (включая ошибки)<br/>
-  ☑ DTO вместо Entity в API<br/>
-  ☑ Пагинация для коллекций (не возвращайте все 10 000 записей)<br/>
-  ☑ Метаданные пагинации (totalElements, totalPages)<br/>
-  ☑ Content-Type: application/json<br/>
-  <br/>
-  <strong>Надёжность:</strong><br/>
-  ☑ Валидация входных данных на сервере (@Valid)<br/>
-  ☑ Централизованная обработка ошибок (@ControllerAdvice)<br/>
-  ☑ Информативные сообщения об ошибках (рассмотреть RFC 7807)<br/>
-  ☑ Версионирование API<br/>
-  ☑ Rate limiting для публичных API<br/>
-  ☑ Idempotency-Key для POST при необходимости
-</div>
-
-<h3>Антипаттерны REST API</h3>
-
-<div class="warn">
-  <strong>Избегайте:</strong><br/>
-  ✗ Глаголы в URI: <code>GET /api/getUser/1</code> → <code>GET /api/users/1</code><br/>
-  ✗ Возвращать 200 OK с ошибкой в теле: <code>{"success": false, "error": "..."}</code><br/>
-  ✗ Игнорировать семантику методов: <code>GET /api/deleteUser/1</code><br/>
-  ✗ Возвращать Entity с lazy-полями напрямую<br/>
-  ✗ Коллекции без пагинации<br/>
-  ✗ Одинаковый DTO для создания и ответа<br/>
-  ✗ Использовать <code>@ResponseStatus</code> и <code>ResponseEntity</code> одновременно<br/>
-  ✗ <code>Map&lt;String, String&gt;</code> вместо <code>HttpHeaders</code> для заголовков<br/>
-  ✗ Эндпоинт <code>GET /head</code> вместо HTTP-метода <code>HEAD /</code>
-</div>
+<div class="endpoint"><a href="/api/security/events">GET /api/security/events</a></div>
 
 <hr class="section-divider"/>
 
 <!-- ==================== SECTION 10 ==================== -->
-<h2 id="section10">19. Глоссарий терминов</h2>
+<h2 id="section10">10. Глоссарий терминов</h2>
 
 <table>
   <tr><th>Термин</th><th>Определение</th></tr>
-  <tr><td><strong>HTTP</strong></td><td>HyperText Transfer Protocol — текстовый протокол прикладного уровня для передачи данных в вебе. Работает поверх TCP. Определяет формат запросов (Request Line + Headers + Body) и ответов (Status Line + Headers + Body).</td></tr>
-  <tr><td><strong>HTTPS</strong></td><td>HTTP over TLS — тот же HTTP, но внутри зашифрованного TLS-канала. Обеспечивает конфиденциальность (шифрование), целостность (MAC) и аутентификацию сервера (сертификат X.509).</td></tr>
-  <tr><td><strong>TLS/SSL</strong></td><td>Transport Layer Security — криптографический протокол, обеспечивающий шифрование TCP-соединения. SSL — устаревшее название (SSLv3 заменён на TLS 1.0+). Текущая версия — TLS 1.3.</td></tr>
-  <tr><td><strong>TCP</strong></td><td>Transmission Control Protocol — протокол транспортного уровня с гарантированной доставкой, порядком пакетов и контролем потока. HTTP/1.1 и HTTP/2 работают поверх TCP.</td></tr>
-  <tr><td><strong>UDP</strong></td><td>User Datagram Protocol — протокол транспортного уровня без гарантии доставки и порядка пакетов. Легковесный и быстрый. QUIC (и, следовательно, HTTP/3) работает поверх UDP.</td></tr>
-  <tr><td><strong>QUIC</strong></td><td>Quick UDP Internet Connections — транспортный протокол поверх UDP, разработанный Google и стандартизированный в RFC 9000 (2021). Объединяет функции TCP (надёжная доставка, контроль потока) и TLS 1.3 (шифрование) в одном протоколе. Устраняет Head-of-Line blocking, поддерживает 0-RTT и миграцию соединений.</td></tr>
-  <tr><td><strong>HTTP/2</strong></td><td>Бинарный протокол (в отличие от текстового HTTP/1.1) с мультиплексированием (множество запросов параллельно по одному TCP-соединению), сжатием заголовков (HPACK) и server push. Стандартизирован в RFC 7540 (2015). Страдает от Head-of-Line blocking на уровне TCP.</td></tr>
-  <tr><td><strong>HTTP/3</strong></td><td>Третья основная версия HTTP, стандартизированная в RFC 9114 (2022). Работает поверх QUIC (UDP) вместо TCP. Устраняет Head-of-Line blocking, обеспечивает быструю установку соединения (1 RTT, 0-RTT при повторном), поддерживает миграцию соединений при смене сети. Использует QPACK для сжатия заголовков.</td></tr>
-  <tr><td><strong>Head-of-Line Blocking</strong></td><td>Проблема, при которой потеря одного пакета блокирует обработку всех последующих данных. В HTTP/2 over TCP потеря пакета одного потока блокирует все потоки в соединении. QUIC/HTTP/3 решает это — каждый поток независим.</td></tr>
-  <tr><td><strong>0-RTT</strong></td><td>Zero Round-Trip Time — режим QUIC, при котором клиент отправляет данные вместе с первым пакетом при повторном подключении к известному серверу, без ожидания хэндшейка. Подвержен replay-атакам, поэтому подходит только для идемпотентных запросов.</td></tr>
-  <tr><td><strong>Connection Migration</strong></td><td>Возможность QUIC сохранять соединение при смене IP-адреса клиента (например, переключение Wi-Fi → 4G). TCP этого не поддерживает — соединение привязано к IP-адресам. QUIC использует Connection ID для идентификации.</td></tr>
-  <tr><td><strong>Alt-Svc</strong></td><td>HTTP-заголовок (Alternative Services, RFC 7838), через который сервер сообщает клиенту о поддержке альтернативных протоколов. Используется для перехода на HTTP/3: <code>Alt-Svc: h3=":443"; ma=86400</code>.</td></tr>
-  <tr><td><strong>QPACK</strong></td><td>Алгоритм сжатия HTTP-заголовков для HTTP/3, аналог HPACK в HTTP/2. Адаптирован для работы с QUIC, где пакеты могут приходить в произвольном порядке.</td></tr>
-  <tr><td><strong>TCP Handshake</strong></td><td>Трёхстороннее рукопожатие (SYN → SYN-ACK → ACK) для установления TCP-соединения перед обменом данными.</td></tr>
-  <tr><td><strong>TLS Handshake</strong></td><td>Процесс согласования шифрования между клиентом и сервером: обмен сертификатами, выбор шифров, генерация сессионного ключа. Происходит после TCP-хэндшейка.</td></tr>
-  <tr><td><strong>Keep-Alive</strong></td><td>Режим HTTP/1.1, при котором TCP-соединение переиспользуется для нескольких запросов, избегая накладных расходов на повторные TCP/TLS-хэндшейки.</td></tr>
-  <tr><td><strong>REST</strong></td><td>Representational State Transfer — архитектурный стиль, описанный Роем Филдингом (2000). Набор из 6 ограничений для построения масштабируемых распределённых систем.</td></tr>
-  <tr><td><strong>RESTful</strong></td><td>API, соблюдающее все ограничения REST (включая HATEOAS). На практике термин часто используется для API уровня 2 по Ричардсону.</td></tr>
-  <tr><td><strong>Resource</strong></td><td>Ресурс — любая сущность, к которой можно обратиться по URI (продукт, пользователь, заказ).</td></tr>
-  <tr><td><strong>Representation</strong></td><td>Представление ресурса — конкретный формат данных (JSON, XML), передаваемый в запросе/ответе.</td></tr>
-  <tr><td><strong>Endpoint</strong></td><td>Точка доступа к API — комбинация URI + HTTP-метода (например, GET /api/products).</td></tr>
-  <tr><td><strong>URI</strong></td><td>Uniform Resource Identifier — уникальный идентификатор ресурса (/api/products/42).</td></tr>
-  <tr><td><strong>HTTP methods</strong></td><td>GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS — определяют действие над ресурсом.</td></tr>
-  <tr><td><strong>Status codes</strong></td><td>Трёхзначные числовые коды результата обработки запроса (200, 404, 500). Сгруппированы по категориям: 2xx — успех, 3xx — перенаправление, 4xx — ошибка клиента, 5xx — ошибка сервера.</td></tr>
-  <tr><td><strong>Idempotent</strong></td><td>Идемпотентный — повторный вызов с теми же параметрами даёт тот же результат (GET, PUT, DELETE).</td></tr>
-  <tr><td><strong>Safe method</strong></td><td>Безопасный метод — не изменяет состояние сервера (GET, HEAD, OPTIONS).</td></tr>
-  <tr><td><strong>HATEOAS</strong></td><td>Hypermedia As The Engine Of Application State — принцип REST Level 3: ответы содержат ссылки на связанные действия и ресурсы. Клиент обнаруживает возможности API из ответов, а не из документации. Сервер управляет доступными действиями через наличие/отсутствие ссылок.</td></tr>
-  <tr><td><strong>HAL</strong></td><td>Hypertext Application Language — самый популярный формат гипермедиа. Ссылки в <code>_links</code>, вложенные ресурсы в <code>_embedded</code>. Поддерживается Spring HATEOAS по умолчанию.</td></tr>
-  <tr><td><strong>EntityModel</strong></td><td>Класс Spring HATEOAS — обёртка над DTO, добавляющая ссылки (<code>_links</code>) к одиночному ресурсу.</td></tr>
-  <tr><td><strong>CollectionModel</strong></td><td>Класс Spring HATEOAS — обёртка над коллекцией <code>EntityModel</code>, добавляющая ссылки для коллекции в целом.</td></tr>
-  <tr><td><strong>Content Negotiation</strong></td><td>Механизм выбора формата ответа (JSON/XML) на основе заголовка Accept. При отсутствии подходящего конвертера — 406 Not Acceptable.</td></tr>
-  <tr><td><strong>DTO</strong></td><td>Data Transfer Object — объект для передачи данных между слоями, отделённый от Entity.</td></tr>
-  <tr><td><strong>Entity</strong></td><td>JPA-сущность, маппится на таблицу в базе данных. Управляется EntityManager.</td></tr>
-  <tr><td><strong>@RequestBody</strong></td><td>Аннотация для десериализации тела HTTP-запроса в Java-объект через HttpMessageConverter (Jackson).</td></tr>
-  <tr><td><strong>ResponseEntity</strong></td><td>Класс Spring для полного управления HTTP-ответом (статус, заголовки, тело). Не комбинировать с @ResponseStatus.</td></tr>
-  <tr><td><strong>@PathVariable</strong></td><td>Извлечение переменных из пути URL (/products/{id}).</td></tr>
-  <tr><td><strong>@RequestParam</strong></td><td>Извлечение query-параметров (?page=0&amp;size=10).</td></tr>
-  <tr><td><strong>@RestController</strong></td><td>Комбинация @Controller + @ResponseBody. Все методы возвращают данные, а не имена представлений.</td></tr>
-  <tr><td><strong>@ControllerAdvice</strong></td><td>Централизованная обработка исключений для всех контроллеров.</td></tr>
-  <tr><td><strong>@Valid</strong></td><td>Аннотация Bean Validation (JSR 380), активирующая валидацию @RequestBody.</td></tr>
-  <tr><td><strong>Content-Type</strong></td><td>HTTP-заголовок, указывающий формат тела запроса (application/json).</td></tr>
-  <tr><td><strong>Accept</strong></td><td>HTTP-заголовок, указывающий желаемый формат ответа.</td></tr>
-  <tr><td><strong>Location</strong></td><td>HTTP-заголовок в ответе 201 Created, содержащий URI созданного ресурса.</td></tr>
-  <tr><td><strong>Jackson</strong></td><td>Библиотека сериализации/десериализации JSON, встроенная в Spring Boot.</td></tr>
-  <tr><td><strong>HttpMessageConverter</strong></td><td>Интерфейс Spring для преобразования HTTP-сообщений. MappingJackson2HttpMessageConverter — реализация для JSON.</td></tr>
-  <tr><td><strong>HttpHeaders</strong></td><td>Класс Spring для работы с HTTP-заголовками. Предпочтительнее Map для сохранения множественных значений и регистронезависимости.</td></tr>
-  <tr><td><strong>Pageable</strong></td><td>Интерфейс Spring Data, инкапсулирующий информацию о пагинации и сортировке.</td></tr>
-  <tr><td><strong>ProblemDetail</strong></td><td>Класс Spring (6+) для формирования ответов об ошибках по стандарту RFC 7807.</td></tr>
-  <tr><td><strong>JSON Merge Patch</strong></td><td>RFC 7396 — частичный JSON для обновления ресурса. Поле null = удалить, отсутствие = не менять.</td></tr>
-  <tr><td><strong>JSON Patch</strong></td><td>RFC 6902 — массив операций (add, remove, replace, move, copy, test) для обновления ресурса.</td></tr>
-  <tr><td><strong>Idempotency-Key</strong></td><td>Заголовок для обеспечения идемпотентности POST-запросов при сетевых сбоях.</td></tr>
-  <tr><td><strong>DispatcherServlet</strong></td><td>Центральный сервлет Spring MVC, принимающий все HTTP-запросы и маршрутизирующий их к нужному контроллеру через HandlerMapping.</td></tr>
-  <tr><td><strong>Embedded Tomcat</strong></td><td>Встроенный веб-сервер в Spring Boot. Слушает TCP-порт, принимает HTTP-соединения и передаёт запросы в DispatcherServlet.</td></tr>
+  <tr><td><strong>Authentication</strong></td><td>Процесс проверки личности пользователя (Кто вы?)</td></tr>
+  <tr><td><strong>Authorization</strong></td><td>Процесс определения прав доступа (Что вы можете делать?)</td></tr>
+  <tr><td><strong>Principal</strong></td><td>Аутентифицированный пользователь в Spring Security</td></tr>
+  <tr><td><strong>GrantedAuthority</strong></td><td>Разрешение или роль, назначенная пользователю</td></tr>
+  <tr><td><strong>SecurityContext</strong></td><td>Контекст, хранящий информацию безопасности для текущего запроса</td></tr>
+  <tr><td><strong>SecurityFilterChain</strong></td><td>Цепочка фильтров, обрабатывающая каждый HTTP запрос</td></tr>
+  <tr><td><strong>UserDetails</strong></td><td>Интерфейс для представления пользовательских данных</td></tr>
+  <tr><td><strong>UserDetailsService</strong></td><td>Интерфейс для загрузки пользовательских данных по username</td></tr>
+  <tr><td><strong>PasswordEncoder</strong></td><td>Интерфейс для шифрования и проверки паролей</td></tr>
+  <tr><td><strong>CSRF</strong></td><td>Защита от межсайтовой подделки запроса</td></tr>
+  <tr><td><strong>CORS</strong></td><td>Разрешение междоменных запросов</td></tr>
+  <tr><td><strong>JWT</strong></td><td>JSON Web Token для stateless аутентификации</td></tr>
+  <tr><td><strong>RBAC</strong></td><td>Role-Based Access Control — доступ на основе ролей</td></tr>
+  <tr><td><strong>@Secured</strong></td><td>Аннотация для простой роли-безопасности</td></tr>
+  <tr><td><strong>@PreAuthorize</strong></td><td>Аннотация для SpEL-безопасности перед выполнением</td></tr>
+  <tr><td><strong>BCrypt</strong></td><td>Алгоритм хеширования паролей с солью</td></tr>
 </table>
+
+<div class="endpoint"><a href="/api/security/glossary">GET /api/security/glossary</a></div>
 
 <hr class="section-divider"/>
 
 <!-- ==================== SECTION 11 ==================== -->
-<h2 id="section11">20. Endpoint'ы API</h2>
+<h2 id="section11">11. Структура проекта</h2>
 
-<h3>Demo Endpoints</h3>
-<div class="endpoint">GET /api/rest/basics</div>
-<div class="endpoint">GET /api/rest/http-methods</div>
-<div class="endpoint">POST /api/rest/http-methods</div>
-<div class="endpoint">PUT /api/rest/http-methods</div>
-<div class="endpoint">HEAD /api/rest/http-methods</div>
-<div class="endpoint">OPTIONS /api/rest/http-methods</div>
-<div class="endpoint">GET /api/rest/parameters/path/{id}</div>
-<div class="endpoint">POST /api/rest/parameters/body</div>
-<div class="endpoint">GET /api/rest/response/{type}</div>
-<div class="endpoint">GET /api/rest/exception/{type}</div>
-<div class="endpoint">POST /api/rest/validation</div>
-
-<h3>Product Endpoints</h3>
-<div class="endpoint">GET /api/rest/products</div>
-<div class="endpoint">GET /api/rest/products/{id}</div>
-<div class="endpoint">POST /api/rest/products</div>
-<div class="endpoint">PUT /api/rest/products/{id}</div>
-<div class="endpoint">PATCH /api/rest/products/{id}</div>
-<div class="endpoint">DELETE /api/rest/products/{id}</div>
-<div class="endpoint">GET /api/rest/products/search</div>
-<div class="endpoint">GET /api/rest/products/paginated</div>
-
-<h3>Category Endpoints</h3>
-<div class="endpoint">GET /api/rest/categories</div>
-<div class="endpoint">GET /api/rest/categories/{id}</div>
-<div class="endpoint">GET /api/rest/categories/{id}/products</div>
-<div class="endpoint">POST /api/rest/categories</div>
+<div class="card">
+<pre><code>08-spring-security
+├── pom.xml
+└── src
+    ├── main
+    │   ├── java/com/example/springsecurity
+    │   │   ├── SpringSecurityApplication.java
+    │   │   ├── config
+    │   │   │   ├── DemoDataInitializer.java
+    │   │   │   ├── SecurityConfiguration.java
+    │   │   │   └── SecurityEventsCollector.java
+    │   │   ├── controller
+    │   │   │   ├── AuthController.java
+    │   │   │   ├── DemoController.java
+    │   │   │   ├── GlobalExceptionHandler.java
+    │   │   │   ├── PermissionController.java
+    │   │   │   ├── RoleController.java
+    │   │   │   └── UserController.java
+    │   │   ├── entity
+    │   │   │   ├── Permission.java
+    │   │   │   ├── Role.java
+    │   │   │   └── User.java
+    │   │   ├── exception
+    │   │   │   ├── RoleNotFoundException.java
+    │   │   │   ├── UserAlreadyExistsException.java
+    │   │   │   └── UserNotFoundException.java
+    │   │   ├── model
+    │   │   │   └── ApiModels.java
+    │   │   ├── repository
+    │   │   │   ├── PermissionRepository.java
+    │   │   │   ├── RoleRepository.java
+    │   │   │   └── UserRepository.java
+    │   │   └── service
+    │   │       ├── PermissionService.java
+    │   │       ├── RoleService.java
+    │   │       ├── SpringSecurityDemoService.java
+    │   │       └── UserService.java
+    │   └── resources
+    │       ├── application.yaml
+    │       └── static
+    │           └── index.html
+    └── test
+        └── java/com/example/springsecurity
+            ├── Section1_SecurityConceptsTest.java
+            ├── Section2_FilterChainTest.java
+            ├── Section3_AuthVsAuthorizationTest.java
+            ├── Section4_MethodSecurityTest.java
+            ├── Section5_SecurityConfigTest.java
+            ├── Section6_GlossaryTest.java
+            ├── Section7_EndpointsTest.java
+            └── Section8_ArchitectureTest.java</code></pre>
+</div>
 
 <hr class="section-divider"/>
 
-<h3>Примеры запросов (curl)</h3>
+<!-- ==================== SECTION 12 ==================== -->
+<h2 id="section12">12. Endpoint'ы API</h2>
 
-<pre><code># Получить все продукты
-curl http://localhost:8891/api/rest/products
+<table>
+  <thead><tr><th>Метод</th><th>Путь</th><th>Описание</th><th>Auth</th></tr></thead>
+  <tbody>
+  <tr><td>GET</td><td><a href="/api/security/concepts"><code>/api/security/concepts</code></a></td><td>Ключевые концепции Spring Security</td><td>Нет</td></tr>
+  <tr><td>GET</td><td><a href="/api/security/filter-chain"><code>/api/security/filter-chain</code></a></td><td>Цепочка фильтров</td><td>Нет</td></tr>
+  <tr><td>GET</td><td><a href="/api/security/architecture"><code>/api/security/architecture</code></a></td><td>Обзор архитектуры</td><td>Нет</td></tr>
+  <tr><td>GET</td><td><a href="/api/security/auth-vs-authorization"><code>/api/security/auth-vs-authorization</code></a></td><td>Аутентификация vs Авторизация</td><td>Нет</td></tr>
+  <tr><td>GET</td><td><a href="/api/security/method-security"><code>/api/security/method-security</code></a></td><td>Аннотации метод-безопасности</td><td>Нет</td></tr>
+  <tr><td>GET</td><td><a href="/api/security/password-encoder"><code>/api/security/password-encoder</code></a></td><td>Demo шифрования паролей</td><td>Нет</td></tr>
+  <tr><td>GET</td><td><a href="/api/security/config"><code>/api/security/config</code></a></td><td>Опции конфигурации</td><td>Нет</td></tr>
+  <tr><td>GET</td><td><a href="/api/security/glossary"><code>/api/security/glossary</code></a></td><td>Глоссарий терминов</td><td>Нет</td></tr>
+  <tr><td>GET</td><td><a href="/api/security/events"><code>/api/security/events</code></a></td><td>Лог событий безопасности</td><td>Нет</td></tr>
+  <tr><td>GET</td><td><a href="/api/security/endpoints"><code>/api/security/endpoints</code></a></td><td>Список всех endpoint'ов</td><td>Нет</td></tr>
+  <tr><td>POST</td><td><code>/api/auth/login</code></td><td>Аутентификация пользователя</td><td>Нет</td></tr>
+  <tr><td>GET</td><td><code>/api/users</code></td><td>Список всех пользователей</td><td>ADMIN</td></tr>
+  <tr><td>GET</td><td><code>/api/users/{id}</code></td><td>Получить пользователя по ID</td><td>ADMIN или owner</td></tr>
+  <tr><td>GET</td><td><code>/api/users/me</code></td><td>Текущий пользователь</td><td>Да</td></tr>
+  <tr><td>POST</td><td><code>/api/users</code></td><td>Создать пользователя</td><td>ADMIN</td></tr>
+  <tr><td>PUT</td><td><code>/api/users/{id}</code></td><td>Обновить пользователя</td><td>ADMIN или owner</td></tr>
+  <tr><td>DELETE</td><td><code>/api/users/{id}</code></td><td>Удалить пользователя</td><td>ADMIN</td></tr>
+  <tr><td>PUT</td><td><code>/api/users/{id}/password</code></td><td>Изменить пароль</td><td>Да</td></tr>
+  <tr><td>POST</td><td><code>/api/users/{id}/roles/{roleId}</code></td><td>Назначить роль пользователю</td><td>ADMIN</td></tr>
+  <tr><td>DELETE</td><td><code>/api/users/{id}/roles/{roleId}</code></td><td>Удалить роль у пользователя</td><td>ADMIN</td></tr>
+  <tr><td>PUT</td><td><code>/api/users/{id}/enable</code></td><td>Включить пользователя</td><td>ADMIN</td></tr>
+  <tr><td>PUT</td><td><code>/api/users/{id}/disable</code></td><td>Отключить пользователя</td><td>ADMIN</td></tr>
+  <tr><td>GET</td><td><code>/api/roles</code></td><td>Список ролей</td><td>Да</td></tr>
+  <tr><td>GET</td><td><code>/api/roles/{id}</code></td><td>Роль по ID</td><td>Да</td></tr>
+  <tr><td>POST</td><td><code>/api/roles</code></td><td>Создать роль</td><td>ADMIN</td></tr>
+  <tr><td>DELETE</td><td><code>/api/roles/{id}</code></td><td>Удалить роль</td><td>ADMIN</td></tr>
+  <tr><td>GET</td><td><code>/api/permissions</code></td><td>Список разрешений</td><td>Да</td></tr>
+  <tr><td>POST</td><td><code>/api/permissions</code></td><td>Создать разрешение</td><td>ADMIN</td></tr>
+  <tr><td>DELETE</td><td><code>/api/permissions/{id}</code></td><td>Удалить разрешение</td><td>ADMIN</td></tr>
+  </tbody>
+</table>
 
-# Получить продукт по ID
-curl http://localhost:8891/api/rest/products/1
+<h3>Примеры JSON запросов</h3>
 
-# Создать продукт (POST → 201 Created + Location)
-curl -X POST http://localhost:8891/api/rest/products \
+<h4>POST /api/auth/login — аутентификация</h4>
+<p><strong>Request body:</strong></p>
+<pre><code>{
+  "username": "admin",
+  "password": "admin123"
+}</code></pre>
+<p><strong>Response (200 OK):</strong></p>
+<pre><code>{
+  "success": true,
+  "data": {
+    "token": "mock-jwt-token-...",
+    "type": "Bearer",
+    "user": {
+      "id": 1,
+      "username": "admin",
+      "email": "admin@example.com",
+      "fullName": "System Administrator",
+      "enabled": true,
+      "roles": ["ADMIN"]
+    }
+  }
+}</code></pre>
+
+<h4>POST /api/users — создание пользователя</h4>
+<p><strong>Request body:</strong></p>
+<pre><code>{
+  "username": "newuser",
+  "password": "password123",
+  "email": "newuser@example.com",
+  "firstName": "New",
+  "lastName": "User"
+}</code></pre>
+
+<div class="endpoint"><a href="/api/security/endpoints">GET /api/security/endpoints</a></div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 13 ==================== -->
+<h2 id="section13">13. Быстрый старт (curl)</h2>
+
+<p>Примеры запросов для быстрого тестирования API после запуска приложения:</p>
+
+<h4>Получить концепции безопасности</h4>
+<pre><code>curl http://localhost:8892/api/security/concepts | jq</code></pre>
+
+<h4>Аутентификация</h4>
+<pre><code>curl -X POST http://localhost:8892/api/auth/login \
   -H "Content-Type: application/json" \
+  -d '{"username": "admin", "password": "admin123"}' | jq</code></pre>
+
+<h4>Получить всех пользователей (HTTP Basic auth)</h4>
+<pre><code>curl -u admin:admin123 \
+  http://localhost:8892/api/users | jq</code></pre>
+
+<h4>Создать пользователя</h4>
+<pre><code>curl -X POST http://localhost:8892/api/users \
+  -H "Content-Type: application/json" \
+  -u admin:admin123 \
   -d '{
-    "name": "New Product",
-    "type": "DEVICE",
-    "price": 499.99,
-    "manufacturer": "TechCo",
-    "sku": "NEW-001"
-  }'
+    "username": "testuser",
+    "password": "test123",
+    "email": "test@example.com",
+    "firstName": "Test",
+    "lastName": "User"
+  }' | jq</code></pre>
 
-# Полная замена (PUT — все поля обязательны)
-curl -X PUT http://localhost:8891/api/rest/products/1 \
+<h4>Назначить роль пользователю</h4>
+<pre><code>curl -X POST http://localhost:8892/api/users/2/roles/2 \
   -H "Content-Type: application/json" \
-  -d '{
-    "name": "Updated Phone",
-    "type": "DEVICE",
-    "price": 1099.00,
-    "manufacturer": "Acme Pro",
-    "sku": "SKU-PHONE-2"
-  }'
+  -u admin:admin123 | jq</code></pre>
 
-# Частичное обновление (PATCH — только изменяемые поля)
-curl -X PATCH http://localhost:8891/api/rest/products/1 \
+<h4>Отключить пользователя</h4>
+<pre><code>curl -X PUT http://localhost:8892/api/users/2/disable \
   -H "Content-Type: application/json" \
-  -d '{"price": 899.99}'
+  -u admin:admin123 | jq</code></pre>
 
-# Удалить продукт (→ 204 No Content)
-curl -X DELETE http://localhost:8891/api/rest/products/1
+<h4>Получить все роли</h4>
+<pre><code>curl http://localhost:8892/api/roles | jq</code></pre>
 
-# HEAD — только заголовки, без тела
-curl -I http://localhost:8891/api/rest/products
+<h4>Получить все разрешения</h4>
+<pre><code>curl http://localhost:8892/api/permissions | jq</code></pre>
 
-# OPTIONS — разрешённые методы
-curl -X OPTIONS -i http://localhost:8891/api/rest/products
+<h4>Получить события безопасности</h4>
+<pre><code>curl http://localhost:8892/api/security/events | jq</code></pre>
 
-# Пагинация с сортировкой
-curl "http://localhost:8891/api/rest/products/paginated?page=0&size=3&sortBy=price&sortDir=desc"
+<hr class="section-divider"/>
 
-# Поиск по типу
-curl "http://localhost:8891/api/rest/products/search?type=DEVICE&page=0&size=10"
+<!-- ==================== SECTION 14 ==================== -->
+<h2 id="section14">14. Тесты</h2>
 
-# Получить категории
-curl http://localhost:8891/api/rest/categories
+<p>
+  Каждый ключевой аспект покрыт интеграционными тестами, разбитыми по секциям:
+</p>
 
-# Получить продукты в категории (вложенный ресурс)
-curl http://localhost:8891/api/rest/categories/1/products</code></pre>
+<ul>
+  <li><span class="file-link">Section1_SecurityConceptsTest.java</span> — проверяет ключевые концепции.</li>
+  <li><span class="file-link">Section2_FilterChainTest.java</span> — проверяет цепочку фильтров.</li>
+  <li><span class="file-link">Section3_AuthVsAuthorizationTest.java</span> — сравнение аутентификации и авторизации.</li>
+  <li><span class="file-link">Section4_MethodSecurityTest.java</span> — аннотации метод-безопасности.</li>
+  <li><span class="file-link">Section5_SecurityConfigTest.java</span> — настройки конфигурации.</li>
+  <li><span class="file-link">Section6_GlossaryTest.java</span> — наличие основных терминов.</li>
+  <li><span class="file-link">Section7_EndpointsTest.java</span> — проверка REST endpoint'ов.</li>
+  <li><span class="file-link">Section8_ArchitectureTest.java</span> — обзор архитектуры.</li>
+</ul>
+
+<div class="good">
+  Тесты можно запустить командой <code>mvn clean test</code> в модуле.
+</div>
+
+<hr class="section-divider"/>
+
+<h2>Вывод</h2>
+<p>
+  Spring Security предоставляет комплексное решение для аутентификации и авторизации
+  в Spring-приложениях. Этот проект демонстрирует все ключевые возможности:
+  RBAC с пользователями, ролями и разрешениями, method security, password encoding,
+  security events, конфигурацию цепочки фильтров и полноценный REST API.
+</p>
 
 </body>
 </html>
