@@ -1,47 +1,1408 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Модуль в разработке</title>
+  <meta charset="UTF-8">
+  <title>Servlets Demo — Документация</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>mermaid.initialize({startOnLoad: true, theme: 'default'});</script>
   <style>
     body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f7f7f8;
-      color: #222;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 20px;
+        line-height: 1.7;
+        color: #333;
+        background: #fafafa;
     }
-
-    .container {
-      text-align: center;
-      background: white;
-      padding: 40px 32px;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-      max-width: 500px;
-      width: 90%;
-    }
-
     h1 {
-      margin: 0 0 12px;
-      font-size: 28px;
+        color: #2c3e50;
+        border-bottom: 3px solid #3498db;
+        padding-bottom: 10px;
     }
-
-    p {
-      margin: 0;
-      font-size: 16px;
-      color: #555;
+    h2 {
+        color: #2980b9;
+        margin-top: 50px;
+        border-left: 4px solid #3498db;
+        padding-left: 12px;
+    }
+    h3 {
+        color: #27ae60;
+        margin-top: 28px;
+    }
+    h4 {
+        color: #8e44ad;
+        margin-top: 20px;
+    }
+    pre {
+        background: #2d2d2d;
+        color: #f8f8f2;
+        padding: 16px;
+        border-radius: 6px;
+        overflow-x: auto;
+        font-size: 14px;
+    }
+    code {
+        background: #ecf0f1;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 14px;
+    }
+    pre code {
+        background: none;
+        padding: 0;
+    }
+    .mermaid {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        margin: 16px 0;
+        overflow-x: auto;
+    }
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 12px 0;
+        background: white;
+    }
+    th, td {
+        border: 1px solid #bdc3c7;
+        padding: 10px;
+        text-align: left;
+        vertical-align: top;
+    }
+    th {
+        background: #3498db;
+        color: white;
+    }
+    a {
+        color: #2980b9;
+    }
+    .file-link {
+        background: #e8f6f3;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 13px;
+        display: inline-block;
+        margin: 2px 0;
+    }
+    .note {
+        background: #fef9e7;
+        border-left: 4px solid #f1c40f;
+        padding: 12px;
+        margin: 12px 0;
+        border-radius: 4px;
+    }
+    .good, .ok {
+        background: #eafaf1;
+        border-left: 4px solid #27ae60;
+        padding: 12px;
+        margin: 12px 0;
+        border-radius: 4px;
+    }
+    .bad {
+        background: #fdedec;
+        border-left: 4px solid #e74c3c;
+        padding: 12px;
+        margin: 12px 0;
+        border-radius: 4px;
+    }
+    .warn {
+        background: #fffbeb;
+        border-left: 4px solid #d97706;
+        padding: 12px;
+        margin: 12px 0;
+        border-radius: 4px;
+    }
+    .violet {
+        background: #f5f3ff;
+        border-left: 4px solid #7c3aed;
+        padding: 12px;
+        margin: 12px 0;
+        border-radius: 4px;
+    }
+    .toc {
+        background: white;
+        border: 1px solid #dcdcdc;
+        border-radius: 8px;
+        padding: 18px;
+        margin: 20px 0 30px 0;
+    }
+    .toc ul {
+        margin: 0;
+        padding-left: 20px;
+    }
+    .endpoint {
+        background: #eef6ff;
+        border: 1px solid #d6eaff;
+        border-radius: 6px;
+        padding: 10px 12px;
+        margin: 6px 0;
+        font-family: monospace;
+        font-size: 13px;
+    }
+    .section-divider {
+        margin: 35px 0;
+        border: none;
+        border-top: 1px solid #ddd;
+    }
+    .card {
+        background: white;
+        border: 1px solid #dcdcdc;
+        border-radius: 12px;
+        padding: 18px 18px 16px;
+        margin: 16px 0;
+    }
+    .grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    @media (min-width: 980px) {
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+    }
+    .tag {
+        display: inline-block;
+        padding: 4px 8px;
+        margin: 0 8px 8px 0;
+        border-radius: 999px;
+        background: #f1f5f9;
+        border: 1px solid #cbd5e1;
+        color: #334155;
+        font-size: 12px;
+    }
+    .summary-box {
+        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+        border: 1px solid #cbd5e1;
+        border-radius: 12px;
+        padding: 20px;
+        margin: 18px 0 30px;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Модуль в разработке</h1>
-    <p>Материалы для этого раздела скоро появятся.</p>
-  </div>
+
+<h1>Servlets Demo</h1>
+<p>Краткая теория по Servlet API с привязкой к работающему коду проекта: сервлеты, request/response, session/cookie, filters, listeners, forward/redirect, error handling и CRUD.</p>
+
+<div class="good">
+  <strong>Документация:</strong> <code>http://localhost:8885/</code><br/>
+  <strong>Прямая ссылка:</strong> <code>http://localhost:8885/index.html</code><br/>
+  <strong>Обзор API:</strong> <a href="/api/demo">/api/demo</a><br/>
+  <strong>Базовый CRUD:</strong> <a href="/api/basic/products">/api/basic/products</a>
+</div>
+
+<div class="toc">
+  <h3>Содержание</h3>
+  <ul>
+    <li><a href="#section1">1. Что такое Servlet API и как проект устроен</a></li>
+    <li><a href="#section2">2. Запуск приложения и регистрация компонентов</a></li>
+    <li><a href="#section3">3. Жизненный цикл сервлета и многопоточность</a></li>
+    <li><a href="#section4">4. HttpServletRequest и области данных</a></li>
+    <li><a href="#section5">5. HttpServletResponse и формат API-ответов</a></li>
+    <li><a href="#section6">6. CRUD-сервлет и хранение данных в ServletContext</a></li>
+    <li><a href="#section7">7. Session и Cookie API</a></li>
+    <li><a href="#section8">8. Filters</a></li>
+    <li><a href="#section9">9. Listeners</a></li>
+    <li><a href="#section10">10. Forward vs Redirect</a></li>
+    <li><a href="#section11">11. Обработка ошибок</a></li>
+    <li><a href="#section12">12. Spring MVC внутри servlet-приложения</a></li>
+    <li><a href="#section13">13. Структура проекта</a></li>
+    <li><a href="#section14">14. Endpoint'ы и тесты</a></li>
+  </ul>
+</div>
+
+<hr class="section-divider"/>
+
+<h2 id="section1">1. Что такое Servlet API и как проект устроен</h2>
+
+<p><strong>Servlet API</strong> — это базовый Java API для серверной обработки HTTP-запросов. Он дает низкоуровневые механизмы для работы с запросом, ответом, сессиями, фильтрами и событиями жизненного цикла.</p>
+
+<table>
+  <tr>
+    <th>Уровень</th>
+    <th>Что это</th>
+    <th>Пример в проекте</th>
+  </tr>
+  <tr>
+    <td><code>Servlet</code></td>
+    <td>Базовый интерфейс сервлета</td>
+    <td>Используется не напрямую, а через <code>HttpServlet</code></td>
+  </tr>
+  <tr>
+    <td><code>GenericServlet</code></td>
+    <td>Абстрактная основа для сервлетов</td>
+    <td>Промежуточный уровень в иерархии</td>
+  </tr>
+  <tr>
+    <td><code>HttpServlet</code></td>
+    <td>Базовый класс для HTTP</td>
+    <td><code>BasicHttpServlet</code>, <code>RequestApiServlet</code>, <code>ResponseApiServlet</code> и др.</td>
+  </tr>
+  <tr>
+    <td>Spring MVC</td>
+    <td>Более высокий уровень абстракции над HTTP</td>
+    <td><code>DemoController</code></td>
+  </tr>
+</table>
+
+<div class="mermaid">
+  graph TB
+  B[Browser / HTTP client] --> T[Embedded Tomcat]
+  T --> F[Filters]
+  F --> S[Servlets]
+  F --> C[Spring MVC Controller]
+  S --> R[JSON / text / redirect]
+  C --> R
+</div>
+
+<div class="note">
+  <strong>Идея проекта:</strong> показать сразу два уровня:
+  <ul>
+    <li><strong>чистый Servlet API</strong> через <code>@WebServlet</code>, <code>@WebFilter</code>, <code>@WebListener</code>;</li>
+    <li><strong>Spring MVC</strong> через <code>@RestController</code> для обзорных endpoint'ов <code>/api/demo/*</code>.</li>
+  </ul>
+</div>
+
+<h3>📁 Связанный код</h3>
+<ul>
+  <li><span class="file-link">ServletsApplication.java</span> — старт приложения</li>
+  <li><span class="file-link">BasicHttpServlet.java</span> — CRUD-сервлет</li>
+  <li><span class="file-link">RequestApiServlet.java</span> — Request API</li>
+  <li><span class="file-link">ResponseApiServlet.java</span> — Response API</li>
+  <li><span class="file-link">SessionCookieServlet.java</span> — Session/Cookie API</li>
+  <li><span class="file-link">ForwardRedirectServlet.java</span> — forward и redirect</li>
+  <li><span class="file-link">ErrorHandlingServlet.java</span> — ошибки</li>
+  <li><span class="file-link">DemoController.java</span> — обзорные Spring MVC endpoint'ы</li>
+</ul>
+
+<hr class="section-divider"/>
+
+<h2 id="section2">2. Запуск приложения и регистрация компонентов</h2>
+
+<p>Приложение работает на Spring Boot, но servlet-компоненты регистрируются не как Spring beans, а через стандартные jakarta.servlet-аннотации.</p>
+
+<pre><code>@SpringBootApplication
+@ServletComponentScan
+public class ServletsApplication {
+  public static void main(String[] args) {
+    SpringApplication.run(ServletsApplication.class, args);
+  }
+}</code></pre>
+
+<table>
+  <tr>
+    <th>Аннотация</th>
+    <th>Назначение</th>
+    <th>Пример</th>
+  </tr>
+  <tr>
+    <td><code>@ServletComponentScan</code></td>
+    <td>Включает поиск servlet-компонентов</td>
+    <td><code>ServletsApplication</code></td>
+  </tr>
+  <tr>
+    <td><code>@WebServlet</code></td>
+    <td>Регистрирует сервлет</td>
+    <td><code>BasicHttpServlet</code>, <code>RequestApiServlet</code></td>
+  </tr>
+  <tr>
+    <td><code>@WebFilter</code></td>
+    <td>Регистрирует фильтр</td>
+    <td><code>LoggingFilter</code>, <code>TimingFilter</code></td>
+  </tr>
+  <tr>
+    <td><code>@WebListener</code></td>
+    <td>Регистрирует listener</td>
+    <td><code>ApplicationServletContextListener</code>, <code>DemoDataInitializer</code></td>
+  </tr>
+</table>
+
+<div class="mermaid">
+  flowchart LR
+  A["Spring Boot start"] --> B["ServletComponentScan"]
+  B --> C["scan WebServlet"]
+  B --> D["scan WebFilter"]
+  B --> E["scan WebListener"]
+  C --> F["Servlets registered"]
+  D --> G["Filters registered"]
+  E --> H["Listeners registered"]
+</div>
+
+<div class="note">
+  У нескольких сервлетов задан <code>loadOnStartup</code>. Это означает, что контейнер может инициализировать их уже при старте приложения, а не ждать первый запрос.
+</div>
+
+<h3>📁 Связанный код</h3>
+<ul>
+  <li><span class="file-link">ServletsApplication.java</span></li>
+  <li><span class="file-link">BasicHttpServlet.java</span></li>
+  <li><span class="file-link">RequestApiServlet.java</span></li>
+  <li><span class="file-link">ResponseApiServlet.java</span></li>
+  <li><span class="file-link">SessionCookieServlet.java</span></li>
+</ul>
+
+<hr class="section-divider"/>
+
+<h2 id="section3">3. Жизненный цикл сервлета и многопоточность</h2>
+
+<p>Сервлет обычно создается контейнером один раз и затем используется для обработки множества запросов.</p>
+
+<table>
+  <tr>
+    <th>Этап</th>
+    <th>Метод</th>
+    <th>Смысл</th>
+  </tr>
+  <tr>
+    <td>Инициализация</td>
+    <td><code>init()</code></td>
+    <td>Контейнер создает и подготавливает сервлет</td>
+  </tr>
+  <tr>
+    <td>Обработка</td>
+    <td><code>service()</code></td>
+    <td>Распределяет вызов в <code>doGet()</code>, <code>doPost()</code>, <code>doPut()</code> и т.д.</td>
+  </tr>
+  <tr>
+    <td>Завершение</td>
+    <td><code>destroy()</code></td>
+    <td>Контейнер уничтожает сервлет при остановке приложения</td>
+  </tr>
+</table>
+
+<div class="mermaid">
+  sequenceDiagram
+  participant Client
+  participant Container
+  participant Servlet
+
+  Container->>Servlet: init()
+  Client->>Container: HTTP request
+  Container->>Servlet: service(req, resp)
+  Servlet->>Servlet: doGet()/doPost()/doPut()/doDelete()
+  Servlet-->>Client: HTTP response
+  Container->>Servlet: destroy()
+</div>
+
+<h3>HTTP-методы в проекте</h3>
+<table>
+  <tr>
+    <th>Метод</th>
+    <th>Где показан</th>
+    <th>Что демонстрирует</th>
+  </tr>
+  <tr>
+    <td><code>GET</code></td>
+    <td>Практически все сервлеты</td>
+    <td>Чтение данных</td>
+  </tr>
+  <tr>
+    <td><code>POST</code></td>
+    <td><code>BasicHttpServlet</code>, <code>RequestApiServlet</code>, <code>SessionCookieServlet</code>, <code>ErrorHandlingServlet</code></td>
+    <td>Создание ресурса / чтение body / установка session attributes</td>
+  </tr>
+  <tr>
+    <td><code>PUT</code></td>
+    <td><code>BasicHttpServlet</code></td>
+    <td>Обновление ресурса</td>
+  </tr>
+  <tr>
+    <td><code>DELETE</code></td>
+    <td><code>BasicHttpServlet</code>, <code>SessionCookieServlet</code></td>
+    <td>Удаление ресурса / удаление session attribute</td>
+  </tr>
+  <tr>
+    <td><code>OPTIONS</code></td>
+    <td><code>BasicHttpServlet</code></td>
+    <td>Разрешенные методы и заголовки</td>
+  </tr>
+  <tr>
+    <td><code>HEAD</code></td>
+    <td><code>BasicHttpServlet</code></td>
+    <td>Ответ без body</td>
+  </tr>
+</table>
+
+<div class="warn">
+  <strong>Важно про потоки:</strong> один экземпляр сервлета может обрабатывать много запросов одновременно. Поэтому нельзя хранить данные конкретного запроса в полях сервлета.
+</div>
+
+<div class="good">
+  В проекте это учтено правильно:
+  <ul>
+    <li>данные запроса живут в локальных переменных методов;</li>
+    <li>общие демо-данные лежат в <code>ServletContext</code>;</li>
+    <li>для них используются потокобезопасные структуры: <code>ConcurrentHashMap</code> и <code>AtomicLong</code>.</li>
+  </ul>
+</div>
+
+<h3>📁 Связанный код</h3>
+<ul>
+  <li><span class="file-link">BasicHttpServlet.java</span></li>
+  <li><span class="file-link">DemoDataInitializer.java</span></li>
+</ul>
+
+<hr class="section-divider"/>
+
+<h2 id="section4">4. HttpServletRequest и области данных</h2>
+
+<p><code>HttpServletRequest</code> содержит все, что пришло от клиента: метод, URI, query-параметры, заголовки, body, cookies, атрибуты, сессию.</p>
+
+<h3>Что показывает RequestApiServlet</h3>
+<table>
+  <tr>
+    <th>Метод API</th>
+    <th>Что делает</th>
+    <th>Где используется</th>
+  </tr>
+  <tr>
+    <td><code>getMethod()</code></td>
+    <td>Возвращает HTTP-метод</td>
+    <td><code>RequestApiServlet#doGet</code></td>
+  </tr>
+  <tr>
+    <td><code>getRequestURI()</code></td>
+    <td>URI запроса</td>
+    <td><code>RequestInfo</code></td>
+  </tr>
+  <tr>
+    <td><code>getContextPath()</code></td>
+    <td>Контекст приложения</td>
+    <td><code>RequestInfo</code></td>
+  </tr>
+  <tr>
+    <td><code>getServletPath()</code></td>
+    <td>Путь к сервлету</td>
+    <td><code>RequestInfo</code></td>
+  </tr>
+  <tr>
+    <td><code>getParameterMap()</code></td>
+    <td>Все query/form параметры</td>
+    <td><code>RequestApiServlet#doGet</code></td>
+  </tr>
+  <tr>
+    <td><code>getHeaderNames()</code>, <code>getHeader()</code></td>
+    <td>Чтение заголовков</td>
+    <td><code>RequestApiServlet#doGet</code></td>
+  </tr>
+  <tr>
+    <td><code>getReader()</code></td>
+    <td>Чтение body как текста</td>
+    <td><code>RequestApiServlet#doPost</code></td>
+  </tr>
+  <tr>
+    <td><code>getAttribute()</code>, <code>setAttribute()</code></td>
+    <td>Работа с атрибутами запроса</td>
+    <td>listeners и forward-сценарии</td>
+  </tr>
+</table>
+
+<pre><code>ApiModels.RequestInfo requestInfo = new ApiModels.RequestInfo(
+    req.getMethod(),
+    req.getRequestURI(),
+    req.getContextPath(),
+    req.getServletPath(),
+    req.getQueryString(),
+    parameterMap,
+    headers,
+    req.getRemoteAddr(),
+    req.getRemotePort(),
+    req.getProtocol(),
+    req.getScheme()
+);</code></pre>
+
+<h3>Области хранения данных</h3>
+<table>
+  <tr>
+    <th>Scope</th>
+    <th>Где живет</th>
+    <th>Пример в проекте</th>
+  </tr>
+  <tr>
+    <td>Request scope</td>
+    <td>Только в рамках одного HTTP-запроса</td>
+    <td><code>requestStartTime</code>, <code>forwardedFrom</code>, <code>customAttr</code></td>
+  </tr>
+  <tr>
+    <td>Session scope</td>
+    <td>Между запросами одного клиента</td>
+    <td>атрибуты в <code>SessionCookieServlet</code></td>
+  </tr>
+  <tr>
+    <td>Application scope</td>
+    <td>На все приложение</td>
+    <td><code>demoProducts</code>, <code>appStartTime</code></td>
+  </tr>
+</table>
+
+<div class="mermaid">
+  flowchart TB
+  A["HTTP request"] --> B["ApplicationServletRequestListener"]
+  B --> C["requestStartTime attribute added"]
+  C --> D["Servlet or Controller"]
+  D --> E["RequestApiServlet reads params, headers and attributes"]
+</div>
+
+<div class="note">
+  <strong>Интересный момент:</strong> в forward-сценариях атрибуты запроса сохраняются. Именно поэтому в <code>/api/forward/with-attributes</code> можно передать атрибуты и затем увидеть их в <code>/api/request</code>.
+</div>
+
+<h3>📁 Связанный код</h3>
+<ul>
+  <li><span class="file-link">RequestApiServlet.java</span></li>
+  <li><span class="file-link">ApplicationServletRequestListener.java</span></li>
+  <li><span class="file-link">ApiModels.java</span> — <code>RequestInfo</code></li>
+</ul>
+
+<hr class="section-divider"/>
+
+<h2 id="section5">5. HttpServletResponse и формат API-ответов</h2>
+
+<p><code>HttpServletResponse</code> отвечает за то, что именно получит клиент: статус, заголовки, тип контента, кодировку, redirect и тело ответа.</p>
+
+<h3>Что показывает ResponseApiServlet</h3>
+<table>
+  <tr>
+    <th>Метод API</th>
+    <th>Смысл</th>
+    <th>Где показан</th>
+  </tr>
+  <tr>
+    <td><code>setStatus(code)</code></td>
+    <td>Установить HTTP статус</td>
+    <td><code>/api/response/status/{code}</code></td>
+  </tr>
+  <tr>
+    <td><code>setHeader(name, value)</code></td>
+    <td>Добавить заголовки</td>
+    <td><code>/api/response/headers</code></td>
+  </tr>
+  <tr>
+    <td><code>setContentType(type)</code></td>
+    <td>Тип тела ответа</td>
+    <td><code>/api/response/content</code></td>
+  </tr>
+  <tr>
+    <td><code>setCharacterEncoding("UTF-8")</code></td>
+    <td>Кодировка ответа</td>
+    <td><code>/api/response/encoding</code></td>
+  </tr>
+  <tr>
+    <td><code>sendRedirect(to)</code></td>
+    <td>Клиентский redirect</td>
+    <td><code>/api/response/redirect</code></td>
+  </tr>
+  <tr>
+    <td><code>setBufferSize()</code>, <code>resetBuffer()</code></td>
+    <td>Управление буфером</td>
+    <td><code>/api/response/buffer</code></td>
+  </tr>
+  <tr>
+    <td><code>getWriter()</code></td>
+    <td>Запись текстового тела</td>
+    <td>Во всех JSON-ответах</td>
+  </tr>
+</table>
+
+<h3>Единый формат ответов</h3>
+<p>В проекте есть отдельные record-модели для API-ответов в файле <code>ApiModels.java</code>.</p>
+
+<table>
+  <tr>
+    <th>Модель</th>
+    <th>Назначение</th>
+  </tr>
+  <tr>
+    <td><code>HttpResponse</code></td>
+    <td>Успешный ответ: статус, сообщение, данные, timestamp</td>
+  </tr>
+  <tr>
+    <td><code>ErrorResponse</code></td>
+    <td>Ошибка: статус, тип ошибки, сообщение, path, timestamp</td>
+  </tr>
+  <tr>
+    <td><code>CookieInfo</code>, <code>SessionInfo</code>, <code>RequestInfo</code></td>
+    <td>DTO для демонстрации Servlet API</td>
+  </tr>
+</table>
+
+<h3>Пример успешного ответа</h3>
+<pre><code>{
+  "status": 200,
+  "message": "Products retrieved successfully",
+  "data": {
+    "1": {
+      "id": 1,
+      "name": "Smartphone X"
+    }
+  },
+  "timestamp": "2026-03-25T12:00:00Z"
+}</code></pre>
+
+<h3>Пример ответа с ошибкой</h3>
+<pre><code>{
+  "status": 404,
+  "error": "Not Found",
+  "message": "Product not found",
+  "path": "/api/basic/products/999",
+  "timestamp": 1710000000000
+}</code></pre>
+
+<div class="good">
+  <strong>Практический смысл:</strong> единый формат ответа делает API предсказуемым и удобным для тестов и frontend-клиентов.
+</div>
+
+<h3>📁 Связанный код</h3>
+<ul>
+  <li><span class="file-link">ResponseApiServlet.java</span></li>
+  <li><span class="file-link">ApiModels.java</span></li>
+  <li><span class="file-link">BasicHttpServlet.java</span> — успешные и error-ответы</li>
+  <li><span class="file-link">ErrorHandlingServlet.java</span> — error-ответы</li>
+</ul>
+
+<hr class="section-divider"/>
+
+<h2 id="section6">6. CRUD-сервлет и хранение данных в ServletContext</h2>
+
+<p><code>BasicHttpServlet</code> — это основная CRUD-демонстрация на чистом <code>HttpServlet</code>.</p>
+
+<div class="endpoint">GET /api/basic/products</div>
+<div class="endpoint">GET /api/basic/products/{id}</div>
+<div class="endpoint">POST /api/basic/products</div>
+<div class="endpoint">PUT /api/basic/products/{id}</div>
+<div class="endpoint">DELETE /api/basic/products/{id}</div>
+
+<h3>Как устроены данные</h3>
+<p>В проекте нет БД — данные создаются в памяти приложения через <code>DemoDataInitializer</code>, который реализует <code>ServletContextListener</code>.</p>
+
+<table>
+  <tr>
+    <th>Данные</th>
+    <th>Где хранятся</th>
+    <th>Зачем</th>
+  </tr>
+  <tr>
+    <td>Товары</td>
+    <td><code>ServletContext["demoProducts"]</code></td>
+    <td>Общий in-memory store для CRUD</td>
+  </tr>
+  <tr>
+    <td>Категории</td>
+    <td><code>ServletContext["demoCategories"]</code></td>
+    <td>Справочные данные</td>
+  </tr>
+  <tr>
+    <td>Теги</td>
+    <td><code>ServletContext["demoTags"]</code></td>
+    <td>Справочные данные</td>
+  </tr>
+  <tr>
+    <td>Генератор id</td>
+    <td><code>ServletContext["productIdGenerator"]</code></td>
+    <td><code>AtomicLong</code> для создания новых id</td>
+  </tr>
+</table>
+
+<div class="mermaid">
+  flowchart LR
+  A[Application start] --> B[DemoDataInitializer]
+  B --> C[ServletContext]
+  C --> D[demoProducts: ConcurrentHashMap]
+  C --> E[productIdGenerator: AtomicLong]
+  F[BasicHttpServlet] --> C
+</div>
+
+<h3>Модель данных</h3>
+<ul>
+  <li><span class="file-link">Product.java</span> — товар</li>
+  <li><span class="file-link">Category.java</span> — категория</li>
+  <li><span class="file-link">Tag.java</span> — тег</li>
+</ul>
+
+<div class="note">
+  <strong>Полезная деталь:</strong> <code>Product</code> — это Java record. В его конструкторе есть нормализация: если <code>tags == null</code>, то используется <code>emptySet()</code>. Это делает JSON-модель стабильнее.
+</div>
+
+<h3>Как выглядит CRUD по методам</h3>
+<table>
+  <tr>
+    <th>Метод сервлета</th>
+    <th>Смысл</th>
+  </tr>
+  <tr>
+    <td><code>doGet()</code></td>
+    <td>Вернуть список товаров или товар по id</td>
+  </tr>
+  <tr>
+    <td><code>doPost()</code></td>
+    <td>Прочитать JSON, создать новый товар, вернуть <code>201 Created</code></td>
+  </tr>
+  <tr>
+    <td><code>doPut()</code></td>
+    <td>Обновить товар по id</td>
+  </tr>
+  <tr>
+    <td><code>doDelete()</code></td>
+    <td>Удалить товар по id</td>
+  </tr>
+  <tr>
+    <td><code>doOptions()</code></td>
+    <td>Показать разрешенные методы и заголовки</td>
+  </tr>
+  <tr>
+    <td><code>doHead()</code></td>
+    <td>Вернуть только заголовки без тела</td>
+  </tr>
+</table>
+
+<div class="good">
+  Это хороший учебный пример того, как REST-подобный API можно реализовать без Spring MVC, только средствами <code>HttpServlet</code>.
+</div>
+
+<h3>📁 Связанный код</h3>
+<ul>
+  <li><span class="file-link">BasicHttpServlet.java</span></li>
+  <li><span class="file-link">DemoDataInitializer.java</span></li>
+  <li><span class="file-link">Product.java</span></li>
+  <li><span class="file-link">Category.java</span></li>
+  <li><span class="file-link">Tag.java</span></li>
+</ul>
+
+<div class="note">
+  <strong>Тест:</strong> <span class="file-link">Section1_BasicHttpServletTest.java</span>
+</div>
+
+<hr class="section-divider"/>
+
+<h2 id="section7">7. Session и Cookie API</h2>
+
+<p>HTTP по своей природе stateless, поэтому для хранения состояния между запросами используется <code>HttpSession</code>. Cookies помогают клиенту идентифицироваться между запросами.</p>
+
+<div class="endpoint">GET /api/session</div>
+<div class="endpoint">GET /api/session/create</div>
+<div class="endpoint">GET /api/session/invalidate</div>
+<div class="endpoint">GET /api/session/attributes</div>
+<div class="endpoint">GET /api/session/cookies</div>
+<div class="endpoint">POST /api/session</div>
+<div class="endpoint">DELETE /api/session?key=name</div>
+
+<table>
+  <tr>
+    <th>API</th>
+    <th>Смысл</th>
+    <th>Где показан</th>
+  </tr>
+  <tr>
+    <td><code>req.getSession(true)</code></td>
+    <td>Создать/получить сессию</td>
+    <td><code>/api/session/create</code>, <code>POST /api/session</code></td>
+  </tr>
+  <tr>
+    <td><code>req.getSession(false)</code></td>
+    <td>Получить существующую без создания</td>
+    <td><code>/api/session</code>, <code>/invalidate</code></td>
+  </tr>
+  <tr>
+    <td><code>session.setAttribute()</code></td>
+    <td>Сохранить данные в сессии</td>
+    <td><code>handleSetAttribute</code></td>
+  </tr>
+  <tr>
+    <td><code>session.invalidate()</code></td>
+    <td>Уничтожить сессию</td>
+    <td><code>/api/session/invalidate</code></td>
+  </tr>
+  <tr>
+    <td><code>resp.addCookie(cookie)</code></td>
+    <td>Отправить cookie клиенту</td>
+    <td><code>handleCreateSession</code></td>
+  </tr>
+  <tr>
+    <td><code>req.getCookies()</code></td>
+    <td>Прочитать cookies</td>
+    <td><code>/api/session</code>, <code>/cookies</code></td>
+  </tr>
+</table>
+
+<div class="mermaid">
+  sequenceDiagram
+  participant Client
+  participant Servlet as SessionCookieServlet
+  participant Session as HttpSession
+
+  Client->>Servlet: GET /api/session/create
+  Servlet->>Session: req.getSession(true)
+  Servlet->>Session: setAttribute(createdAt, userAgent)
+  Servlet-->>Client: Set-Cookie + JSON
+
+  Client->>Servlet: GET /api/session
+  Servlet->>Session: req.getSession(false)
+  Servlet-->>Client: SessionInfo + CookieInfo
+
+  Client->>Servlet: GET /api/session/invalidate
+  Servlet->>Session: invalidate()
+  Servlet-->>Client: remove cookie + JSON
+</div>
+
+<div class="note">
+  В проекте есть отдельные DTO:
+  <ul>
+    <li><code>ApiModels.SessionInfo</code></li>
+    <li><code>ApiModels.CookieInfo</code></li>
+  </ul>
+  Это делает демонстрацию наглядной: сессия и cookies возвращаются в удобном JSON-виде.
+</div>
+
+<div class="good">
+  <strong>Связь с listeners:</strong> создание и уничтожение сессий отслеживает <code>ApplicationHttpSessionListener</code>, который считает активные сессии через <code>AtomicInteger</code>.
+</div>
+
+<h3>📁 Связанный код</h3>
+<ul>
+  <li><span class="file-link">SessionCookieServlet.java</span></li>
+  <li><span class="file-link">ApiModels.java</span> — <code>SessionInfo</code>, <code>CookieInfo</code></li>
+  <li><span class="file-link">ApplicationHttpSessionListener.java</span></li>
+</ul>
+
+<div class="note">
+  <strong>Тест:</strong> <span class="file-link">Section4_SessionCookieTest.java</span>
+</div>
+
+<hr class="section-divider"/>
+
+<h2 id="section8">8. Filters</h2>
+
+<p>Фильтр — это промежуточный слой, который может выполнить код до и после обработки запроса сервлетом или контроллером.</p>
+
+<div class="mermaid">
+  flowchart LR
+  A[Client request] --> B[LoggingFilter]
+  B --> C[TimingFilter]
+  C --> D[Servlet / Controller]
+  D --> C
+  C --> B
+  B --> E[Response]
+</div>
+
+<table>
+  <tr>
+    <th>Фильтр</th>
+    <th>URL pattern</th>
+    <th>Что делает</th>
+  </tr>
+  <tr>
+    <td><code>LoggingFilter</code></td>
+    <td><code>/*</code></td>
+    <td>Логирует вход и выход запроса, считает длительность</td>
+  </tr>
+  <tr>
+    <td><code>TimingFilter</code></td>
+    <td><code>/api/*</code></td>
+    <td>Отмечает медленные запросы</td>
+  </tr>
+</table>
+
+<h3>Ключевая идея Filter API</h3>
+<pre><code>public void doFilter(ServletRequest request,
+                     ServletResponse response,
+                     FilterChain chain) {
+    // код до сервлета
+    chain.doFilter(request, response);
+    // код после сервлета
+}</code></pre>
+
+<div class="note">
+  <code>LoggingFilter</code> также показывает использование <code>@WebInitParam</code>:
+  <ul>
+    <li><code>logHeaders=true</code></li>
+    <li><code>logParams=false</code></li>
+  </ul>
+  В текущем демо эти init-параметры читаются при <code>init()</code>, а сам фильтр логирует метод, URI и длительность запроса.
+</div>
+
+<div class="warn">
+  Фильтры полезны для сквозной логики: логирование, CORS, аутентификация, метрики, сжатие, кодировка, аудит.
+</div>
+
+<h3>📁 Связанный код</h3>
+<ul>
+  <li><span class="file-link">LoggingFilter.java</span></li>
+  <li><span class="file-link">TimingFilter.java</span></li>
+</ul>
+
+<div class="note">
+  <strong>Тест:</strong> <span class="file-link">Section8_FiltersTest.java</span>
+</div>
+
+<hr class="section-divider"/>
+
+<h2 id="section9">9. Listeners</h2>
+
+<p>Listeners реагируют на события жизненного цикла приложения, сессий и запросов.</p>
+
+<table>
+  <tr>
+    <th>Listener</th>
+    <th>Интерфейс</th>
+    <th>Что делает в проекте</th>
+  </tr>
+  <tr>
+    <td><code>ApplicationServletContextListener</code></td>
+    <td><code>ServletContextListener</code></td>
+    <td>Сохраняет <code>appStartTime</code> и логирует старт/остановку приложения</td>
+  </tr>
+  <tr>
+    <td><code>DemoDataInitializer</code></td>
+    <td><code>ServletContextListener</code></td>
+    <td>Инициализирует демо-данные в <code>ServletContext</code></td>
+  </tr>
+  <tr>
+    <td><code>ApplicationHttpSessionListener</code></td>
+    <td><code>HttpSessionListener</code></td>
+    <td>Считает количество активных сессий</td>
+  </tr>
+  <tr>
+    <td><code>ApplicationServletRequestListener</code></td>
+    <td><code>ServletRequestListener</code></td>
+    <td>Сохраняет время начала запроса</td>
+  </tr>
+</table>
+
+<div class="mermaid">
+  flowchart TB
+  A[Application start] --> B[ServletContextListeners]
+  B --> C[appStartTime]
+  B --> D[demoProducts/demoCategories/demoTags]
+
+  E[New HTTP request] --> F[ServletRequestListener]
+  F --> G[requestStartTime]
+
+  H[New session] --> I[HttpSessionListener]
+  I --> J[activeSessions++]
+</div>
+
+<div class="note">
+  <strong>Точность по коду:</strong> в <code>ApplicationServletRequestListener</code> длительность запроса вычисляется, но вывод в консоль сейчас закомментирован. То есть listener уже собирает данные, но не шумит логами.
+</div>
+
+<div class="good">
+  <code>DemoController</code> использует <code>ApplicationHttpSessionListener.getActiveSessionCount()</code>, чтобы отдать число активных сессий в <code>/api/demo/listener-api</code>.
+</div>
+
+<h3>📁 Связанный код</h3>
+<ul>
+  <li><span class="file-link">ApplicationServletContextListener.java</span></li>
+  <li><span class="file-link">DemoDataInitializer.java</span></li>
+  <li><span class="file-link">ApplicationHttpSessionListener.java</span></li>
+  <li><span class="file-link">ApplicationServletRequestListener.java</span></li>
+</ul>
+
+<div class="note">
+  <strong>Тест:</strong> <span class="file-link">Section9_ListenersTest.java</span>
+</div>
+
+<hr class="section-divider"/>
+
+<h2 id="section10">10. Forward vs Redirect</h2>
+
+<p>Обе техники переводят пользователя в другой обработчик, но механика у них принципиально разная.</p>
+
+<table>
+  <tr>
+    <th>Критерий</th>
+    <th>Forward</th>
+    <th>Redirect</th>
+  </tr>
+  <tr>
+    <td>Где происходит</td>
+    <td>На сервере</td>
+    <td>На клиенте</td>
+  </tr>
+  <tr>
+    <td>URL в браузере</td>
+    <td>Не меняется</td>
+    <td>Меняется</td>
+  </tr>
+  <tr>
+    <td>Атрибуты request</td>
+    <td>Сохраняются</td>
+    <td>Теряются, потому что идет новый запрос</td>
+  </tr>
+  <tr>
+    <td>Количество HTTP-запросов</td>
+    <td>Один</td>
+    <td>Минимум два</td>
+  </tr>
+  <tr>
+    <td>Инструмент</td>
+    <td><code>RequestDispatcher.forward()</code></td>
+    <td><code>sendRedirect()</code> или статус + <code>Location</code></td>
+  </tr>
+</table>
+
+<div class="mermaid">
+  sequenceDiagram
+  participant Client
+  participant Server
+
+  Note over Client,Server: Forward
+  Client->>Server: GET /api/forward/with-attributes
+  Server->>Server: request.setAttribute(...)
+  Server->>Server: forward("/api/request")
+  Server-->>Client: one final response
+
+  Note over Client,Server: Redirect
+  Client->>Server: GET /api/redirect/temporary
+  Server-->>Client: 302 + Location: /api/demo
+  Client->>Server: GET /api/demo
+  Server-->>Client: new response
+</div>
+
+<h3>Что показывает код</h3>
+<ul>
+  <li><code>/api/forward/to-welcome</code> — серверный forward</li>
+  <li><code>/api/forward/with-attributes</code> — forward с атрибутами запроса</li>
+  <li><code>/api/forward/chain</code> — цепочка forward</li>
+  <li><code>/api/forward/loop</code> — защита от бесконечного цикла</li>
+  <li><code>/api/redirect/temporary</code> — 302</li>
+  <li><code>/api/redirect/permanent</code> — 301</li>
+  <li><code>/api/redirect/see-other</code> — 303</li>
+</ul>
+
+<div class="note">
+  В <code>ForwardRedirectServlet</code> redirect показан вручную через установку статуса и заголовка <code>Location</code>, а в <code>ResponseApiServlet</code> есть отдельная демонстрация через <code>resp.sendRedirect(to)</code>.
+</div>
+
+<h3>📁 Связанный код</h3>
+<ul>
+  <li><span class="file-link">ForwardRedirectServlet.java</span></li>
+  <li><span class="file-link">ResponseApiServlet.java</span> — <code>sendRedirect()</code></li>
+</ul>
+
+<div class="note">
+  <strong>Тест:</strong> <span class="file-link">Section5_ForwardRedirectTest.java</span>
+</div>
+
+<hr class="section-divider"/>
+
+<h2 id="section11">11. Обработка ошибок</h2>
+
+<p><code>ErrorHandlingServlet</code> показывает два подхода:</p>
+<ul>
+  <li>явно вернуть JSON-ошибку со статусом;</li>
+  <li>намеренно выбросить исключение, чтобы увидеть поведение контейнера/фреймворка.</li>
+</ul>
+
+<div class="endpoint">GET /api/error</div>
+<div class="endpoint">GET /api/error/bad-request</div>
+<div class="endpoint">GET /api/error/not-found</div>
+<div class="endpoint">GET /api/error/forbidden</div>
+<div class="endpoint">GET /api/error/server-error</div>
+<div class="endpoint">GET /api/error/runtime</div>
+<div class="endpoint">GET /api/error/illegal-argument</div>
+<div class="endpoint">GET /api/error/null-pointer</div>
+<div class="endpoint">POST /api/error</div>
+
+<table>
+  <tr>
+    <th>Сценарий</th>
+    <th>Что происходит</th>
+  </tr>
+  <tr>
+    <td><code>/bad-request</code></td>
+    <td>Возвращается <code>400</code> с <code>ErrorResponse</code></td>
+  </tr>
+  <tr>
+    <td><code>/not-found</code></td>
+    <td>Возвращается <code>404</code> с <code>ErrorResponse</code></td>
+  </tr>
+  <tr>
+    <td><code>/forbidden</code></td>
+    <td>Возвращается <code>403</code></td>
+  </tr>
+  <tr>
+    <td><code>/server-error</code></td>
+    <td>Возвращается <code>500</code></td>
+  </tr>
+  <tr>
+    <td><code>/runtime</code>, <code>/illegal-argument</code>, <code>/null-pointer</code></td>
+    <td>Сервлет намеренно бросает исключения</td>
+  </tr>
+  <tr>
+    <td><code>POST /api/error</code></td>
+    <td>Проверяется <code>Content-Type</code> и обязательное поле <code>name</code></td>
+  </tr>
+</table>
+
+<h3>Ключевая идея</h3>
+<pre><code>private void sendErrorResponse(HttpServletResponse resp,
+                               int status,
+                               String error,
+                               String message,
+                               String path) throws IOException {
+    ApiModels.ErrorResponse errorResponse =
+        new ApiModels.ErrorResponse(status, error, message, path);
+    resp.setStatus(status);
+    sendJsonResponse(resp, errorResponse);
+}</code></pre>
+
+<div class="warn">
+  <strong>Практический смысл:</strong> вместо HTML error page клиент получает предсказуемый JSON. Это важно для REST API, автотестов и frontend-приложений.
+</div>
+
+<h3>📁 Связанный код</h3>
+<ul>
+  <li><span class="file-link">ErrorHandlingServlet.java</span></li>
+  <li><span class="file-link">ApiModels.java</span> — <code>ErrorResponse</code></li>
+</ul>
+
+<div class="note">
+  <strong>Тест:</strong> <span class="file-link">Section6_ErrorHandlingTest.java</span>
+</div>
+
+<hr class="section-divider"/>
+
+<h2 id="section12">12. Spring MVC внутри servlet-приложения</h2>
+
+<p><code>DemoController</code> — это не сервлет, а Spring MVC <code>@RestController</code>. Он нужен как обзорный слой документации и справочных endpoint'ов.</p>
+
+<table>
+  <tr>
+    <th>Подход</th>
+    <th>Пример</th>
+    <th>Особенность</th>
+  </tr>
+  <tr>
+    <td>Чистый Servlet API</td>
+    <td><code>BasicHttpServlet</code>, <code>RequestApiServlet</code></td>
+    <td>Явно работаем с <code>HttpServletRequest</code>/<code>HttpServletResponse</code></td>
+  </tr>
+  <tr>
+    <td>Spring MVC</td>
+    <td><code>DemoController</code></td>
+    <td>Удобнее для декларативных HTTP endpoint'ов</td>
+  </tr>
+</table>
+
+<div class="mermaid">
+  graph LR
+  A[Servlet API] --> B[Low-level control]
+  C[Spring MVC] --> D[High-level abstraction]
+  B --> E[Same HTTP infrastructure]
+  D --> E
+</div>
+
+<h3>Обзорные endpoint'ы</h3>
+<div class="endpoint">GET /api/demo</div>
+<div class="endpoint">GET /api/demo/servlet-api</div>
+<div class="endpoint">GET /api/demo/request-api</div>
+<div class="endpoint">GET /api/demo/response-api</div>
+<div class="endpoint">GET /api/demo/session-api</div>
+<div class="endpoint">GET /api/demo/filter-api</div>
+<div class="endpoint">GET /api/demo/listener-api</div>
+<div class="endpoint">GET /api/demo/forward-redirect</div>
+<div class="endpoint">GET /api/demo/error-handling</div>
+
+<div class="good">
+  Это полезно для обучения: один и тот же проект показывает и низкоуровневую servlet-модель, и более привычную spring-модель.
+</div>
+
+<h3>📁 Связанный код</h3>
+<ul>
+  <li><span class="file-link">DemoController.java</span></li>
+</ul>
+
+<div class="note">
+  <strong>Тест:</strong> <span class="file-link">Section7_DemoControllerTest.java</span>
+</div>
+
+<hr class="section-divider"/>
+
+<h2 id="section13">13. Структура проекта</h2>
+
+<pre><code>src/main/java/com/example/servlets/
+├── ServletsApplication.java
+├── config/
+│   └── DemoDataInitializer.java
+├── controller/
+│   └── DemoController.java
+├── filter/
+│   ├── LoggingFilter.java
+│   └── TimingFilter.java
+├── listener/
+│   ├── ApplicationHttpSessionListener.java
+│   ├── ApplicationServletContextListener.java
+│   └── ApplicationServletRequestListener.java
+├── model/
+│   ├── ApiModels.java
+│   ├── Category.java
+│   ├── Product.java
+│   └── Tag.java
+└── servlet/
+    ├── BasicHttpServlet.java
+    ├── ErrorHandlingServlet.java
+    ├── ForwardRedirectServlet.java
+    ├── RequestApiServlet.java
+    ├── ResponseApiServlet.java
+    └── SessionCookieServlet.java
+
+src/test/java/com/example/servlets/
+├── Section1_BasicHttpServletTest.java
+├── Section2_RequestApiTest.java
+├── Section3_ResponseApiTest.java
+├── Section4_SessionCookieTest.java
+├── Section5_ForwardRedirectTest.java
+├── Section6_ErrorHandlingTest.java
+├── Section7_DemoControllerTest.java
+├── Section8_FiltersTest.java
+└── Section9_ListenersTest.java
+
+src/main/resources/
+├── application.yaml
+└── static/
+    └── index.html</code></pre>
+
+<hr class="section-divider"/>
+
+<h2 id="section14">14. Endpoint'ы и тесты</h2>
+
+<h3>Главная документация</h3>
+<div class="endpoint">GET /</div>
+<div class="endpoint">GET /index.html</div>
+
+<h3>Обзор Servlet API через Spring MVC</h3>
+<div class="endpoint">GET /api/demo</div>
+<div class="endpoint">GET /api/demo/servlet-api</div>
+<div class="endpoint">GET /api/demo/request-api</div>
+<div class="endpoint">GET /api/demo/response-api</div>
+<div class="endpoint">GET /api/demo/session-api</div>
+<div class="endpoint">GET /api/demo/filter-api</div>
+<div class="endpoint">GET /api/demo/listener-api</div>
+<div class="endpoint">GET /api/demo/forward-redirect</div>
+<div class="endpoint">GET /api/demo/error-handling</div>
+
+<h3>CRUD товаров</h3>
+<div class="endpoint">GET /api/basic/products</div>
+<div class="endpoint">GET /api/basic/products/{id}</div>
+<div class="endpoint">POST /api/basic/products</div>
+<div class="endpoint">PUT /api/basic/products/{id}</div>
+<div class="endpoint">DELETE /api/basic/products/{id}</div>
+
+<h3>Request API</h3>
+<div class="endpoint">GET /api/request</div>
+<div class="endpoint">POST /api/request</div>
+
+<h3>Response API</h3>
+<div class="endpoint">GET /api/response</div>
+<div class="endpoint">GET /api/response/status/{code}</div>
+<div class="endpoint">GET /api/response/headers</div>
+<div class="endpoint">GET /api/response/content?type=html|text|xml</div>
+<div class="endpoint">GET /api/response/redirect?to=/path</div>
+<div class="endpoint">GET /api/response/encoding</div>
+<div class="endpoint">GET /api/response/buffer</div>
+
+<h3>Session / Cookie API</h3>
+<div class="endpoint">GET /api/session</div>
+<div class="endpoint">GET /api/session/create</div>
+<div class="endpoint">GET /api/session/invalidate</div>
+<div class="endpoint">GET /api/session/attributes</div>
+<div class="endpoint">GET /api/session/cookies</div>
+<div class="endpoint">POST /api/session</div>
+<div class="endpoint">DELETE /api/session?key=name</div>
+
+<h3>Forward / Redirect</h3>
+<div class="endpoint">GET /api/forward</div>
+<div class="endpoint">GET /api/forward/to-welcome</div>
+<div class="endpoint">GET /api/forward/with-attributes</div>
+<div class="endpoint">GET /api/forward/chain</div>
+<div class="endpoint">GET /api/forward/loop</div>
+<div class="endpoint">GET /api/redirect</div>
+<div class="endpoint">GET /api/redirect/temporary</div>
+<div class="endpoint">GET /api/redirect/permanent</div>
+<div class="endpoint">GET /api/redirect/see-other</div>
+
+<h3>Error Handling</h3>
+<div class="endpoint">GET /api/error</div>
+<div class="endpoint">GET /api/error/bad-request</div>
+<div class="endpoint">GET /api/error/not-found</div>
+<div class="endpoint">GET /api/error/forbidden</div>
+<div class="endpoint">GET /api/error/server-error</div>
+<div class="endpoint">GET /api/error/runtime</div>
+<div class="endpoint">GET /api/error/illegal-argument</div>
+<div class="endpoint">GET /api/error/null-pointer</div>
+<div class="endpoint">POST /api/error</div>
+
+<h3>Тесты</h3>
+<table>
+  <tr>
+    <th>Тест</th>
+    <th>Что покрывает</th>
+  </tr>
+  <tr>
+    <td><code>Section1_BasicHttpServletTest</code></td>
+    <td>CRUD и HTTP методы</td>
+  </tr>
+  <tr>
+    <td><code>Section2_RequestApiTest</code></td>
+    <td>Request API</td>
+  </tr>
+  <tr>
+    <td><code>Section3_ResponseApiTest</code></td>
+    <td>Response API</td>
+  </tr>
+  <tr>
+    <td><code>Section4_SessionCookieTest</code></td>
+    <td>Session и cookies</td>
+  </tr>
+  <tr>
+    <td><code>Section5_ForwardRedirectTest</code></td>
+    <td>Forward / redirect</td>
+  </tr>
+  <tr>
+    <td><code>Section6_ErrorHandlingTest</code></td>
+    <td>Ошибки и статус-коды</td>
+  </tr>
+  <tr>
+    <td><code>Section7_DemoControllerTest</code></td>
+    <td>Обзорные Spring MVC endpoint'ы</td>
+  </tr>
+  <tr>
+    <td><code>Section8_FiltersTest</code></td>
+    <td>Фильтры</td>
+  </tr>
+  <tr>
+    <td><code>Section9_ListenersTest</code></td>
+    <td>Listeners</td>
+  </tr>
+</table>
+
+<div class="summary-box">
+  <h3>Финальное резюме</h3>
+  <p>
+    Этот проект показывает базовые механизмы Servlet API не в отрыве от практики, а через конкретный код:
+  </p>
+  <ul>
+    <li><strong>Servlets</strong> — обработка HTTP-методов и CRUD;</li>
+    <li><strong>Request/Response</strong> — доступ к данным запроса и формирование ответа;</li>
+    <li><strong>Session/Cookie</strong> — хранение состояния между запросами;</li>
+    <li><strong>Filters</strong> — сквозная обработка;</li>
+    <li><strong>Listeners</strong> — реакция на события жизненного цикла;</li>
+    <li><strong>Forward/Redirect</strong> — два разных способа перенаправления;</li>
+    <li><strong>Error handling</strong> — статус-коды, JSON-ошибки и исключения;</li>
+    <li><strong>Spring MVC</strong> — более высокий уровень поверх той же HTTP-инфраструктуры.</li>
+  </ul>
+  <p>
+    Главное, что полезно вынести: <strong>Spring Web не отменяет Servlet API, а строится поверх него</strong>. Этот проект помогает увидеть основу.
+  </p>
+</div>
+
 </body>
 </html>

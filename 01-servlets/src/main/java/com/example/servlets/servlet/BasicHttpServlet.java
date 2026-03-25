@@ -3,6 +3,7 @@ package com.example.servlets.servlet;
 import com.example.servlets.config.DemoDataInitializer;
 import com.example.servlets.model.ApiModels;
 import com.example.servlets.model.Product;
+import com.example.servlets.util.JsonUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.ServletException;
@@ -22,7 +23,7 @@ import java.util.concurrent.atomic.AtomicLong;
 @WebServlet(urlPatterns = {"/api/basic/products/*", "/api/basic/products"}, loadOnStartup = 1)
 public class BasicHttpServlet extends HttpServlet {
 
-  private final ObjectMapper objectMapper = new ObjectMapper();
+  private final ObjectMapper objectMapper = JsonUtils.objectMapper();
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {

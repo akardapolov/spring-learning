@@ -1,6 +1,7 @@
 package com.example.servlets.servlet;
 
 import com.example.servlets.model.ApiModels;
+import com.example.servlets.util.JsonUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.ServletException;
@@ -19,7 +20,7 @@ import java.util.Map;
 @WebServlet(urlPatterns = {"/api/response", "/api/response/*"}, loadOnStartup = 2)
 public class ResponseApiServlet extends HttpServlet {
 
-  private final ObjectMapper objectMapper = new ObjectMapper();
+  private final ObjectMapper objectMapper = JsonUtils.objectMapper();
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
