@@ -1,47 +1,1682 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Модуль в разработке</title>
+  <meta charset="UTF-8">
+  <title>Spring IoC Container — теория и демо</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'default',
+      securityLevel: 'loose',
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true
+      }
+    });
+  </script>
   <style>
     body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f7f7f8;
-      color: #222;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 20px;
+        line-height: 1.7;
+        color: #333;
+        background: #fafafa;
     }
-
-    .container {
-      text-align: center;
-      background: white;
-      padding: 40px 32px;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-      max-width: 500px;
-      width: 90%;
-    }
-
     h1 {
-      margin: 0 0 12px;
-      font-size: 28px;
+        color: #2c3e50;
+        border-bottom: 3px solid #2980b9;
+        padding-bottom: 10px;
     }
-
-    p {
-      margin: 0;
-      font-size: 16px;
-      color: #555;
+    h2 {
+        color: #2980b9;
+        margin-top: 50px;
+        border-left: 4px solid #3498db;
+        padding-left: 12px;
+    }
+    h3 {
+        color: #16a085;
+        margin-top: 28px;
+    }
+    h4 {
+        color: #8e44ad;
+        margin-top: 20px;
+    }
+    pre {
+        background: #2d2d2d;
+        color: #f8f8f2;
+        padding: 16px;
+        border-radius: 6px;
+        overflow-x: auto;
+        font-size: 14px;
+    }
+    code {
+        background: #ecf0f1;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 14px;
+    }
+    pre code {
+        background: none;
+        padding: 0;
+    }
+    .mermaid {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        margin: 16px 0;
+        overflow-x: auto;
+        text-align: center;
+    }
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 12px 0;
+        background: white;
+    }
+    th, td {
+        border: 1px solid #bdc3c7;
+        padding: 10px;
+        text-align: left;
+        vertical-align: top;
+    }
+    th {
+        background: #2980b9;
+        color: white;
+    }
+    a {
+        color: #2980b9;
+    }
+    .file-link {
+        background: #ebf5fb;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 13px;
+        display: inline-block;
+        margin: 2px 0;
+    }
+    .note {
+        background: #fef9e7;
+        border-left: 4px solid #f1c40f;
+        padding: 12px;
+        margin: 12px 0;
+        border-radius: 4px;
+    }
+    .good {
+        background: #eafaf1;
+        border-left: 4px solid #27ae60;
+        padding: 12px;
+        margin: 12px 0;
+        border-radius: 4px;
+    }
+    .warn {
+        background: #fffbeb;
+        border-left: 4px solid #d97706;
+        padding: 12px;
+        margin: 12px 0;
+        border-radius: 4px;
+    }
+    .danger {
+        background: #fdedec;
+        border-left: 4px solid #e74c3c;
+        padding: 12px;
+        margin: 12px 0;
+        border-radius: 4px;
+    }
+    .info {
+        background: #ebf5fb;
+        border-left: 4px solid #3498db;
+        padding: 12px;
+        margin: 12px 0;
+        border-radius: 4px;
+    }
+    .toc {
+        background: white;
+        border: 1px solid #dcdcdc;
+        border-radius: 8px;
+        padding: 18px;
+        margin: 20px 0 30px 0;
+    }
+    .toc ul {
+        margin: 0;
+        padding-left: 20px;
+    }
+    .toc ul ul {
+        padding-left: 16px;
+    }
+    .endpoint {
+        background: #eef6ff;
+        border: 1px solid #d6eaff;
+        border-radius: 6px;
+        padding: 10px 12px;
+        margin: 6px 0;
+        font-family: monospace;
+        font-size: 13px;
+    }
+    .endpoint a {
+        text-decoration: none;
+        color: #2563eb;
+    }
+    .endpoint a:hover {
+        text-decoration: underline;
+    }
+    .section-divider {
+        margin: 35px 0;
+        border: none;
+        border-top: 1px solid #ddd;
+    }
+    .card {
+        background: white;
+        border: 1px solid #dcdcdc;
+        border-radius: 12px;
+        padding: 18px 18px 16px;
+        margin: 16px 0;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Модуль в разработке</h1>
-    <p>Материалы для этого раздела скоро появятся.</p>
-  </div>
+
+<h1>Spring IoC Container — теория и демо</h1>
+<p>Теория, работающий код и тесты для демонстрации основ Spring Core: IoC контейнер, Dependency Injection, жизненный цикл бинов, профили, события и условные бины.</p>
+
+<div class="good">
+  <strong>Framework:</strong> Spring Boot 3.x + Spring Framework 6.x<br/>
+  <strong>Java:</strong> 21<br/>
+  <strong>Ключевые концепции:</strong> IoC, DI, Bean Scopes, Lifecycle, Events, Profiles, Conditional
+</div>
+
+<div class="toc">
+  <h3>Содержание</h3>
+  <ul>
+    <li><a href="#section1">1. Что такое IoC Container</a></li>
+    <li><a href="#section2">2. Dependency Injection — три способа инъекции</a></li>
+    <li><a href="#section3">3. Bean Scope — singleton vs prototype</a></li>
+    <li><a href="#section4">4. Lifecycle бина — @PostConstruct и @PreDestroy</a></li>
+    <li><a href="#section5">5. @Configuration и @Bean</a>
+      <ul>
+        <li><a href="#section5-1">5.1 @Primary — бин по умолчанию</a></li>
+        <li><a href="#section5-2">5.2 CGLIB-прокси для @Configuration</a></li>
+      </ul>
+    </li>
+    <li><a href="#section6">6. Стереотипы — @Component, @Service, @Repository</a></li>
+    <li><a href="#section7">7. @Autowired и @Qualifier</a>
+      <ul>
+        <li><a href="#section7-1">7.1 Алгоритм разрешения зависимостей</a></li>
+      </ul>
+    </li>
+    <li><a href="#section8">8. @Value и Property Injection</a></li>
+    <li><a href="#section9">9. ApplicationContextAware</a></li>
+    <li><a href="#section10">10. Профили (@Profile)</a></li>
+    <li><a href="#section11">11. События (Events)</a></li>
+    <li><a href="#section12">12. Условные бины (@Conditional)</a></li>
+    <li><a href="#section13">13. Глоссарий терминов</a></li>
+    <li><a href="#section14">14. Структура проекта</a></li>
+    <li><a href="#section15">15. Тесты</a></li>
+    <li><a href="#section16">16. Советы и лучшие практики</a></li>
+  </ul>
+</div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 1 ==================== -->
+<h2 id="section1">1. Что такое IoC Container</h2>
+
+<p>
+  <strong>IoC (Inversion of Control)</strong> — принцип проектирования, при котором управление
+  жизненным циклом объектов и создание их зависимостей передаётся внешнему фреймворку
+  (контейнеру), а не самим объектам. В Spring этот контейнер называется
+  <strong>ApplicationContext</strong>.
+</p>
+
+<div class="note">
+  <strong>Ключевая идея:</strong> в традиционном подходе объект сам создаёт свои зависимости
+  через <code>new</code>. При IoC контейнер читает конфигурацию (аннотации, Java-конфиг),
+  создаёт объекты (бины) и «скручивает» (wiring) их вместе. Ваш код просто запрашивает
+  готовый объект из контейнера.
+</div>
+
+<p>
+  <code>ApplicationContext</code> — основной интерфейс контейнера. Он расширяет
+  <code>BeanFactory</code>, добавляя поддержку AOP, событий, профилей и интернационализации.
+</p>
+
+<div class="mermaid">
+  classDiagram
+  direction TB
+
+  class BeanFactory {
+  +getBean(name)
+  +getBean(type)
+  +containsBean(name)
+  +isSingleton(name)
+  }
+
+  class ApplicationContext {
+  +getBeanDefinitionCount()
+  +getBeanNamesForType(type)
+  +publishEvent(event)
+  +getEnvironment()
+  +getBean(name, type)
+  }
+
+  class AnnotationConfigApplicationContext
+  class GenericWebApplicationContext
+
+  BeanFactory <|-- ApplicationContext
+  ApplicationContext <|-- AnnotationConfigApplicationContext
+  ApplicationContext <|-- GenericWebApplicationContext
+</div>
+
+<h3>Как работает IoC-контейнер</h3>
+
+<div class="mermaid">
+  flowchart TD
+  Config["Конфигурация<br>@ComponentScan, @Bean, annotation metadata"] --> Container["IoC Container<br>ApplicationContext"]
+  Container --> B1["Bean: productService"]
+  Container --> B2["Bean: categoryService"]
+  Container --> B3["Bean: productRepository"]
+  B1 -->|Зависит от| B3
+  B2 -->|Зависит от| B3
+  App["Код приложения<br>@Autowired"] -->|Запрашивает бин| Container
+  Container -->|Возвращает готовый объект| App
+</div>
+
+<h3>Получение бинов из контейнера</h3>
+
+<pre><code>@SpringBootTest
+class Section1_IoCContainerTest {
+
+    @Autowired
+    private ApplicationContext context;
+
+    @Test
+    void shouldContainExpectedBeans() {
+        // Проверка наличия бинов по имени
+        assertThat(context.containsBean("productService")).isTrue();
+        assertThat(context.containsBean("categoryService")).isTrue();
+        assertThat(context.containsBean("productRepository")).isTrue();
+    }
+
+    @Test
+    void shouldRetrieveBeansFromContext() {
+        // Получение бина по имени
+        var productService = context.getBean("productService");
+        // Получение бина по типу
+        var categoryService = context.getBean(CategoryService.class);
+
+        assertThat(productService).isNotNull();
+        assertThat(categoryService).isNotNull();
+    }
+
+    @Test
+    void shouldGetContainerType() {
+        String containerType = context.getClass().getSimpleName();
+        assertThat(containerType).containsIgnoringCase("AnnotationConfig");
+    }
+}</code></pre>
+
+<div class="info">
+  <strong>В проекте:</strong> тест <span class="file-link">Section1_IoCContainerTest.java</span>
+  демонстрирует получение бинов из контейнера, проверку их наличия и тип контейнера.
+  Метод <code>iocContainerDemo()</code> в <span class="file-link">SpringContextDemoService.java</span>
+  собирает информацию о контейнере в <code>IocContainerResult</code>.
+</div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 2 ==================== -->
+<h2 id="section2">2. Dependency Injection — три способа инъекции</h2>
+
+<p>
+  <strong>Dependency Injection (DI)</strong> — конкретная реализация IoC, при которой контейнер
+  <em>внедряет</em> зависимости в объект. Spring поддерживает три способа инъекции.
+</p>
+
+<table>
+  <thead>
+  <tr><th>Способ</th><th>Аннотация</th><th>Рекомендация</th><th>Пример</th></tr>
+  </thead>
+  <tbody>
+  <tr>
+    <td><strong>Конструкторная</strong></td>
+    <td><code>@Autowired</code> (или без неё)</td>
+    <td>✅ Рекомендуется</td>
+    <td><code>public Foo(Bar bar) { … }</code></td>
+  </tr>
+  <tr>
+    <td><strong>Setter</strong></td>
+    <td><code>@Autowired</code> на сеттер</td>
+    <td>⚠️ Опциональные зависимости</td>
+    <td><code>public void setBar(Bar b) { … }</code></td>
+  </tr>
+  <tr>
+    <td><strong>Field</strong></td>
+    <td><code>@Autowired</code> на поле</td>
+    <td>❌ Не рекомендуется</td>
+    <td><code>@Autowired private Bar bar;</code></td>
+  </tr>
+  </tbody>
+</table>
+
+<div class="mermaid">
+  flowchart TD
+  subgraph Constructor["1. Конструкторная инъекция (✅ Рекомендуется)"]
+  C1[ProductService] -->|final ProductRepository<br>передаётся через конструктор| C2[ProductRepository]
+  end
+
+  subgraph Setter["2. Setter инъекция"]
+  S1[ProductService<br>@Autowired setDefaultCategory] -->|Вызывается сеттер<br>с @Value| S2[defaultCategory = 'Uncategorized']
+  end
+
+  subgraph Field["3. Field инъекция (❌)"]
+  F1[ProductService<br>@Autowired private ...] -->|Внедряется напрямую в поле| F2[defaultProduct]
+  end
+</div>
+
+<h3>Конструкторная инъекция (рекомендуемый подход)</h3>
+
+<pre><code>@Service
+public class ProductService {
+
+    private final ProductRepository productRepository;
+
+    // @Autowired необязателен при единственном конструкторе (Spring 4.3+)
+    public ProductService(ProductRepository productRepository) {
+        this.productRepository = productRepository;
+    }
+
+    public List&lt;Product&gt; findAll() {
+        return productRepository.findAll();
+    }
+}</code></pre>
+
+<h3>Setter-инъекция</h3>
+
+<pre><code>@Service
+public class ProductService {
+
+    private String defaultCategory;
+
+    @Autowired
+    public void setDefaultCategory(
+            @Value("${app.default-category:Uncategorized}") String defaultCategory) {
+        this.defaultCategory = defaultCategory;
+    }
+}</code></pre>
+
+<h3>Field-инъекция (не рекомендуется)</h3>
+
+<pre><code>@Service
+public class ProductService {
+
+    // ⚠️ Не рекомендуется: скрывает зависимости, мешает тестированию
+    @Autowired
+    @Qualifier("defaultProduct")
+    private Product defaultProduct;
+}</code></pre>
+
+<h3>Почему конструкторная инъекция лучше?</h3>
+<ul>
+  <li><strong>Неизменяемость:</strong> поля можно сделать <code>final</code></li>
+  <li><strong>Явность:</strong> все зависимости видны в сигнатуре конструктора</li>
+  <li><strong>Тестируемость:</strong> легко создать объект в тесте, передав mock</li>
+  <li><strong>Fail-fast:</strong> контейнер не стартует, если зависимость отсутствует</li>
+</ul>
+
+<div class="danger">
+  <strong>Field injection — антипаттерн.</strong> Скрывает зависимости, делает класс неизменяемым,
+  усложняет модульное тестирование (нужен Reflection или Spring Test Context).
+  Используйте только в демонстрационных целях, как в этом проекте.
+</div>
+
+<div class="info">
+  <strong>В проекте:</strong> <span class="file-link">ProductService.java</span> демонстрирует
+  все три способа одновременно — конструкторную (ProductRepository), setter (defaultCategory
+  через @Value) и field (defaultProduct через @Autowired + @Qualifier).
+  Тест <span class="file-link">Section2_DependencyInjectionTest.java</span> проверяет каждый из них.
+</div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 3 ==================== -->
+<h2 id="section3">3. Bean Scope — singleton vs prototype</h2>
+
+<p>
+  <strong>Scope</strong> определяет, сколько экземпляров бина создаёт контейнер
+  и как долго они живут. По умолчанию все бины — <strong>singleton</strong>.
+</p>
+
+<table>
+  <thead>
+  <tr><th>Scope</th><th>Аннотация</th><th>Количество экземпляров</th><th>Область применения</th></tr>
+  </thead>
+  <tbody>
+  <tr>
+    <td><strong>singleton</strong></td>
+    <td>(по умолчанию)</td>
+    <td>1 на контейнер</td>
+    <td>Все слои</td>
+  </tr>
+  <tr>
+    <td><strong>prototype</strong></td>
+    <td><code>@Scope("prototype")</code></td>
+    <td>Новый при каждом запросе</td>
+    <td>Состояние-зависимые бины</td>
+  </tr>
+  <tr>
+    <td><strong>request</strong></td>
+    <td><code>@RequestScope</code></td>
+    <td>1 на HTTP-запрос</td>
+    <td>Web</td>
+  </tr>
+  <tr>
+    <td><strong>session</strong></td>
+    <td><code>@SessionScope</code></td>
+    <td>1 на HTTP-сессию</td>
+    <td>Web</td>
+  </tr>
+  <tr>
+    <td><strong>application</strong></td>
+    <td><code>@ApplicationScope</code></td>
+    <td>1 на ServletContext</td>
+    <td>Web</td>
+  </tr>
+  </tbody>
+</table>
+
+<div class="mermaid">
+  flowchart LR
+  subgraph Singleton["Singleton Scope"]
+  S1["Запрос 1"] --> Bean1["Bean A<br>экземпляр #1"]
+  S2["Запрос 2"] --> Bean1
+  S3["Запрос 3"] --> Bean1
+  end
+
+  subgraph Prototype["Prototype Scope"]
+  P1["Запрос 1"] --> BeanP1["Bean B<br>экземпляр #1"]
+  P2["Запрос 2"] --> BeanP2["Bean B<br>экземпляр #2"]
+  P3["Запрос 3"] --> BeanP3["Bean B<br>экземпляр #3"]
+  end
+</div>
+
+<h3>Пример из проекта</h3>
+
+<pre><code>// Singleton (по умолчанию) — один экземпляр на весь контейнер
+@Service
+public class ProductService {
+    // ...
+}
+
+// Prototype — новый экземпляр при каждом вызове getBean()
+@Service
+@Scope("prototype")
+public class PrototypeProductService {
+
+    private final Product currentProduct;
+
+    public PrototypeProductService() {
+        this.currentProduct = new Product(
+            "Prototype Product", "PROTOTYPE", BigDecimal.ONE);
+    }
+
+    public Product getCurrentProduct() {
+        return currentProduct;
+    }
+}</code></pre>
+
+<pre><code>@Test
+void shouldShowScopeDifference() {
+    // Singleton — всегда один и тот же объект
+    Product p1 = context.getBean(ProductService.class).getDefaultProduct();
+    Product p2 = context.getBean(ProductService.class).getDefaultProduct();
+    assertThat(p1).isSameAs(p2);
+    assertThat(p1.getId()).isEqualTo(p2.getId());
+
+    // Prototype — каждый раз новый объект
+    PrototypeProductService t1 = context.getBean(PrototypeProductService.class);
+    PrototypeProductService t2 = context.getBean(PrototypeProductService.class);
+    assertThat(t1).isNotSameAs(t2);
+    assertThat(t1.getCurrentProduct().getId())
+            .isNotEqualTo(t2.getCurrentProduct().getId());
+}</code></pre>
+
+<div class="warn">
+  <strong>Singleton → Prototype проблема.</strong>
+  Если singleton-бин инжектит prototype-бин, prototype будет создан один раз
+  (при создании singleton). Чтобы получать новый prototype каждый раз, используйте
+  <code>ObjectProvider&lt;T&gt;</code>, <code>Provider&lt;T&gt;</code> или <code>@Lookup</code>.
+</div>
+
+<div class="info">
+  <strong>В проекте:</strong> <span class="file-link">PrototypeProductService.java</span>
+  с <code>@Scope("prototype")</code>. Тест <span class="file-link">Section3_ScopeTest.java</span>
+  проверяет разницу между singleton и prototype. Метод <code>scopeDemo()</code> возвращает
+  <code>ScopeDemoResult</code> с идентификаторами экземпляров.
+</div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 4 ==================== -->
+<h2 id="section4">4. Lifecycle бина — @PostConstruct и @PreDestroy</h2>
+
+<p>
+  Каждый бин проходит через набор этапов жизненного цикла:
+  создание → инъекция зависимостей → инициализация → использование → уничтожение.
+</p>
+
+<div class="mermaid">
+  flowchart LR
+  A["1. Конструктор<br>создание объекта"] --> B["2. Инъекция<br>зависимостей"]
+  B --> C["3. @PostConstruct<br>инициализация"]
+  C --> D["4. Использование<br>рабочее состояние"]
+  D --> E["5. @PreDestroy<br>уничтожение"]
+</div>
+
+<table>
+  <tr><th>Способ</th><th>Аннотация / интерфейс</th><th>Когда вызывается</th></tr>
+  <tr><td>Конструктор</td><td>—</td><td>При создании бина</td></tr>
+  <tr><td>Инициализация</td><td><code>@PostConstruct</code></td><td>После инъекции всех зависимостей</td></tr>
+  <tr><td>Уничтожение</td><td><code>@PreDestroy</code></td><td>Перед удалением бина из контекста</td></tr>
+  <tr><td>Инициализация</td><td><code>InitializingBean.afterPropertiesSet()</code></td><td>После инъекции свойств</td></tr>
+  <tr><td>Уничтожение</td><td><code>DisposableBean.destroy()</code></td><td>При закрытии контекста</td></tr>
+</table>
+
+<h3>Пример из проекта</h3>
+
+<pre><code>@Component
+public class LifecycleBean {
+
+    private static final Logger log = LoggerFactory.getLogger(LifecycleBean.class);
+
+    private final List&lt;String&gt; lifecycleEvents = new ArrayList&lt;&gt;();
+    private int initCallCount = 0;
+    private int destroyCallCount = 0;
+
+    public LifecycleBean() {
+        log.info("LifecycleBean constructor called");
+        lifecycleEvents.add("CONSTRUCTOR");
+    }
+
+    @PostConstruct
+    public void init() {
+        initCallCount++;
+        log.info("LifecycleBean @PostConstruct called (count: {})", initCallCount);
+        lifecycleEvents.add("POST_CONSTRUCT");
+        // Инициализация ресурсов, проверка конфигурации
+    }
+
+    @PreDestroy
+    public void destroy() {
+        destroyCallCount++;
+        log.info("LifecycleBean @PreDestroy called (count: {})", destroyCallCount);
+        lifecycleEvents.add("PRE_DESTROY");
+        // Освобождение ресурсов
+    }
+
+    public List&lt;String&gt; getLifecycleEvents() { return lifecycleEvents; }
+    public int getInitCallCount() { return initCallCount; }
+}</code></pre>
+
+<div class="note">
+  <strong>Порядок вызовов:</strong> контейнер гарантирует, что <code>@PostConstruct</code>
+  вызывается только после того, как все зависимости будут инъектированы.
+  Для singleton-бинов <code>@PostConstruct</code> вызывается ровно один раз.
+  <code>@PreDestroy</code> не вызывается для prototype-бинов — Spring не отслеживает их после создания.
+</div>
+
+<div class="info">
+  <strong>В проекте:</strong> <span class="file-link">LifecycleBean.java</span> с конструктором,
+  <code>@PostConstruct</code> и <code>@PreDestroy</code>. Тест
+  <span class="file-link">Section4_LifecycleTest.java</span> проверяет порядок и количество вызовов.
+  Метод <code>lifecycleDemo()</code> возвращает <code>LifecycleResult</code>.
+</div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 5 ==================== -->
+<h2 id="section5">5. @Configuration и @Bean</h2>
+
+<p>
+  <code>@Configuration</code> — аннотация класса, который содержит методы <code>@Bean</code>.
+  Каждый метод <code>@Bean</code> создаёт и возвращает объект, который регистрируется как бин
+  в контейнере. Это способ декларативно определить бины для классов, которые вы не контролируете
+  (библиотечные классы) или которым нужна сложная инициализация.
+</p>
+
+<div class="mermaid">
+  flowchart TD
+  AppConfig["@Configuration AppConfig"] --> B1["@Bean defaultProduct()<br>→ Product"]
+  AppConfig --> B2["@Bean electronicsCategory()<br>→ Category"]
+  AppConfig --> B3["@Bean smartphoneProduct()<br>→ Product"]
+  B3 -->|Зависит от| B2
+  AppConfig --> B4["@Bean @Primary primaryProduct()<br>→ Product"]
+
+  IoC["IoC Container"] -->|Читает методы @Bean и регистрирует бины| AppConfig
+</div>
+
+<h3>Пример из проекта</h3>
+
+<pre><code>@Configuration
+public class AppConfig {
+
+    // Бин продукта, созданный через @Bean
+    @Bean(name = "defaultProduct")
+    public Product defaultProduct() {
+        return new Product("Default Product", "DEVICE", BigDecimal.valueOf(99.99));
+    }
+
+    // Бин категории для электроники
+    @Bean(name = "electronicsCategory")
+    public Category electronicsCategory() {
+        return new Category("Electronics", "Electronic devices and accessories");
+    }
+
+    // Бин с зависимостью на другой бин из той же конфигурации
+    @Bean(name = "smartphoneProduct")
+    public Product smartphoneProduct(Category electronicsCategory) {
+        Product product = new Product("Smartphone", "DEVICE", BigDecimal.valueOf(699.99));
+        product.setCategory(electronicsCategory);
+        return product;
+    }
+
+    // Primary бин — выбирается по умолчанию при инъекции по типу Product
+    @Bean
+    @Primary
+    public Product primaryProduct() {
+        return new Product("Primary Product", "DEFAULT", BigDecimal.valueOf(1.00));
+    }
+}</code></pre>
+
+<h3>Когда использовать @Bean vs @Component</h3>
+
+<table>
+  <tr><th>Критерий</th><th><code>@Component</code></th><th><code>@Bean</code></th></tr>
+  <tr>
+    <td>Где применяется</td>
+    <td>На классе (свой код)</td>
+    <td>На методе (чужие классы / сложная инициализация)</td>
+  </tr>
+  <tr>
+    <td>Контроль над созданием</td>
+    <td>Spring через Reflection</td>
+    <td>Вы — вызываете конструктор вручную</td>
+  </tr>
+  <tr>
+    <td>Именование</td>
+    <td>По имени класса (camelCase)</td>
+    <td>По имени метода или <code>name</code></td>
+  </tr>
+  <tr>
+    <td>Использование</td>
+    <td>Ваши сущности, сервисы, репозитории</td>
+    <td>Библиотечные классы, DataSource, ObjectMapper…</td>
+  </tr>
+</table>
+
+<h3 id="section5-1">5.1 @Primary — бин по умолчанию</h3>
+
+<p>
+  Когда в контейнере несколько бинов одного типа, <code>@Primary</code> указывает,
+  какой бин использовать по умолчанию при инъекции по типу.
+</p>
+
+<pre><code>@Bean
+@Primary
+public Product primaryProduct() {
+    return new Product("Primary Product", "DEFAULT", BigDecimal.ONE);
+}
+
+// При инъекции по типу Product будет выбран primaryProduct
+@Autowired
+private Product product; // ← primaryProduct
+
+// Альтернатива — получить конкретный бин по имени
+@Autowired
+@Qualifier("defaultProduct")
+private Product defaultProduct; // ← defaultProduct</code></pre>
+
+<h3 id="section5-2">5.2 CGLIB-прокси для @Configuration</h3>
+
+<div class="note">
+  <strong>Важно:</strong> классы с <code>@Configuration</code> проксируются через CGLIB.
+  Это гарантирует, что при вызове одного <code>@Bean</code>-метода из другого
+  возвращается тот же singleton-экземпляр, а не создаётся новый. Классы с
+  <code>@Component</code> такой прокси не имеют — межметодные вызовы создают новые экземпляры.
+</div>
+
+<div class="info">
+  <strong>В проекте:</strong> <span class="file-link">AppConfig.java</span> демонстрирует
+  <code>@Bean</code>, <code>@Primary</code> и зависимости между бинами.
+  Тест <span class="file-link">Section5_ConfigurationTest.java</span> проверяет создание и инъекцию.
+</div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 6 ==================== -->
+<h2 id="section6">6. Стереотипы — @Component, @Service, @Repository</h2>
+
+<p>
+  Spring предлагает <strong>специализированные аннотации</strong>, которые являются
+  «наследниками» <code>@Component</code>. Они не меняют техническое поведение,
+  но добавляют <em>семантику</em> и дают Spring дополнительные подсказки.
+</p>
+
+<div class="mermaid">
+  flowchart TD
+  Component["@Component<br>Базовый стереотип"]
+  Service["@Service<br>Бизнес-логика"]
+  Repository["@Repository<br>Доступ к данным<br>Преобразование исключений БД"]
+  Controller["@Controller<br>Обработка HTTP-запросов"]
+
+  Service -->|специализация| Component
+  Repository -->|специализация| Component
+  Controller -->|специализация| Component
+</div>
+
+<table>
+  <tr><th>Аннотация</th><th>Слой</th><th>Доп. поведение</th><th>Пример в проекте</th></tr>
+  <tr>
+    <td><code>@Component</code></td>
+    <td>Любой</td>
+    <td>—</td>
+    <td><code>ContextAwareBean</code>, <code>EventPublisher</code></td>
+  </tr>
+  <tr>
+    <td><code>@Service</code></td>
+    <td>Service</td>
+    <td>Семантика бизнес-логики</td>
+    <td><code>ProductService</code>, <code>OrderService</code></td>
+  </tr>
+  <tr>
+    <td><code>@Repository</code></td>
+    <td>DAO / Repository</td>
+    <td>Преобразование исключений БД в <code>DataAccessException</code></td>
+    <td><code>ProductRepository</code>, <code>CategoryRepository</code></td>
+  </tr>
+  <tr>
+    <td><code>@Controller</code></td>
+    <td>Web</td>
+    <td>Обработчики запросов, <code>@RequestMapping</code></td>
+    <td>— (в web-слое)</td>
+  </tr>
+</table>
+
+<h3>Component Scanning</h3>
+
+<p>
+  <code>@ComponentScan</code> (включён в <code>@SpringBootApplication</code>) сканирует пакет
+  и все подпакеты, находя классы с аннотациями-стереотипами и регистрируя их как бины.
+</p>
+
+<pre><code>@SpringBootApplication
+// = @ComponentScan + @EnableAutoConfiguration + @Configuration
+public class SpringContextApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(SpringContextApplication.class, args);
+    }
+}</code></pre>
+
+<h3>Примеры из проекта</h3>
+
+<pre><code>@Service
+public class ProductService {
+    private final ProductRepository productRepository;
+    public ProductService(ProductRepository productRepository) {
+        this.productRepository = productRepository;
+    }
+    // ...
+}
+
+@Repository
+public class ProductRepository {
+    private final Map&lt;String, Product&gt; storage = new ConcurrentHashMap&lt;&gt;();
+    // ...
+}
+
+@Component
+public class EventPublisher {
+    private final ApplicationEventPublisher eventPublisher;
+    @Autowired
+    public EventPublisher(ApplicationEventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
+    }
+    // ...
+}</code></pre>
+
+<div class="info">
+  <strong>В проекте:</strong> используются <code>@Service</code> (4 класса),
+  <code>@Repository</code> (2 класса), <code>@Component</code> (3 класса).
+  Тест <span class="file-link">Section6_StereotypesTest.java</span> проверяет наличие всех
+  стереотипных бинов и их типы. Метод <code>stereotypesDemo()</code> возвращает
+  <code>StereotypesResult</code>.
+</div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 7 ==================== -->
+<h2 id="section7">7. @Autowired и @Qualifier</h2>
+
+<p>
+  <code>@Autowired</code> включает автоматическую инъекцию зависимостей.
+  Когда в контейнере несколько бинов одного типа, <code>@Qualifier</code> помогает
+  выбрать конкретный. Также можно получить бин по имени через <code>context.getBean("name")</code>.
+</p>
+
+<h3 id="section7-1">7.1 Алгоритм разрешения зависимостей</h3>
+
+<div class="mermaid">
+  flowchart TD
+  Start["Нужен бин типа T"] --> Check{"Есть ли ровно<br>1 бин типа T?"}
+  Check -->|Да| Inject["Инъектировать его"]
+  Check -->|Нет| Primary{"Есть ли @Primary?"}
+  Primary -->|Да| InjectPrimary["Инъектировать<br>@Primary бин"]
+  Primary -->|Нет| Qualifier{"Есть ли @Qualifier<br>с нужным именем?"}
+  Qualifier -->|Да| InjectQualifier["Инъектировать<br>квалифицированный бин"]
+  Qualifier -->|Нет| Name{"Совпадает ли имя<br>параметра с именем бина?"}
+  Name -->|Да| InjectByName["Инъектировать<br>по совпадению имени"]
+  Name -->|Нет| Error["NoUniqueBeanDefinitionException<br>или NoSuchBeanDefinitionException"]
+</div>
+
+<h3>@Qualifier — выбор конкретного бина</h3>
+
+<pre><code>@Service
+public class ProductService {
+
+    @Autowired
+    @Qualifier("defaultProduct")
+    private Product defaultProduct;
+
+    public Product getDefaultProduct() {
+        return defaultProduct;
+    }
+}</code></pre>
+
+<h3>@Primary — бин по умолчанию</h3>
+
+<pre><code>@Bean
+@Primary
+public Product primaryProduct() {
+    return new Product("Primary Product", "DEFAULT", BigDecimal.ONE);
+}
+
+// При инъекции по типу Product будет выбран primaryProduct
+// (если нет @Qualifier, указывающего на другой бин)
+@Autowired
+private Product product; // ← primaryProduct</code></pre>
+
+<h3>Получение бина по имени</h3>
+
+<pre><code>@Test
+void shouldGetSpecificBeanByName() {
+    // Получение бина по имени — альтернатива @Qualifier
+    Product defaultProduct = context.getBean("defaultProduct", Product.class);
+    Product smartphoneProduct = context.getBean("smartphoneProduct", Product.class);
+
+    assertThat(defaultProduct.getName()).isEqualTo("Default Product");
+    assertThat(smartphoneProduct.getName()).isEqualTo("Smartphone");
+}</code></pre>
+
+<div class="good">
+  <strong>Лучшая практика:</strong> используйте <code>@Primary</code> для основного бина и
+  <code>@Qualifier</code> — для второстепенных. Так код остаётся читаемым.
+</div>
+
+<div class="info">
+  <strong>В проекте:</strong> <span class="file-link">ProductService.java</span> демонстрирует
+  <code>@Autowired</code> + <code>@Qualifier</code> на поле. Тест
+  <span class="file-link">Section7_AutowiredQualifierTest.java</span> проверяет все варианты.
+</div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 8 ==================== -->
+<h2 id="section8">8. @Value и Property Injection</h2>
+
+<p>
+  <code>@Value</code> позволяет инъектировать значения из файлов конфигурации
+  (<code>application.yml</code> / <code>application.properties</code>), переменных окружения
+  и системных свойств. <code>Environment</code> предоставляет программный доступ к тем же источникам.
+</p>
+
+<h3>Синтаксис @Value</h3>
+
+<pre><code>// Простое свойство
+@Value("${app.name}")
+private String appName;
+
+// Значение по умолчанию (если свойство отсутствует)
+@Value("${app.default-price:100.00}")
+private BigDecimal defaultPrice;
+
+// Булево значение
+@Value("${app.feature-enabled:false}")
+private boolean featureEnabled;
+
+// SpEL (Spring Expression Language)
+@Value("#{systemProperties['user.name']}")
+private String userName;</code></pre>
+
+<h3>application.yml</h3>
+
+<pre><code>spring:
+  application:
+    name: spring-context-demo</code></pre>
+
+<h3>Environment API</h3>
+
+<pre><code>@Service
+public class SpringContextDemoService {
+
+    private final Environment environment;
+
+    // ...
+
+    public String getActiveProfile() {
+        return Arrays.stream(environment.getActiveProfiles())
+                .findFirst()
+                .orElse("default");
+    }
+
+    public String getProperty(String key) {
+        return environment.getProperty(key);
+    }
+}</code></pre>
+
+<div class="mermaid">
+  flowchart LR
+  YML["application.yml"] --> PS["PropertySource<br>приоритетный список"]
+  ENV["Переменные окружения<br>SPRING_PROFILES_ACTIVE"] --> PS
+  SYS["System.getProperty()"] --> PS
+  PROP["application.properties"] --> PS
+  PS --> Bean["@Value / Environment<br>в бине"]
+</div>
+
+<div class="note">
+  <strong>Приоритет источников:</strong> JVM-аргументы (<code>-D</code>) → переменные окружения →
+  <code>application-{profile}.properties</code> → <code>application.properties</code>.
+  При конфликте побеждает источник с более высоким приоритетом.
+</div>
+
+<div class="info">
+  <strong>В проекте:</strong> <span class="file-link">ProductService.java</span> инжектит
+  <code>defaultCategory</code> через setter с <code>@Value</code>.
+  <span class="file-link">SpringContextDemoService.java</span> инжектит <code>appName</code>,
+  <code>defaultPrice</code>, <code>featureEnabled</code>.
+  Тест <span class="file-link">Section8_PropertyInjectionTest.java</span> проверяет инъекцию и значения по умолчанию.
+</div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 9 ==================== -->
+<h2 id="section9">9. ApplicationContextAware</h2>
+
+<p>
+  Интерфейс <code>ApplicationContextAware</code> позволяет бину получить ссылку на
+  <code>ApplicationContext</code> напрямую. Spring вызывает <code>setApplicationContext()</code>
+  после создания бина и инъекции всех его зависимостей.
+</p>
+
+<pre><code>@Component
+public class ContextAwareBean implements ApplicationContextAware {
+
+    private static final Logger log = LoggerFactory.getLogger(ContextAwareBean.class);
+
+    private ApplicationContext applicationContext;
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        log.info("ApplicationContext injected into ContextAwareBean");
+        this.applicationContext = applicationContext;
+    }
+
+    public ApplicationContext getApplicationContext() {
+        return applicationContext;
+    }
+
+    public String getApplicationContextClassName() {
+        return applicationContext.getClass().getSimpleName();
+    }
+
+    public int getBeanCount() {
+        return applicationContext.getBeanDefinitionCount();
+    }
+
+    public boolean containsProductService() {
+        return applicationContext.containsBeanDefinition("productService");
+    }
+}</code></pre>
+
+<h3>Альтернативы (предпочтительные)</h3>
+
+<table>
+  <tr><th>Подход</th><th>Преимущество</th></tr>
+  <tr>
+    <td>Прямая инъекция <code>ApplicationContext</code> в конструктор</td>
+    <td>Нет привязки к интерфейсу Spring, можно сделать <code>final</code></td>
+  </tr>
+  <tr>
+    <td><code>ObjectProvider&lt;T&gt;</code></td>
+    <td>Получение нужного бина без зависимости от контекста</td>
+  </tr>
+  <tr>
+    <td><code>ApplicationEventPublisher</code></td>
+    <td>Только публикация событий (узкая ответственность)</td>
+  </tr>
+</table>
+
+<div class="warn">
+  <strong>Рекомендация:</strong> не злоупотребляйте <code>ApplicationContextAware</code>.
+  Чаще всего нужен именно конкретный бин, а не весь контейнер.
+  Инжектите только то, что действительно нужно.
+</div>
+
+<div class="info">
+  <strong>В проекте:</strong> <span class="file-link">ContextAwareBean.java</span>.
+  Тест <span class="file-link">Section9_ContextAwareTest.java</span> проверяет, что
+  контекст инжектирован и ссылается на тот же экземпляр, что и в тесте.
+</div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 10 ==================== -->
+<h2 id="section10">10. Профили (@Profile)</h2>
+
+<p>
+  <strong>Профили</strong> позволяют регистрировать разные бины для разных окружений
+  (dev, test, prod). Бин с <code>@Profile("dev")</code> создаётся только при активном профиле <code>dev</code>.
+</p>
+
+<h3>Определение профильных бинов</h3>
+
+<pre><code>@Configuration
+public class ProfileConfig {
+
+    @Bean
+    @Profile("dev")
+    public Product devProduct() {
+        return new Product("Dev Product", "DEV", BigDecimal.ZERO);
+    }
+
+    @Bean
+    @Profile("prod")
+    public Product prodProduct() {
+        return new Product("Prod Product", "PROD", BigDecimal.valueOf(999.99));
+    }
+
+    @Bean
+    @Profile("test")
+    public Product testProduct() {
+        return new Product("Test Product", "TEST", BigDecimal.ONE);
+    }
+}</code></pre>
+
+<div class="mermaid">
+  flowchart LR
+  subgraph Activate["Способы активации профиля"]
+  A1["application.yml<br>spring.profiles.active=dev"]
+  A2["JVM-аргумент<br>-Dspring.profiles.active=dev"]
+  A3["ENV-переменная<br>SPRING_PROFILES_ACTIVE=dev"]
+  A4["@ActiveProfiles('dev')<br>в тестах"]
+  end
+
+  Activate --> Profile["Профиль 'dev' активен"]
+  Profile --> Beans["Создаются бины<br>с @Profile('dev')<br>и @ConditionalOnProfile"]
+</div>
+
+<h3>Тестирование с профилями</h3>
+
+<pre><code>@SpringBootTest
+@ActiveProfiles("dev")
+class Section10_ProfileDevTest {
+
+    @Autowired(required = false)
+    @Qualifier("devProduct")
+    private Product devProduct;
+
+    @Test
+    void shouldLoadDevProfileBean() {
+        assertThat(devProduct).isNotNull();
+        assertThat(devProduct.getType()).isEqualTo("DEV");
+    }
+}</code></pre>
+
+<div class="note">
+  <strong>Профили по умолчанию:</strong> если ни один профиль не активен, используются профили
+  из <code>spring.profiles.default</code> (по умолчанию — <code>"default"</code>).
+  В тестах профили по умолчанию не активны, поэтому бины с <code>@Profile</code>
+  без <code>@ActiveProfiles</code> не создаются.
+</div>
+
+<div class="info">
+  <strong>В проекте:</strong> <span class="file-link">ProfileConfig.java</span> определяет
+  три профильных бина. Тесты:
+  <span class="file-link">Section10_ProfileTest.java</span> (без профиля),
+  <span class="file-link">Section10_ProfileDevTest.java</span> (dev),
+  <span class="file-link">Section10_ProfileTestEnvTest.java</span> (test).
+</div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 11 ==================== -->
+<h2 id="section11">11. События (Events)</h2>
+
+<p>
+  Spring поддерживает паттерн <strong>publisher-subscriber</strong> для слабосвязанной
+  коммуникации между компонентами. Контейнер сам публикует системные события
+  (<code>ContextRefreshedEvent</code>, <code>ContextClosedEvent</code>), а вы можете
+  создавать свои кастомные события.
+</p>
+
+<div class="mermaid">
+  sequenceDiagram
+  participant Service as SpringContextDemoService
+  participant Pub as EventPublisher
+  participant AppCtx as ApplicationContext
+  participant Listener as CustomEventListener
+
+  Service->>Pub: publishEvent("Test event")
+  Pub->>AppCtx: publishEvent(new CustomEvent(...))
+  AppCtx->>Listener: handleCustomEvent(event)
+  Note right of Listener: @EventListener автоматически вызывается
+  AppCtx->>Listener: handleContextRefreshed(event)
+  Note right of Listener: Стандартное событие Spring
+</div>
+
+<h3>Создание кастомного события</h3>
+
+<pre><code>public class CustomEvent extends ApplicationEvent {
+
+    private final String message;
+    private final long eventTimestamp;
+
+    public CustomEvent(Object source, String message) {
+        super(source);
+        this.message = message;
+        this.eventTimestamp = System.currentTimeMillis();
+    }
+
+    public String getMessage() { return message; }
+    public long getEventTimestamp() { return eventTimestamp; }
+}</code></pre>
+
+<h3>Публикация события</h3>
+
+<pre><code>@Component
+public class EventPublisher {
+
+    private final ApplicationEventPublisher eventPublisher;
+
+    @Autowired
+    public EventPublisher(ApplicationEventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
+    }
+
+    public void publishEvent(String message) {
+        CustomEvent event = new CustomEvent(this, message);
+        eventPublisher.publishEvent(event);
+    }
+}</code></pre>
+
+<h3>Обработка событий</h3>
+
+<pre><code>@Component
+public class CustomEventListener {
+
+    private final List&lt;String&gt; capturedEvents = new ArrayList&lt;&gt;();
+    private int customEventCount = 0;
+
+    // Обработка кастомного события
+    @EventListener
+    public void handleCustomEvent(CustomEvent event) {
+        capturedEvents.add("CUSTOM: " + event.getMessage());
+        customEventCount++;
+    }
+
+    // Обработка системного события (контекст обновлён)
+    @EventListener
+    public void handleContextRefreshedEvent(ContextRefreshedEvent event) {
+        capturedEvents.add("CONTEXT_REFRESHED");
+    }
+
+    public List&lt;String&gt; getCapturedEvents() { return capturedEvents; }
+    public int getCustomEventCount() { return customEventCount; }
+    public String getLastEventPayload() {
+        return capturedEvents.isEmpty() ? null : capturedEvents.getLast();
+    }
+}</code></pre>
+
+<h3>Стандартные события Spring</h3>
+
+<table>
+  <tr><th>Событие</th><th>Когда публикуется</th></tr>
+  <tr><td><code>ContextRefreshedEvent</code></td><td>После инициализации или обновления ApplicationContext</td></tr>
+  <tr><td><code>ContextStartedEvent</code></td><td>После вызова <code>start()</code></td></tr>
+  <tr><td><code>ContextStoppedEvent</code></td><td>После вызова <code>stop()</code></td></tr>
+  <tr><td><code>ContextClosedEvent</code></td><td>После вызова <code>close()</code></td></tr>
+  <tr><td><code>RequestHandledEvent</code></td><td>После обработки HTTP-запроса (web)</td></tr>
+</table>
+
+<div class="good">
+  <strong>Асинхронные события:</strong> добавьте <code>@Async</code> к методу-обработчику,
+  и он будет выполняться в отдельном потоке. Не забудьте <code>@EnableAsync</code> на конфигурации.
+</div>
+
+<div class="info">
+  <strong>В проекте:</strong> <span class="file-link">CustomEvent.java</span>,
+  <span class="file-link">EventPublisher.java</span>,
+  <span class="file-link">CustomEventListener.java</span>.
+  Тест <span class="file-link">Section11_EventTest.java</span> проверяет публикацию, приём
+  и количество событий.
+</div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 12 ==================== -->
+<h2 id="section12">12. Условные бины (@Conditional)</h2>
+
+<p>
+  Условные бины создаются только при выполнении определённого условия:
+  наличие свойства, класса, другого бина или активного профиля.
+</p>
+
+<h3>Обзор условных аннотаций Spring Boot</h3>
+
+<table>
+  <tr><th>Аннотация</th><th>Условие</th><th>Пример</th></tr>
+  <tr>
+    <td><code>@ConditionalOnProperty</code></td>
+    <td>Свойство имеет нужное значение</td>
+    <td><code>@ConditionalOnProperty(name="feature.enabled", havingValue="true")</code></td>
+  </tr>
+  <tr>
+    <td><code>@ConditionalOnClass</code></td>
+    <td>Класс есть в classpath</td>
+    <td><code>@ConditionalOnClass(name="redis.clients.jedis.Jedis")</code></td>
+  </tr>
+  <tr>
+    <td><code>@ConditionalOnMissingBean</code></td>
+    <td>Бин определённого типа ещё не создан</td>
+    <td><code>@ConditionalOnMissingBean(DataSource.class)</code></td>
+  </tr>
+  <tr>
+    <td><code>@ConditionalOnBean</code></td>
+    <td>Бин определённого типа существует</td>
+    <td><code>@ConditionalOnBean(CacheManager.class)</code></td>
+  </tr>
+  <tr>
+    <td><code>@ConditionalOnExpression</code></td>
+    <td>SpEL-выражение возвращает <code>true</code></td>
+    <td><code>@ConditionalOnExpression("${a} > ${b}")</code></td>
+  </tr>
+  <tr>
+    <td><code>@Profile</code></td>
+    <td>Активный профиль совпадает</td>
+    <td><code>@Profile("dev")</code></td>
+  </tr>
+</table>
+
+<h3>Пример из проекта</h3>
+
+<pre><code>@Configuration
+public class ConditionalConfig {
+
+    // Бин создаётся, если feature.enabled=true.
+    // matchIfMissing=true → создаётся даже если свойство отсутствует.
+    @Bean
+    @ConditionalOnProperty(
+        name = "feature.enabled",
+        havingValue = "true",
+        matchIfMissing = true
+    )
+    public FeatureService enabledFeatureService() {
+        return new FeatureService("ENABLED_FEATURE");
+    }
+
+    // Бин создаётся только в dev-профиле
+    @Bean
+    @Profile("dev")
+    public DevToolsService devToolsService() {
+        return new DevToolsService();
+    }
+}</code></pre>
+
+<h3>Последовательность проверки</h3>
+
+<div class="mermaid">
+  flowchart TD
+  A["Spring сканирует @Bean-метод / @Component"] --> B{"Есть ли @Conditional*?"}
+  B -->|Нет| Create["Создать бин"]
+  B -->|Да| Eval["Вычислить условие"]
+  Eval --> Result{"Условие выполнено?"}
+  Result -->|Да| Create
+  Result -->|Нет| Skip["Пропустить бин (не регистрировать)"]
+</div>
+
+<h3>Тестирование условных бинов</h3>
+
+<pre><code>// Без дополнительных свойств — feature.enabled отсутствует,
+// но matchIfMissing=true, поэтому бин создаётся
+@SpringBootTest
+class Section12_ConditionalTest {
+
+    @Autowired
+    private ApplicationContext context;
+
+    @Test
+    void shouldCreateBeanWhenPropertyTrue() {
+        assertThat(context.containsBean("enabledFeatureService")).isTrue();
+    }
+
+    @Test
+    void shouldNotCreateDevToolsWithoutDevProfile() {
+        assertThat(context.containsBean("devToolsService")).isFalse();
+    }
+}
+
+// Явно отключаем свойство
+@SpringBootTest
+@TestPropertySource(properties = "feature.enabled=false")
+class Section12_ConditionalDisabledTest {
+
+    @Autowired
+    private ApplicationContext context;
+
+    @Test
+    void shouldNotCreateBeanWhenPropertyFalse() {
+        assertThat(context.containsBean("enabledFeatureService")).isFalse();
+    }
+}</code></pre>
+
+<div class="info">
+  <strong>Spring Boot Auto-configuration</strong> построена на условных бинах.
+  Именно поэтому вы можете подключать стартеры (<code>spring-boot-starter-data-jpa</code>,
+  <code>spring-boot-starter-web</code>), а Spring Boot автоматически создаёт нужные бины
+  при наличии зависимостей в classpath.
+</div>
+
+<div class="info">
+  <strong>В проекте:</strong> <span class="file-link">ConditionalConfig.java</span> определяет
+  условные бины. Тесты:
+  <span class="file-link">Section12_ConditionalTest.java</span> (по умолчанию),
+  <span class="file-link">Section12_ConditionalDisabledTest.java</span> (свойство false),
+  <span class="file-link">Section12_ConditionalDevTest.java</span> (dev-профиль).
+</div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 13 ==================== -->
+<h2 id="section13">13. Глоссарий терминов</h2>
+
+<table>
+  <tr><th>Термин</th><th>Определение</th></tr>
+  <tr><td><strong>IoC</strong></td><td>Inversion of Control — принцип, при котором управление объектами передаётся контейнеру.</td></tr>
+  <tr><td><strong>DI</strong></td><td>Dependency Injection — способ реализации IoC, при котором зависимости внедряются в объект.</td></tr>
+  <tr><td><strong>Bean</strong></td><td>Объект, управляемый Spring-контейнером (создание, инициализация, инъекция, уничтожение).</td></tr>
+  <tr><td><strong>ApplicationContext</strong></td><td>Основной интерфейс IoC-контейнера, расширяет <code>BeanFactory</code>.</td></tr>
+  <tr><td><strong>BeanFactory</strong></td><td>Базовый интерфейс контейнера для регистрации и получения бинов.</td></tr>
+  <tr><td><strong>@Component</strong></td><td>Базовая аннотация для автоматического обнаружения и регистрации бина.</td></tr>
+  <tr><td><strong>@Service</strong></td><td>Специализированный <code>@Component</code> для сервисного слоя.</td></tr>
+  <tr><td><strong>@Repository</strong></td><td>Специализированный <code>@Component</code> для слоя доступа к данным.</td></tr>
+  <tr><td><strong>@Configuration</strong></td><td>Класс, содержащий методы <code>@Bean</code> для декларативного определения бинов.</td></tr>
+  <tr><td><strong>@Bean</strong></td><td>Метод, возвращающий объект, который будет зарегистрирован как бин.</td></tr>
+  <tr><td><strong>@Autowired</strong></td><td>Автоматическая инъекция зависимости по типу.</td></tr>
+  <tr><td><strong>@Qualifier</strong></td><td>Уточнение конкретного бина при наличии нескольких кандидатов одного типа.</td></tr>
+  <tr><td><strong>@Primary</strong></td><td>Помечает бин как основной при инъекции по типу.</td></tr>
+  <tr><td><strong>@Value</strong></td><td>Инъекция значений из properties-файлов, переменных окружения и SpEL.</td></tr>
+  <tr><td><strong>@Scope</strong></td><td>Определяет жизненный цикл и количество экземпляров бина (singleton, prototype…).</td></tr>
+  <tr><td><strong>@PostConstruct</strong></td><td>Колбэк, вызываемый после инъекции зависимостей.</td></tr>
+  <tr><td><strong>@PreDestroy</strong></td><td>Колбэк, вызываемый перед уничтожением бина.</td></tr>
+  <tr><td><strong>@Profile</strong></td><td>Ограничение регистрации бина определённым профилем окружения.</td></tr>
+  <tr><td><strong>@Conditional</strong></td><td>Семейство аннотаций для условной регистрации бинов.</td></tr>
+  <tr><td><strong>Component Scan</strong></td><td>Процесс сканирования пакетов для обнаружения <code>@Component</code>-классов.</td></tr>
+  <tr><td><strong>ApplicationContextAware</strong></td><td>Интерфейс для получения <code>ApplicationContext</code> внутри бина.</td></tr>
+  <tr><td><strong>ApplicationEvent</strong></td><td>Базовый класс для событий в Spring event system.</td></tr>
+  <tr><td><strong>@EventListener</strong></td><td>Метод, автоматически вызываемый при публикации события.</td></tr>
+</table>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 14 ==================== -->
+<h2 id="section14">14. Структура проекта</h2>
+
+<div class="card">
+<pre><code>02-spring-context
+├── pom.xml
+├── README.md
+└── src
+    ├── main
+    │   ├── java/com/example/springcontext
+    │   │   ├── SpringContextApplication.java          # Точка входа
+    │   │   ├── config
+    │   │   │   ├── AppConfig.java                     # @Configuration + @Bean
+    │   │   │   ├── ConditionalConfig.java             # Условные бины
+    │   │   │   ├── DevToolsService.java               # Dev-only сервис
+    │   │   │   ├── FeatureService.java                # Условный бин
+    │   │   │   ├── LifecycleBean.java                 # @PostConstruct / @PreDestroy
+    │   │   │   └── ProfileConfig.java                 # @Profile бины
+    │   │   ├── entity
+    │   │   │   ├── Category.java
+    │   │   │   ├── Customer.java
+    │   │   │   ├── Order.java
+    │   │   │   ├── OrderItem.java
+    │   │   │   ├── OrderStatus.java
+    │   │   │   └── Product.java
+    │   │   ├── listener
+    │   │   │   ├── ContextAwareBean.java              # ApplicationContextAware
+    │   │   │   ├── CustomEvent.java                   # Кастомное событие
+    │   │   │   ├── CustomEventListener.java           # @EventListener
+    │   │   │   └── EventPublisher.java                # Публикация событий
+    │   │   ├── model
+    │   │   │   └── ApiModels.java                     # DTO (Java Records)
+    │   │   ├── repository
+    │   │   │   ├── CategoryRepository.java            # @Repository
+    │   │   │   └── ProductRepository.java             # @Repository
+    │   │   └── service
+    │   │       ├── CategoryService.java               # @Service
+    │   │       ├── OrderService.java                  # @Service
+    │   │       ├── ProductService.java                # @Service + DI варианты
+    │   │       ├── PrototypeProductService.java        # @Scope("prototype")
+    │   │       └── SpringContextDemoService.java       # Агрегирующий сервис
+    │   └── resources
+    │       └── application.yml
+    └── test
+        └── java/com/example/springcontext
+            ├── Section1_IoCContainerTest.java          # IoC контейнер
+            ├── Section2_DependencyInjectionTest.java   # Три типа DI
+            ├── Section3_ScopeTest.java                 # Singleton vs Prototype
+            ├── Section4_LifecycleTest.java             # @PostConstruct / @PreDestroy
+            ├── Section5_ConfigurationTest.java         # @Configuration + @Bean
+            ├── Section6_StereotypesTest.java           # @Component / @Service / @Repository
+            ├── Section7_AutowiredQualifierTest.java    # @Autowired + @Qualifier
+            ├── Section8_PropertyInjectionTest.java     # @Value + Environment
+            ├── Section9_ContextAwareTest.java          # ApplicationContextAware
+            ├── Section10_ProfileTest.java              # Профили (default)
+            ├── Section10_ProfileDevTest.java           # Профили (dev)
+            ├── Section10_ProfileTestEnvTest.java       # Профили (test)
+            ├── Section11_EventTest.java                # События
+            ├── Section12_ConditionalTest.java          # Условные бины (default)
+            ├── Section12_ConditionalDisabledTest.java  # Условные бины (disabled)
+            └── Section12_ConditionalDevTest.java       # Условные бины (dev)</code></pre>
+</div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 15 ==================== -->
+<h2 id="section15">15. Тесты</h2>
+
+<p>
+  Каждый ключевой аспект Spring IoC покрыт интеграционными тестами, разбитыми по секциям:
+</p>
+
+<table>
+  <tr><th>Тест</th><th>Что проверяет</th><th>Ключевые моменты</th></tr>
+  <tr>
+    <td><span class="file-link">Section1_IoCContainerTest.java</span></td>
+    <td>IoC контейнер</td>
+    <td>Наличие бинов, получение по имени/типу, тип контейнера</td>
+  </tr>
+  <tr>
+    <td><span class="file-link">Section2_DependencyInjectionTest.java</span></td>
+    <td>Dependency Injection</td>
+    <td>Конструкторная, setter, field инъекция</td>
+  </tr>
+  <tr>
+    <td><span class="file-link">Section3_ScopeTest.java</span></td>
+    <td>Bean Scope</td>
+    <td>Одинаковые ID для singleton, разные для prototype</td>
+  </tr>
+  <tr>
+    <td><span class="file-link">Section4_LifecycleTest.java</span></td>
+    <td>Жизненный цикл</td>
+    <td>Порядок вызовов: CONSTRUCTOR → POST_CONSTRUCT, один вызов init</td>
+  </tr>
+  <tr>
+    <td><span class="file-link">Section5_ConfigurationTest.java</span></td>
+    <td>@Configuration + @Bean</td>
+    <td>Создание бинов, инъекция зависимостей, @Primary</td>
+  </tr>
+  <tr>
+    <td><span class="file-link">Section6_StereotypesTest.java</span></td>
+    <td>Стереотипы</td>
+    <td>@Service, @Repository, @Component бины, корректные типы</td>
+  </tr>
+  <tr>
+    <td><span class="file-link">Section7_AutowiredQualifierTest.java</span></td>
+    <td>@Autowired + @Qualifier</td>
+    <td>Инъекция по @Qualifier, @Primary, получение по имени</td>
+  </tr>
+  <tr>
+    <td><span class="file-link">Section8_PropertyInjectionTest.java</span></td>
+    <td>@Value + Environment</td>
+    <td>Инъекция свойств, значения по умолчанию, активный профиль</td>
+  </tr>
+  <tr>
+    <td><span class="file-link">Section9_ContextAwareTest.java</span></td>
+    <td>ApplicationContextAware</td>
+    <td>Контекст инжектирован, ссылается на тот же экземпляр</td>
+  </tr>
+  <tr>
+    <td><span class="file-link">Section10_ProfileTest.java</span></td>
+    <td>Профили (default)</td>
+    <td>Активный профиль = "default", profile-specific бины не создаются</td>
+  </tr>
+  <tr>
+    <td><span class="file-link">Section10_ProfileDevTest.java</span></td>
+    <td>Профили (dev)</td>
+    <td>Бин devProduct создаётся с типом "DEV"</td>
+  </tr>
+  <tr>
+    <td><span class="file-link">Section11_EventTest.java</span></td>
+    <td>События</td>
+    <td>Публикация/приём, ContextRefreshedEvent, множественные события</td>
+  </tr>
+  <tr>
+    <td><span class="file-link">Section12_ConditionalTest.java</span></td>
+    <td>Условные бины (default)</td>
+    <td>Бин создаётся при matchIfMissing, devToolsService не создаётся</td>
+  </tr>
+  <tr>
+    <td><span class="file-link">Section12_ConditionalDisabledTest.java</span></td>
+    <td>Условные бины (disabled)</td>
+    <td>Бин не создаётся при feature.enabled=false</td>
+  </tr>
+  <tr>
+    <td><span class="file-link">Section12_ConditionalDevTest.java</span></td>
+    <td>Условные бины (dev)</td>
+    <td>devToolsService создаётся в dev-профиле</td>
+  </tr>
+</table>
+
+<div class="good">
+  Тесты можно запустить командой <code>mvn clean test</code> в модуле.
+  Конкретный тест: <code>mvn test -Dtest=Section1_IoCContainerTest</code>
+</div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 16 ==================== -->
+<h2 id="section16">16. Советы и лучшие практики</h2>
+
+<h3>Предпочитайте конструкторную инъекцию</h3>
+
+<pre><code>// ✅ Хорошо — явно, тестируемо, immutable
+@Service
+public class ProductService {
+    private final ProductRepository repository;
+
+    public ProductService(ProductRepository repository) {
+        this.repository = repository;
+    }
+}
+
+// ❌ Плохо — скрывает зависимости, не immutable
+@Service
+public class ProductService {
+    @Autowired
+    private ProductRepository repository;
+}</code></pre>
+
+<h3>Используйте final для неизменяемых зависимостей</h3>
+
+<pre><code>private final ProductRepository repository; // final гарантирует инъекцию</code></pre>
+
+<h3>Применяйте @Primary для выбора бина по умолчанию</h3>
+
+<pre><code>@Bean
+@Primary
+public Product primaryProduct() {
+    return new Product("Primary", "DEFAULT", BigDecimal.ONE);
+}</code></pre>
+
+<h3>Используйте @Profile для профилизации</h3>
+
+<pre><code>@Bean
+@Profile("dev")
+public DataSource devDataSource() {
+    // Конфигурация для разработки
+}</code></pre>
+
+<h3>Не смешивайте @Configuration и @Component</h3>
+
+<div class="warn">
+  Не используйте <code>@Component</code> на классах, содержащих <code>@Bean</code>-методы.
+  Без <code>@Configuration</code> (и CGLIB-прокси) межметодные вызовы будут создавать
+  новые экземпляры вместо возврата singleton'а.
+</div>
+
+<h3>Разделяйте ответственность конфигураций</h3>
+
+<pre><code>// Разные @Configuration классы для разных подсистем
+@Configuration
+public class DataSourceConfig { /* ... */ }
+
+@Configuration
+public class SecurityConfig { /* ... */ }
+
+@Configuration
+public class WebConfig { /* ... */ }</code></pre>
+
+<h3>Проверяйте границы агрегатов (если применяете DDD)</h3>
+
+<p>
+  Как и в Spring Data JDBC, в Spring IoC важно правильно определять границы бинов.
+  Не делайте один God-класс-сервис на 3000 строк. Разделяйте на маленькие,
+  сфокусированные сервисы с чёткими зависимостями — контейнер справится с этим.
+</p>
+
+<hr class="section-divider"/>
+
+<h2>Вывод</h2>
+<p>
+  Spring IoC Container — это фундаментальная основа всего фреймворка. Понимание принципов
+  IoC и DI, управления жизненным циклом бинов, работы с профилями и событиями позволяет
+  строить слабосвязанные, тестируемые и расширяемые приложения. Этот проект демонстрирует
+  все ключевые возможности Spring Core на практических примерах с полным набором тестов.
+</p>
+
 </body>
 </html>
