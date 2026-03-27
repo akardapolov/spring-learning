@@ -1,0 +1,84 @@
+spring:
+  application:
+    name: spring-boot-demo
+  profiles:
+    active: dev
+
+app:
+  name: Spring Boot Demo Application
+  version: 1.0.0
+  features:
+    cache-enabled: true
+    metrics-enabled: true
+    logging-enabled: true
+  message:
+    welcome: "Welcome to Spring Boot Demo!"
+    greeting: "Hello from Spring Boot!"
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+app:
+  environment: development
+  features:
+    debug-mode: true
+    detailed-logging: true
+
+logging:
+  level:
+    com.example.springboot: DEBUG
+
+server:
+  port: 8080
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+app:
+  environment: production
+  features:
+    debug-mode: false
+    detailed-logging: false
+
+logging:
+  level:
+    com.example.springboot: INFO
+
+server:
+  port: 8081
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+
+app:
+  environment: test
+
+---
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,env,beans,configprops,loggers
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized
+    info:
+      enabled: true
+  metrics:
+    export:
+      simple:
+        enabled: true
+    tags:
+      application: ${spring.application.name}
+      environment: ${app.environment}

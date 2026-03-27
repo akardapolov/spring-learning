@@ -1,47 +1,1418 @@
+<!-- filename: src/main/resources/static/index.html -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Модуль в разработке</title>
+  <meta charset="UTF-8">
+  <title>Spring Boot Demo — теория и документация</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>mermaid.initialize({startOnLoad: true, theme: 'default'});</script>
   <style>
     body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f7f7f8;
-      color: #222;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 20px;
+        line-height: 1.7;
+        color: #333;
+        background: #fafafa;
     }
-
-    .container {
-      text-align: center;
-      background: white;
-      padding: 40px 32px;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-      max-width: 500px;
-      width: 90%;
-    }
-
     h1 {
-      margin: 0 0 12px;
-      font-size: 28px;
+        color: #2c3e50;
+        border-bottom: 3px solid #27ae60;
+        padding-bottom: 10px;
     }
-
-    p {
-      margin: 0;
-      font-size: 16px;
-      color: #555;
+    h2 {
+        color: #27ae60;
+        margin-top: 50px;
+        border-left: 4px solid #2ecc71;
+        padding-left: 12px;
+    }
+    h3 {
+        color: #16a085;
+        margin-top: 28px;
+    }
+    h4 {
+        color: #8e44ad;
+        margin-top: 20px;
+    }
+    pre {
+        background: #2d2d2d;
+        color: #f8f8f2;
+        padding: 16px;
+        border-radius: 6px;
+        overflow-x: auto;
+        font-size: 14px;
+    }
+    code {
+        background: #ecf0f1;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 14px;
+    }
+    pre code {
+        background: none;
+        padding: 0;
+    }
+    .mermaid {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        margin: 16px 0;
+        overflow-x: auto;
+    }
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 12px 0;
+        background: white;
+    }
+    th, td {
+        border: 1px solid #bdc3c7;
+        padding: 10px;
+        text-align: left;
+        vertical-align: top;
+    }
+    th {
+        background: #27ae60;
+        color: white;
+    }
+    a {
+        color: #2980b9;
+    }
+    .file-link {
+        background: #e8f6f3;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 13px;
+        display: inline-block;
+        margin: 2px 0;
+    }
+    .note {
+        background: #fef9e7;
+        border-left: 4px solid #f1c40f;
+        padding: 12px;
+        margin: 12px 0;
+        border-radius: 4px;
+    }
+    .good {
+        background: #eafaf1;
+        border-left: 4px solid #27ae60;
+        padding: 12px;
+        margin: 12px 0;
+        border-radius: 4px;
+    }
+    .warn {
+        background: #fffbeb;
+        border-left: 4px solid #d97706;
+        padding: 12px;
+        margin: 12px 0;
+        border-radius: 4px;
+    }
+    .danger {
+        background: #fef2f2;
+        border-left: 4px solid #e74c3c;
+        padding: 12px;
+        margin: 12px 0;
+        border-radius: 4px;
+    }
+    .info {
+        background: #eef6ff;
+        border-left: 4px solid #3498db;
+        padding: 12px;
+        margin: 12px 0;
+        border-radius: 4px;
+    }
+    .toc {
+        background: white;
+        border: 1px solid #dcdcdc;
+        border-radius: 8px;
+        padding: 18px;
+        margin: 20px 0 30px 0;
+    }
+    .toc ul {
+        margin: 0;
+        padding-left: 20px;
+    }
+    .endpoint {
+        background: #eef6ff;
+        border: 1px solid #d6eaff;
+        border-radius: 6px;
+        padding: 10px 12px;
+        margin: 6px 0;
+        font-family: monospace;
+        font-size: 13px;
+    }
+    .endpoint a {
+        text-decoration: none;
+        color: #2563eb;
+    }
+    .endpoint a:hover {
+        text-decoration: underline;
+    }
+    .section-divider {
+        margin: 35px 0;
+        border: none;
+        border-top: 1px solid #ddd;
+    }
+    .card {
+        background: white;
+        border: 1px solid #dcdcdc;
+        border-radius: 12px;
+        padding: 18px 18px 16px;
+        margin: 16px 0;
+    }
+    .flow-step {
+        background: #f0f9ff;
+        border: 1px solid #bae6fd;
+        border-radius: 6px;
+        padding: 8px 14px;
+        margin: 4px 0;
+        font-size: 14px;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Модуль в разработке</h1>
-    <p>Материалы для этого раздела скоро появятся.</p>
-  </div>
+
+<h1>Spring Boot Demo — теория и документация</h1>
+<p>Демо-проект на Spring Boot, демонстрирующий все ключевые концепции фреймворка: запуск приложения, конфигурацию, профили, инспекцию бинов, условные бины, DI, Environment, REST-контроллеры и обработку ошибок.</p>
+
+<div class="good">
+  <strong>Запуск (dev):</strong> <code>http://localhost:8080</code><br/>
+  <strong>Запуск (prod):</strong> <code>http://localhost:8081</code><br/>
+  <strong>Actuator:</strong> <code>/actuator</code><br/>
+  <strong>Требования:</strong> JDK 21+, Maven 3.9+
+</div>
+
+<div class="toc">
+  <h3>Содержание</h3>
+  <ul>
+    <li><a href="#section1">1. Запуск приложения</a></li>
+    <li><a href="#section2">2. Configuration Properties</a></li>
+    <li><a href="#section3">3. Профили Spring</a></li>
+    <li><a href="#section4">4. Инспекция бинов</a></li>
+    <li><a href="#section5">5. Условные бины</a></li>
+    <li><a href="#section6">6. Внедрение зависимостей (DI)</a>
+      <ul>
+        <li><a href="#section6-1">6.1 Конструкторная инъекция</a></li>
+        <li><a href="#section6-2">6.2 @Qualifier и @Primary</a></li>
+      </ul>
+    </li>
+    <li><a href="#section7">7. Environment и окружение</a></li>
+    <li><a href="#section8">8. REST-контроллеры</a></li>
+    <li><a href="#section9">9. Обработка ошибок</a></li>
+    <li><a href="#section10">10. Actuator</a></li>
+    <li><a href="#section11">11. Auto-Configuration</a></li>
+    <li><a href="#section12">12. Endpoint'ы API</a></li>
+    <li><a href="#section13">13. Быстрый старт (curl)</a></li>
+    <li><a href="#section14">14. Тесты</a></li>
+    <li><a href="#section15">15. Сравнение подходов DI</a></li>
+    <li><a href="#section16">16. Best Practices</a></li>
+    <li><a href="#section17">17. Структура проекта</a></li>
+  </ul>
+</div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 1 ==================== -->
+<h2 id="section1">1. Запуск приложения</h2>
+
+<p>
+  Аннотация <code>@SpringBootApplication</code> — это мета-аннотация, которая объединяет три ключевые аннотации Spring Boot: <code>@Configuration</code>, <code>@EnableAutoConfiguration</code> и <code>@ComponentScan</code>.
+</p>
+
+<pre><code>@SpringBootApplication
+@ConfigurationPropertiesScan
+public class SpringBootDemoApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(SpringBootDemoApplication.class, args);
+    }
+}</code></pre>
+
+<h3>Процесс запуска</h3>
+
+<div class="flow-step"><strong>1.</strong> <code>main()</code> — точка входа, вызывается <code>SpringApplication.run()</code></div>
+<div class="flow-step"><strong>2.</strong> Создание <code>ApplicationContext</code> — Spring загружает контекст приложения</div>
+<div class="flow-step"><strong>3.</strong> Auto-Configuration — анализ classpath и автоматическая настройка</div>
+<div class="flow-step"><strong>4.</strong> Bean Creation — сканирование компонентов и создание бинов</div>
+<div class="flow-step"><strong>5.</strong> Embedded Server — запуск Tomcat на указанном порту</div>
+
+<div class="mermaid">
+  graph TB
+  MAIN["main - точка входа"] --> APP_CTX["ApplicationContext"]
+  APP_CTX --> AUTO["Auto-Configuration: анализ classpath"]
+  AUTO --> BEANS["Bean Creation: сканирование Component"]
+  BEANS --> TOMCAT["Embedded Tomcat: запуск сервера"]
+</div>
+
+<h3>Варианты запуска</h3>
+
+<div class="card">
+  <h4>Вариант 1 — через Maven</h4>
+  <pre><code>mvn clean spring-boot:run -pl 03-spring-boot</code></pre>
+</div>
+
+<div class="card">
+  <h4>Вариант 2 — через собранный JAR</h4>
+  <pre><code>mvn clean package -pl 03-spring-boot
+java -jar 03-spring-boot/target/03-spring-boot-1.0.0.jar</code></pre>
+</div>
+
+<div class="good">
+  <strong>Ключевой принцип:</strong> Spring Boot берёт на себя всю конфигурацию. Вам остаётся писать бизнес-логику.
+</div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 2 ==================== -->
+<h2 id="section2">2. Configuration Properties</h2>
+
+<p>
+  <code>@ConfigurationProperties</code> обеспечивает типобезопасную привязку конфигурации из YAML/properties-файлов в Java-объекты с поддержкой валидации и вложенных свойств.
+</p>
+
+<div class="note">
+  <strong>Ключевая идея:</strong> вместо разбросанных <code>@Value("${app.name}")</code> вы создаёте один класс-контейнер, где все свойства собраны и типизированы. Компилятор и IDE проверяют корректность ещё на этапе компиляции.
+</div>
+
+<h3>Конфигурация в YAML</h3>
+
+<pre><code>app:
+  name: Spring Boot Demo Application
+  version: 1.0.0
+  message:
+    welcome: "Welcome to Spring Boot Demo!"
+    greeting: "Hello from Spring Boot!"
+  features:
+    cache-enabled: true
+    metrics-enabled: true
+    logging-enabled: true
+    debug-mode: false</code></pre>
+
+<h3>Java-класс привязки</h3>
+
+<pre><code>@Data
+@Validated
+@ConfigurationProperties(prefix = "app")
+public class AppProperties {
+
+    @NotBlank(message = "Application name cannot be blank")
+    private String name;
+
+    @NotBlank(message = "Application version cannot be blank")
+    private String version;
+
+    @NotNull
+    private String environment;
+
+    private Message message = new Message();
+    private Features features = new Features();
+
+    @Data
+    public static class Message {
+        @NotBlank
+        private String welcome;
+
+        @NotBlank
+        private String greeting;
+    }
+
+    @Data
+    public static class Features {
+        private boolean cacheEnabled = true;
+        private boolean metricsEnabled = true;
+        private boolean loggingEnabled = true;
+        private boolean debugMode = false;
+        private boolean detailedLogging = false;
+    }
+}</code></pre>
+
+<h3>Преимущества</h3>
+
+<table>
+  <tr><th>Фича</th><th>Описание</th><th>Пример</th></tr>
+  <tr><td><strong>Типобезопасность</strong></td><td>Компилятор проверяет типы, IDE подсказывает поля</td><td>Опечатка в имени свойства — ошибка при компиляции</td></tr>
+  <tr><td><strong>Вложенные свойства</strong></td><td>Вложенные классы маппятся на вложенные YAML-структуры</td><td><code>app.features.debug-mode</code></td></tr>
+  <tr><td><strong>Валидация</strong></td><td>JSR-303 аннотации: <code>@NotBlank</code>, <code>@NotNull</code></td><td>Ошибка запуска при пустом имени</td></tr>
+  <tr><td><strong>Значения по умолчанию</strong></td><td>Дефолтные значения прямо в полях Java-класса</td><td><code>private boolean cacheEnabled = true;</code></td></tr>
+</table>
+
+<div class="info">
+  Аннотация <code>@ConfigurationPropertiesScan</code> на главном классе автоматически находит все классы с <code>@ConfigurationProperties</code> и регистрирует их как бины.
+</div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 3 ==================== -->
+<h2 id="section3">3. Профили Spring</h2>
+
+<p>
+  Профили позволяют иметь различные конфигурации для разных окружений: разработка, тестирование, продакшн.
+</p>
+
+<h3>Доступные профили</h3>
+
+<table>
+  <thead><tr><th>Профиль</th><th>Порт</th><th>Окружение</th><th>Debug</th><th>Логирование</th><th>Описание</th></tr></thead>
+  <tbody>
+  <tr><td><code>dev</code></td><td>8080</td><td>development</td><td>✅</td><td>DEBUG</td><td>Режим разработки (по умолчанию)</td></tr>
+  <tr><td><code>prod</code></td><td>8081</td><td>production</td><td>❌</td><td>INFO</td><td>Рабочий режим</td></tr>
+  <tr><td><code>test</code></td><td>random</td><td>test</td><td>—</td><td>INFO</td><td>Тестовый режим</td></tr>
+  </tbody>
+</table>
+
+<h3>Конфигурация профилей в YAML</h3>
+
+<pre><code># Общие свойства (для всех профилей)
+app:
+  name: Spring Boot Demo Application
+  version: 1.0.0
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+app:
+  environment: development
+  features:
+    debug-mode: true
+    detailed-logging: true
+
+logging:
+  level:
+    com.example.springboot: DEBUG
+
+server:
+  port: 8080
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+app:
+  environment: production
+  features:
+    debug-mode: false
+    detailed-logging: false
+
+logging:
+  level:
+    com.example.springboot: INFO
+
+server:
+  port: 8081</code></pre>
+
+<h3>Запуск с конкретным профилем</h3>
+
+<pre><code># Через Maven
+mvn spring-boot:run -pl 03-spring-boot -Dspring-boot.run.profiles=prod
+
+# Через JAR
+java -jar 03-spring-boot/target/03-spring-boot-1.0.0.jar --spring.profiles.active=prod</code></pre>
+
+<h3>Использование профилей в коде</h3>
+
+<pre><code>@Service
+public class ProfileService {
+
+    @Autowired
+    private Environment environment;
+
+    public String getCurrentProfile() {
+        String[] profiles = environment.getActiveProfiles();
+        return profiles.length > 0 ? profiles[0] : "default";
+    }
+
+    public boolean isProfileActive(String profile) {
+        return environment.acceptsProfiles(Profiles.of(profile));
+    }
+
+    public List<String> getActiveProfiles() {
+        return Arrays.asList(environment.getActiveProfiles());
+    }
+
+    public String getProfileSpecificMessage() {
+        if (isProfileActive("dev")) {
+            return "Running in development mode with debug enabled";
+        } else if (isProfileActive("prod")) {
+            return "Running in production mode with optimizations";
+        } else if (isProfileActive("test")) {
+            return "Running in test mode";
+        }
+        return "Running in default mode";
+    }
+}</code></pre>
+
+<div class="mermaid">
+  graph LR
+  YAML["application.yaml"] --> COMMON["Общие свойства"]
+  YAML --> DEV["on-profile: dev"]
+  YAML --> PROD["on-profile: prod"]
+  YAML --> TEST["on-profile: test"]
+  DEV --> APP1["debug-mode: true, порт 8080"]
+  PROD --> APP2["debug-mode: false, порт 8081"]
+  TEST --> APP3["environment: test"]
+</div>
+
+<div class="warn">
+  <strong>Важно:</strong> свойства профиля перекрывают общие. Порядок секций в YAML имеет значение — секции без профиля загружаются первыми и являются базовыми.
+</div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 4 ==================== -->
+<h2 id="section4">4. Инспекция бинов</h2>
+
+<p>
+  <code>ApplicationContext</code> — центральный интерфейс Spring, позволяющий получать информацию о зарегистрированных бинах: их имена, типы, области видимости и зависимости.
+</p>
+
+<div class="card">
+  <pre><code>@Service
+public class BeanService {
+
+    @Autowired
+    private ApplicationContext applicationContext;
+
+    public List&lt;BeanInfo&gt; getAllBeans() {
+        String[] beanNames = applicationContext.getBeanDefinitionNames();
+        List&lt;BeanInfo&gt; beans = new ArrayList&lt;&gt;();
+
+        for (String beanName : beanNames) {
+            try {
+                Object bean = applicationContext.getBean(beanName);
+                String scope = "singleton";
+                if (applicationContext instanceof ConfigurableApplicationContext cac) {
+                    var definition = cac.getBeanFactory().getBeanDefinition(beanName);
+                    scope = definition.getScope();
+                    if (scope == null || scope.isEmpty()) {
+                        scope = "singleton";
+                    }
+                }
+                beans.add(BeanInfo.builder()
+                        .name(beanName)
+                        .type(bean.getClass().getName())
+                        .scope(scope)
+                        .isSingleton(applicationContext.isSingleton(beanName))
+                        .isPrototype(applicationContext.isPrototype(beanName))
+                        .build());
+            } catch (Exception e) {
+                log.debug("Could not inspect bean: {}", beanName);
+            }
+        }
+
+        return beans.stream()
+                .sorted(Comparator.comparing(BeanInfo::getName))
+                .toList();
+    }
+
+    public long getBeanCount() {
+        return applicationContext.getBeanDefinitionNames().length;
+    }
+}</code></pre>
+</div>
+
+<h3>Области видимости бинов</h3>
+
+<table>
+  <tr><th>Scope</th><th>Описание</th><th>Пример использования</th></tr>
+  <tr><td><code>singleton</code></td><td>Один экземпляр на контекст (по умолчанию)</td><td>Сервисы, репозитории, конфиги</td></tr>
+  <tr><td><code>prototype</code></td><td>Новый экземпляр при каждом запросе бина</td><td>Состоятельные объекты, билдеры</td></tr>
+  <tr><td><code>request</code></td><td>Один экземпляр на HTTP-запрос</td><td>Данные запроса (веб)</td></tr>
+  <tr><td><code>session</code></td><td>Один экземпляр на HTTP-сессию</td><td>Данные пользователя (веб)</td></tr>
+</table>
+
+<div class="mermaid">
+  graph TB
+  CTX["ApplicationContext"] --> B1["beanService: singleton"]
+  CTX --> B2["profileService: singleton"]
+  CTX --> B3["appInfoService: singleton"]
+  CTX --> B4["configurationService: singleton"]
+  CTX --> B5["conditionalBeanService: singleton"]
+  CTX --> B6["debugService: conditional"]
+  CTX --> B7["defaultCacheService: conditional"]
+  B6 -. "только если debug-mode=true" .-> COND["ConditionalOnProperty"]
+  B7 -. "только если нет customCacheService" .-> MISSING["ConditionalOnMissingBean"]
+</div>
+
+<div class="good">
+  В этом демо-проекте почти все бины — <strong>singleton</strong>. Это стандартная практика для stateless-сервисов.
+</div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 5 ==================== -->
+<h2 id="section5">5. Условные бины</h2>
+
+<p>
+  Условные аннотации позволяют создавать бины только при выполнении определённых условий. Это основа auto-конфигурации Spring Boot.
+</p>
+
+<div class="note">
+  <strong>Ключевая идея:</strong> Spring Boot проверяет условие перед созданием бина. Если условие не выполнено — бин просто не создаётся, без ошибок. Это позволяет переопределять авто-конфигурацию, просто определив свой бин.
+</div>
+
+<h3>Ключевые аннотации</h3>
+
+<table>
+  <tr><th>Аннотация</th><th>Условие</th><th>Пример использования</th></tr>
+  <tr><td><code>@ConditionalOnProperty</code></td><td>Свойство имеет определённое значение</td><td>Включение фичи через конфиг</td></tr>
+  <tr><td><code>@ConditionalOnMissingBean</code></td><td>Нет бина данного типа</td><td>Дефолтная реализация</td></tr>
+  <tr><td><code>@ConditionalOnClass</code></td><td>Класс есть в classpath</td><td>Интеграция с библиотекой</td></tr>
+  <tr><td><code>@ConditionalOnExpression</code></td><td>SpEL-выражение истинно</td><td>Сложные комбинированные условия</td></tr>
+</table>
+
+<h3>Пример: условный DebugService</h3>
+
+<pre><code>@Bean
+@ConditionalOnProperty(
+    prefix = "app.features",
+    name = "debug-mode",
+    havingValue = "true"
+)
+public DebugService debugService(AppProperties appProperties) {
+    log.info("Creating DebugService - debug mode is enabled");
+    return new DebugService(appProperties);
+}</code></pre>
+
+<h3>Пример: DefaultCacheService (@ConditionalOnMissingBean)</h3>
+
+<pre><code>@Bean
+@ConditionalOnMissingBean(name = "customCacheService")
+public DefaultCacheService defaultCacheService() {
+    log.info("Creating DefaultCacheService - no custom cache service found");
+    return new DefaultCacheService();
+}</code></pre>
+
+<div class="mermaid">
+  graph TB
+  START["Запуск приложения"] --> CHECK1{"debug-mode = true?"}
+  CHECK1 -- Да --> CREATE1["Создать DebugService"]
+  CHECK1 -- Нет --> SKIP1["Пропустить"]
+  START --> CHECK2{"Есть customCacheService?"}
+  CHECK2 -- Да --> SKIP2["Пропустить"]
+  CHECK2 -- Нет --> CREATE2["Создать DefaultCacheService"]
+</div>
+
+<h3>Использование в ConditionalBeanService</h3>
+
+<pre><code>@Service
+public class ConditionalBeanService {
+
+    private final AppProperties appProperties;
+
+    public String getConditionalMessage() {
+        if (appProperties.getFeatures().isDebugMode()) {
+            return "Debug mode is enabled! Conditional bean is active.";
+        } else {
+            return "This conditional bean was created (without debug mode requirement).";
+        }
+    }
+
+    public boolean isFeatureEnabled(String feature) {
+        return switch (feature.toLowerCase()) {
+            case "cache" -&gt; appProperties.getFeatures().isCacheEnabled();
+            case "metrics" -&gt; appProperties.getFeatures().isMetricsEnabled();
+            case "logging" -&gt; appProperties.getFeatures().isLoggingEnabled();
+            case "debug" -&gt; appProperties.getFeatures().isDebugMode();
+            default -&gt; false;
+        };
+    }
+}</code></pre>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 6 ==================== -->
+<h2 id="section6">6. Внедрение зависимостей (DI)</h2>
+
+<p>
+  Spring управляет созданием и связыванием объектов. Существует несколько способов внедрения зависимостей, но есть один рекомендуемый — конструкторная инъекция.
+</p>
+
+<div class="mermaid">
+  graph BT
+  MyService["AppInfoService"] -->|depends on| Props["AppProperties"]
+  MyService -->|depends on| Env["Environment"]
+  DemoController["DemoController"] -->|depends on| AppSvc["AppInfoService"]
+  DemoController -->|depends on| BeanSvc["BeanService"]
+  DemoController -->|depends on| ConfigSvc["ConfigurationService"]
+  DemoController -->|depends on| CondSvc["ConditionalBeanService"]
+  DemoController -->|depends on| ProfSvc["ProfileService"]
+</div>
+
+<h3 id="section6-1">6.1 Конструкторная инъекция (рекомендуется)</h3>
+
+<pre><code>@Service
+@RequiredArgsConstructor  // Lombok генерирует конструктор
+public class AppInfoService {
+
+    private final AppProperties appProperties;  // final — обязательно инициализировать
+
+    @Autowired
+    private Environment environment;
+
+    public ApiModels.AppInfo getAppInfo() {
+        return ApiModels.AppInfo.builder()
+                .name(appProperties.getName())
+                .version(appProperties.getVersion())
+                .environment(appProperties.getEnvironment())
+                .features(getEnabledFeatures())
+                .build();
+    }
+
+    public String getWelcomeMessage() {
+        return appProperties.getMessage().getWelcome();
+    }
+
+    public String getGreetingMessage() {
+        return appProperties.getMessage().getGreeting();
+    }
+}</code></pre>
+
+<h3>Почему конструкторная инъекция лучше</h3>
+
+<table>
+  <tr><th>Критерий</th><th>Конструкторная ✅</th><th>Полевая ❌</th></tr>
+  <tr><td>Поля <code>final</code></td><td>✅ Можно</td><td>❌ Нельзя</td></tr>
+  <tr><td>Гарантия инициализации</td><td>✅ Все зависимости обязательны</td><td>❌ Могут остаться null</td></tr>
+  <tr><td>Тестируемость</td><td>✅ Легко тестировать через конструктор</td><td>❌ Нужен reflection</td></tr>
+  <tr><td>Циклические зависимости</td><td>✅ Обнаруживаются сразу</td><td>❌ Обнаруживаются в рантайме</td></tr>
+  <tr><td>Читаемость</td><td>✅ Все зависимости видны</td><td>❌ Зависимости скрыты</td></tr>
+</table>
+
+<h3 id="section6-2">6.2 Конфликт типов: @Qualifier и @Primary</h3>
+
+<p>
+  Когда в контексте несколько бинов одного типа, Spring не знает, какой из них использовать. Решение — <code>@Primary</code> (для дефолтного) или <code>@Qualifier</code> (для явного выбора).
+</p>
+
+<pre><code>// Когда есть несколько бинов одного типа:
+
+@Bean
+@Primary  // Этот бин будет выбран по умолчанию
+public CacheService primaryCache() {
+    return new DefaultCacheService();
+}
+
+@Bean
+public CacheService redisCache() {
+    return new RedisCacheService();
+}
+
+// Используйте @Qualifier для явного выбора:
+public MyService(@Qualifier("redisCache") CacheService cache) {
+    this.cache = cache;
+}</code></pre>
+
+<div class="info">
+  В проекте используется <code>@Qualifier</code> в тестах для демонстрации явного выбора бина при инъекции.
+</div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 7 ==================== -->
+<h2 id="section7">7. Environment и окружение</h2>
+
+<p>
+  Интерфейс <code>Environment</code> предоставляет доступ ко всем свойствам приложения и позволяет читать конфигурацию из различных источников с учётом их приоритета.
+</p>
+
+<h3>Приоритет источников конфигурации</h3>
+
+<p>Свойства из источника с более высоким приоритетом перекрывают значения из источников с более низким:</p>
+
+<div class="flow-step"><strong>1 (макс. приоритет).</strong> Аргументы командной строки — <code>--server.port=9090</code></div>
+<div class="flow-step"><strong>2.</strong> System properties — <code>-Dapp.name=Test</code></div>
+<div class="flow-step"><strong>3.</strong> OS environment variables — переменные окружения ОС</div>
+<div class="flow-step"><strong>4.</strong> application-{profile}.yaml — профиль-специфичные файлы</div>
+<div class="flow-step"><strong>5.</strong> application.yaml — основной файл конфигурации</div>
+<div class="flow-step"><strong>6.</strong> @PropertySource — дополнительные источники</div>
+<div class="flow-step"><strong>7 (мин. приоритет).</strong> Значения по умолчанию — <code>@Value("${key:default}")</code></div>
+
+<h3>Использование Environment</h3>
+
+<pre><code>@Service
+public class ConfigurationService {
+
+    @Autowired
+    private Environment environment;
+
+    @Autowired
+    private ConfigurableEnvironment configurableEnvironment;
+
+    public String getProperty(String key) {
+        String value = environment.getProperty(key);
+        if (value == null) {
+            throw new ConfigurationException(key, "Property not found");
+        }
+        return value;
+    }
+
+    public String getProperty(String key, String defaultValue) {
+        return environment.getProperty(key, defaultValue);
+    }
+
+    public List&lt;String&gt; getConfigurationSources() {
+        List&lt;String&gt; sources = new ArrayList&lt;&gt;();
+        for (PropertySource&lt;?&gt; source : configurableEnvironment.getPropertySources()) {
+            sources.add(source.getName());
+        }
+        return sources;
+    }
+
+    public List&lt;String&gt; getActiveProfiles() {
+        return List.of(environment.getActiveProfiles());
+    }
+}</code></pre>
+
+<div class="mermaid">
+  graph TB
+  subgraph Sources ["Источники конфигурации"]
+  direction TB
+  S1["1. CLI Args: --server.port=8080"] --> S2["2. System Properties: -Dapp.name=Test"]
+  S2 --> S3["3. OS Env Variables: APP_NAME=Demo"]
+  S3 --> S4["4. application-prod.yaml"]
+  S4 --> S5["5. application.yaml"]
+  S5 --> S6["6. Default Values"]
+  end
+  Sources --> ENV["Environment"]
+  ENV --> PROP["getProperty: app.name"]
+  PROP --> RESULT["Spring Boot Demo Application"]
+</div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 8 ==================== -->
+<h2 id="section8">8. REST-контроллеры</h2>
+
+<p>
+  REST-контроллеры обрабатывают HTTP-запросы и возвращают данные в формате JSON. В проекте используется стандартный формат ответа <code>ApiResponse&lt;T&gt;</code>.
+</p>
+
+<div class="card">
+  <pre><code>@RestController
+@RequestMapping("/api/demo")
+@RequiredArgsConstructor
+public class DemoController {
+
+    private final AppInfoService appInfoService;
+    private final BeanService beanService;
+    private final ConfigurationService configurationService;
+    private final ConditionalBeanService conditionalBeanService;
+    private final ProfileService profileService;
+
+    // GET без параметров
+    @GetMapping("/app-info")
+    public ResponseEntity&lt;ApiResponse&lt;AppInfo&gt;&gt; getAppInfo() {
+        return ResponseEntity.ok(ApiResponse.success(appInfoService.getAppInfo()));
+    }
+
+    // GET с параметром запроса
+    @GetMapping("/greeting")
+    public ResponseEntity&lt;ApiResponse&lt;String&gt;&gt; getGreeting(
+            @RequestParam(defaultValue = "Guest") String name) {
+        String greeting = appInfoService.getGreetingMessage() + ", " + name + "!";
+        return ResponseEntity.ok(ApiResponse.success(greeting));
+    }
+
+    // GET с переменной пути
+    @GetMapping("/beans/{beanName}")
+    public ResponseEntity&lt;ApiResponse&lt;BeanInfo&gt;&gt; getBeanInfo(
+            @PathVariable String beanName) {
+        return ResponseEntity.ok(ApiResponse.success(beanService.getBeanInfo(beanName)));
+    }
+}</code></pre>
+</div>
+
+<h3>Стандартный формат ответа ApiResponse</h3>
+
+<div class="card">
+  <pre><code>@Data
+@Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public static class ApiResponse&lt;T&gt; {
+    private boolean success;
+    private String message;
+    private T data;
+    private List&lt;String&gt; errors;
+    private LocalDateTime timestamp;
+
+    public static &lt;T&gt; ApiResponse&lt;T&gt; success(T data) {
+        return ApiResponse.&lt;T&gt;builder()
+                .success(true)
+                .data(data)
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
+
+    public static &lt;T&gt; ApiResponse&lt;T&gt; error(String message) {
+        return ApiResponse.&lt;T&gt;builder()
+                .success(false)
+                .message(message)
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
+}</code></pre>
+</div>
+
+<h3>Примеры JSON-ответов</h3>
+
+<h4>Успешный ответ</h4>
+<pre><code>{
+  "success": true,
+  "data": {
+    "name": "Spring Boot Demo Application",
+    "version": "1.0.0",
+    "environment": "development",
+    "features": [
+      "Cache: true",
+      "Metrics: true",
+      "Logging: true",
+      "Debug Mode: true"
+    ]
+  },
+  "timestamp": "2025-01-15T10:30:00"
+}</code></pre>
+
+<h4>Ответ с ошибкой</h4>
+<pre><code>{
+  "success": false,
+  "message": "Bean 'unknownBean' not found",
+  "timestamp": "2025-01-15T10:30:00"
+}</code></pre>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 9 ==================== -->
+<h2 id="section9">9. Обработка ошибок</h2>
+
+<p>
+  Аннотация <code>@RestControllerAdvice</code> позволяет централизованно обрабатывать исключения во всех контроллерах, возвращая единообразные ответы об ошибках.
+</p>
+
+<h3>Иерархия исключений</h3>
+
+<div class="mermaid">
+  graph TB
+  RE["RuntimeException"] --> APP["AppException: APP_ERROR"]
+  APP --> BEAN["BeanNotFoundException: BEAN_NOT_FOUND"]
+  APP --> CONFIG["ConfigurationException: CONFIG_ERROR"]
+</div>
+
+<h3>GlobalExceptionHandler</h3>
+
+<pre><code>@Slf4j
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(AppException.class)
+    public ResponseEntity&lt;ApiResponse&lt;Void&gt;&gt; handleAppException(AppException ex) {
+        log.warn("Application exception: {}", ex.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity&lt;ApiResponse&lt;Map&lt;String, String&gt;&gt;&gt; handleValidation(
+            MethodArgumentNotValidException ex) {
+        Map&lt;String, String&gt; errors = new HashMap&lt;&gt;();
+        ex.getBindingResult().getAllErrors().forEach(error -&gt; {
+            String fieldName = ((FieldError) error).getField();
+            errors.put(fieldName, error.getDefaultMessage());
+        });
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error("Validation failed", List.of(errors.toString())));
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity&lt;ApiResponse&lt;Void&gt;&gt; handleIllegalArgument(IllegalArgumentException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity&lt;ApiResponse&lt;Void&gt;&gt; handleGeneric(Exception ex) {
+        log.error("Unexpected error", ex);
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.error("An unexpected error occurred"));
+    }
+}</code></pre>
+
+<h3>Кастомные исключения</h3>
+
+<pre><code>public class AppException extends RuntimeException {
+    private final String code;
+
+    public AppException(String code, String message) {
+        super(message);
+        this.code = code;
+    }
+
+    public String getCode() { return code; }
+}
+
+public class BeanNotFoundException extends AppException {
+    public BeanNotFoundException(String beanName) {
+        super("BEAN_NOT_FOUND", "Bean '" + beanName + "' not found");
+    }
+}
+
+public class ConfigurationException extends AppException {
+    public ConfigurationException(String key, String reason) {
+        super("CONFIG_ERROR", "Configuration error for key '" + key + "': " + reason);
+    }
+}</code></pre>
+
+<div class="warn">
+  <strong>Порядок обработчиков важен:</strong> Spring выбирает наиболее специфичный <code>@ExceptionHandler</code>. Общий обработчик <code>Exception</code> ставится последним как fallback. Более специфичные (например, <code>AppException</code>) перехватываются первыми.
+</div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 10 ==================== -->
+<h2 id="section10">10. Actuator</h2>
+
+<p>
+  Spring Boot Actuator предоставляет production-ready endpoints для мониторинга и управления приложением в runtime.
+</p>
+
+<div class="mermaid">
+  graph LR
+  APP["Spring Boot App"] --> ACT["Actuator"]
+  ACT --> H["/health"]
+  ACT --> I["/info"]
+  ACT --> M["/metrics"]
+  ACT --> E["/env"]
+  ACT --> B["/beans"]
+  ACT --> C["/configprops"]
+  ACT --> L["/loggers"]
+</div>
+
+<h3>Доступные endpoints</h3>
+
+<table>
+  <tr><th>Endpoint</th><th>Описание</th><th>Пример использования</th></tr>
+  <tr><td><code>/actuator/health</code></td><td>Состояние приложения</td><td>Kubernetes readiness/liveness probes</td></tr>
+  <tr><td><code>/actuator/info</code></td><td>Информация о приложении</td><td>Версия, описание, кастомные данные</td></tr>
+  <tr><td><code>/actuator/metrics</code></td><td>Метрики приложения</td><td>JVM, HTTP-запросы, кастомные метрики</td></tr>
+  <tr><td><code>/actuator/env</code></td><td>Окружение и свойства</td><td>Отладка конфигурации</td></tr>
+  <tr><td><code>/actuator/beans</code></td><td>Бины контекста</td><td>Список всех зарегистрированных бинов</td></tr>
+  <tr><td><code>/actuator/configprops</code></td><td>Конфигурационные свойства</td><td>Проверка привязки свойств</td></tr>
+  <tr><td><code>/actuator/loggers</code></td><td>Настройки логирования</td><td>Изменение уровней логирования на лету</td></tr>
+</table>
+
+<h3>Конфигурация Actuator</h3>
+
+<pre><code>management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,env,beans,configprops,loggers
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized
+    info:
+      enabled: true
+  metrics:
+    export:
+      simple:
+        enabled: true
+    tags:
+      application: ${spring.application.name}
+      environment: ${app.environment}</code></pre>
+
+<h3>Кастомные метрики</h3>
+
+<pre><code>@Configuration
+public class CustomMetricsConfig {
+
+    @Autowired
+    private MeterRegistry meterRegistry;
+
+    private Counter requestCounter;
+
+    @PostConstruct
+    public void initMetrics() {
+        requestCounter = Counter.builder("api.requests.total")
+                .description("Total number of API requests")
+                .tag("type", "demo")
+                .register(meterRegistry);
+
+        meterRegistry.gauge("app.beans.loaded", 0);
+    }
+
+    public void recordRequest() {
+        requestCounter.increment();
+    }
+}</code></pre>
+
+<div class="warn">
+  <strong>Безопасность:</strong> в продакшене ограничьте exposure endpoints через <code>management.endpoints.web.exposure.include</code> и настройте авторизацию. Не открывайте <code>/actuator/env</code> и <code>/actuator/configprops</code> публично — они могут содержать чувствительные данные.
+</div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 11 ==================== -->
+<h2 id="section11">11. Auto-Configuration</h2>
+
+<p>
+  Spring Boot автоматически конфигурирует приложение на основе зависимостей в classpath. Это делает настройку минимальной — достаточно добавить нужный starter в <code>pom.xml</code>.
+</p>
+
+<div class="mermaid">
+  graph LR
+  CP["Classpath: зависимости в pom.xml"] --> AC["Auto-Configuration"]
+  AC --> COND["Conditions: ConditionalOn"]
+  COND --> BEANS["Beans: создаются автоматически"]
+  BEANS --> APP["Готовое приложение"]
+</div>
+
+<h3>Просмотр отчёта авто-конфигурации</h3>
+
+<pre><code>mvn spring-boot:run -pl 03-spring-boot -Ddebug</code></pre>
+
+<p>
+  В debug-режиме Spring Boot выведет в лог полный отчёт: какие авто-конфигурации были применены, а какие — пропущены и почему.
+</p>
+
+<h3>Зависимости проекта (starters)</h3>
+
+<table>
+  <tr><th>Starter</th><th>Что предоставляет</th></tr>
+  <tr><td><code>spring-boot-starter-web</code></td><td>Embedded Tomcat, Spring MVC, Jackson</td></tr>
+  <tr><td><code>spring-boot-starter-actuator</code></td><td>Endpoints мониторинга и управления</td></tr>
+  <tr><td><code>spring-boot-starter-validation</code></td><td>Hibernate Validator для @Valid</td></tr>
+  <tr><td><code>spring-boot-configuration-processor</code></td><td>Генерация метаданных для @ConfigurationProperties</td></tr>
+  <tr><td><code>spring-boot-starter-test</code></td><td>JUnit 5, Mockito, AssertJ, TestRestTemplate</td></tr>
+</table>
+
+<div class="good">
+  <strong>Принцип:</strong> Spring Boot конфигурирует только то, что нужно. Если вы определите свой бин — авто-конфигурация отступит (благодаря <code>@ConditionalOnMissingBean</code>). Это даёт полный контроль при минимальных усилиях.
+</div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 12 ==================== -->
+<h2 id="section12">12. Endpoint'ы API</h2>
+
+<p>Полный список HTTP-endpoints, предоставляемых приложением.</p>
+
+<h3>Application Info</h3>
+<table>
+  <thead><tr><th>Метод</th><th>Путь</th><th>Описание</th></tr></thead>
+  <tbody>
+  <tr><td>GET</td><td><code>/api/demo/app-info</code></td><td>Информация о приложении</td></tr>
+  <tr><td>GET</td><td><code>/api/demo/welcome</code></td><td>Приветственное сообщение</td></tr>
+  <tr><td>GET</td><td><code>/api/demo/greeting?name=World</code></td><td>Персональное приветствие</td></tr>
+  </tbody>
+</table>
+
+<h3>Bean Inspection</h3>
+<table>
+  <thead><tr><th>Метод</th><th>Путь</th><th>Описание</th></tr></thead>
+  <tbody>
+  <tr><td>GET</td><td><code>/api/demo/beans</code></td><td>Список всех бинов (первые 50)</td></tr>
+  <tr><td>GET</td><td><code>/api/demo/beans/{beanName}</code></td><td>Информация о конкретном бине</td></tr>
+  <tr><td>GET</td><td><code>/api/demo/beans/count</code></td><td>Общее количество бинов</td></tr>
+  </tbody>
+</table>
+
+<h3>Configuration</h3>
+<table>
+  <thead><tr><th>Метод</th><th>Путь</th><th>Описание</th></tr></thead>
+  <tbody>
+  <tr><td>GET</td><td><code>/api/demo/config/property?key=app.name</code></td><td>Значение конкретного свойства</td></tr>
+  <tr><td>GET</td><td><code>/api/demo/config/sources</code></td><td>Источники конфигурации</td></tr>
+  <tr><td>GET</td><td><code>/api/demo/config/app</code></td><td>Конфигурация приложения</td></tr>
+  </tbody>
+</table>
+
+<h3>Profiles</h3>
+<table>
+  <thead><tr><th>Метод</th><th>Путь</th><th>Описание</th></tr></thead>
+  <tbody>
+  <tr><td>GET</td><td><code>/api/demo/profiles</code></td><td>Информация о профилях</td></tr>
+  <tr><td>GET</td><td><code>/api/demo/profiles/current</code></td><td>Текущий профиль</td></tr>
+  <tr><td>GET</td><td><code>/api/demo/profiles/message</code></td><td>Сообщение для текущего профиля</td></tr>
+  </tbody>
+</table>
+
+<h3>Conditional Beans</h3>
+<table>
+  <thead><tr><th>Метод</th><th>Путь</th><th>Описание</th></tr></thead>
+  <tbody>
+  <tr><td>GET</td><td><code>/api/demo/conditional/message</code></td><td>Сообщение условного бина</td></tr>
+  <tr><td>GET</td><td><code>/api/demo/conditional/feature/{feature}</code></td><td>Проверка включённости фичи (cache, metrics, logging, debug)</td></tr>
+  </tbody>
+</table>
+
+<h3>Health Check</h3>
+<table>
+  <thead><tr><th>Метод</th><th>Путь</th><th>Описание</th></tr></thead>
+  <tbody>
+  <tr><td>GET</td><td><code>/api/demo/health/custom</code></td><td>Кастомная проверка здоровья</td></tr>
+  </tbody>
+</table>
+
+<h3>Пример JSON-ответа: GET /api/demo/app-info</h3>
+
+<pre><code>{
+  "success": true,
+  "data": {
+    "name": "Spring Boot Demo Application",
+    "version": "1.0.0",
+    "environment": "development",
+    "features": [
+      "Cache: true",
+      "Metrics: true",
+      "Logging: true",
+      "Debug Mode: true"
+    ]
+  },
+  "timestamp": "2025-01-15T10:30:00"
+}</code></pre>
+
+<h3>Пример JSON-ответа: GET /api/demo/beans</h3>
+
+<pre><code>{
+  "success": true,
+  "data": {
+    "totalBeans": 142,
+    "beans": [
+      {
+        "name": "appInfoService",
+        "type": "com.example.springboot.service.AppInfoService",
+        "scope": "singleton",
+        "singleton": true,
+        "prototype": false
+      }
+    ]
+  }
+}</code></pre>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 13 ==================== -->
+<h2 id="section13">13. Быстрый старт (curl)</h2>
+
+<p>Примеры запросов для быстрого тестирования API после запуска приложения:</p>
+
+<h4>Получить информацию о приложении</h4>
+<pre><code>curl http://localhost:8080/api/demo/app-info | jq</code></pre>
+
+<h4>Получить приветственное сообщение</h4>
+<pre><code>curl http://localhost:8080/api/demo/welcome | jq</code></pre>
+
+<h4>Персональное приветствие</h4>
+<pre><code>curl "http://localhost:8080/api/demo/greeting?name=World" | jq</code></pre>
+
+<h4>Список всех бинов</h4>
+<pre><code>curl http://localhost:8080/api/demo/beans | jq</code></pre>
+
+<h4>Информация о конкретном бине</h4>
+<pre><code>curl http://localhost:8080/api/demo/beans/appInfoService | jq</code></pre>
+
+<h4>Получить значение свойства</h4>
+<pre><code>curl "http://localhost:8080/api/demo/config/property?key=app.name" | jq</code></pre>
+
+<h4>Источники конфигурации</h4>
+<pre><code>curl http://localhost:8080/api/demo/config/sources | jq</code></pre>
+
+<h4>Текущий профиль</h4>
+<pre><code>curl http://localhost:8080/api/demo/profiles/current | jq</code></pre>
+
+<h4>Проверить включена ли фича</h4>
+<pre><code>curl http://localhost:8080/api/demo/conditional/feature/cache | jq
+curl http://localhost:8080/api/demo/conditional/feature/debug | jq</code></pre>
+
+<h4>Кастомная проверка здоровья</h4>
+<pre><code>curl http://localhost:8080/api/demo/health/custom | jq</code></pre>
+
+<h4>Actuator endpoints</h4>
+<pre><code>curl http://localhost:8080/actuator/health | jq
+curl http://localhost:8080/actuator/info | jq
+curl http://localhost:8080/actuator/beans | jq</code></pre>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 14 ==================== -->
+<h2 id="section14">14. Тесты</h2>
+
+<p>
+  Каждый ключевой аспект проекта покрыт интеграционными тестами, разбитыми по секциям:
+</p>
+
+<table>
+  <tr><th>Тест-класс</th><th>Что проверяет</th><th>Тип</th></tr>
+  <tr><td><span class="file-link">Section1_ApplicationStartupTest.java</span></td><td>Загрузка контекста Spring</td><td>Интеграционный</td></tr>
+  <tr><td><span class="file-link">Section2_ConfigurationPropertiesTest.java</span></td><td>Привязка свойств, валидация</td><td>Интеграционный</td></tr>
+  <tr><td><span class="file-link">Section3_ProfilesTest.java</span></td><td>Активация профилей, @ActiveProfiles</td><td>Интеграционный</td></tr>
+  <tr><td><span class="file-link">Section4_BeanInspectionTest.java</span></td><td>Инспекция бинов, области видимости</td><td>Интеграционный</td></tr>
+  <tr><td><span class="file-link">Section5_ConditionalBeansTest.java</span></td><td>Условное создание бинов</td><td>Интеграционный</td></tr>
+  <tr><td><span class="file-link">Section6_DependencyInjectionTest.java</span></td><td>Конструкторная и полевая инъекция</td><td>Интеграционный</td></tr>
+  <tr><td><span class="file-link">Section7_EnvironmentTest.java</span></td><td>Чтение свойств из Environment</td><td>Интеграционный</td></tr>
+  <tr><td><span class="file-link">Section8_RestControllerTest.java</span></td><td>REST-endpoints через TestRestTemplate</td><td>Web-интеграционный</td></tr>
+  <tr><td><span class="file-link">Section9_ExceptionHandlingTest.java</span></td><td>Кастомные исключения, обработка</td><td>Интеграционный</td></tr>
+</table>
+
+<h3>Пример REST-теста</h3>
+
+<pre><code>@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+class Section8_RestControllerTest {
+
+    @Autowired
+    private TestRestTemplate restTemplate;
+
+    @LocalServerPort
+    private int port;
+
+    @Test
+    void getAppInfoReturnsValidData() {
+        ResponseEntity&lt;Map&gt; response = restTemplate.getForEntity(
+            "http://localhost:" + port + "/api/demo/app-info", Map.class
+        );
+
+        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().get("success")).isEqualTo(true);
+
+        Map&lt;String, Object&gt; data = (Map&lt;String, Object&gt;) response.getBody().get("data");
+        assertThat(data.get("name")).isNotNull();
+        assertThat(data.get("version")).isNotNull();
+    }
+}</code></pre>
+
+<h3>Запуск тестов</h3>
+
+<pre><code># Все тесты
+mvn test -pl 03-spring-boot
+
+# Конкретный тест-класс
+mvn test -pl 03-spring-boot -Dtest=Section8_RestControllerTest
+
+# Конкретный тест-метод
+mvn test -pl 03-spring-boot -Dtest=Section8_RestControllerTest#getAppInfoReturnsValidData</code></pre>
+
+<div class="good">
+  Тесты можно запустить командой <code>mvn clean test -pl 03-spring-boot</code>.
+</div>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 15 ==================== -->
+<h2 id="section15">15. Сравнение подходов DI</h2>
+
+<p>Таблица-шпаргалка по всем способам внедрения зависимостей в Spring.</p>
+
+<table>
+  <thead><tr><th>Подход</th><th>Суть</th><th>Когда использовать</th><th>Рекомендация</th></tr></thead>
+  <tbody>
+  <tr><td><strong>Constructor</strong></td><td>Зависимости через конструктор</td><td>Всегда — рекомендуемый способ</td><td>★★★★★</td></tr>
+  <tr><td><strong>Field</strong></td><td><code>@Autowired</code> над полем</td><td>Только в тестах или специфичных случаях</td><td>★★☆☆☆</td></tr>
+  <tr><td><strong>Setter</strong></td><td><code>@Autowired</code> над сеттером</td><td>Для опциональных зависимостей</td><td>★★★☆☆</td></tr>
+  <tr><td><strong>ApplicationContext</strong></td><td>Получение бина из контекста</td><td>Для динамического поиска бинов</td><td>★★★☆☆</td></tr>
+  <tr><td><strong>@Qualifier</strong></td><td>Уточнение имени бина при конфликте типов</td><td>Когда есть несколько бинов одного типа</td><td>★★★★☆</td></tr>
+  <tr><td><strong>@Primary</strong></td><td>Помечение основного бина</td><td>Дефолтная реализация среди нескольких</td><td>★★★★☆</td></tr>
+  </tbody>
+</table>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 16 ==================== -->
+<h2 id="section16">16. Best Practices</h2>
+
+<h3>Делать ✅</h3>
+
+<table>
+  <tr><th>#</th><th>Практика</th><th>Почему</th></tr>
+  <tr><td>1</td><td>Использовать конструкторную инъекцию</td><td>final-поля, тестируемость, читаемость</td></tr>
+  <tr><td>2</td><td>Делать бины stateless (singleton)</td><td>Потокобезопасность, производительность</td></tr>
+  <tr><td>3</td><td>Использовать <code>@ConfigurationProperties</code></td><td>Типобезопасность, валидация</td></tr>
+  <tr><td>4</td><td>Разделять конфигурацию по профилям</td><td>Чистота окружений</td></tr>
+  <tr><td>5</td><td>Писать интеграционные тесты</td><td>Доверие к коду, отсутствие регрессий</td></tr>
+  <tr><td>6</td><td>Использовать <code>@RestControllerAdvice</code></td><td>Централизованная обработка ошибок</td></tr>
+  <tr><td>7</td><td>Включать Actuator в production</td><td>Мониторинг, health checks</td></tr>
+  <tr><td>8</td><td>Валидировать входные данные</td><td>Защита от некорректных данных</td></tr>
+</table>
+
+<h3>Избегать ❌</h3>
+
+<table>
+  <tr><th>#</th><th>Антипаттерн</th><th>Почему</th></tr>
+  <tr><td>1</td><td>Полевой инъекции (<code>@Autowired</code> на поле)</td><td>Нельзя final, сложнее тестировать</td></tr>
+  <tr><td>2</td><td>Циклических зависимостей</td><td>Нарушение принципа единственной ответственности</td></tr>
+  <tr><td>3</td><td>Хранения состояния в singleton-бинах</td><td>Гонки данных, непредсказуемое поведение</td></tr>
+  <tr><td>4</td><td>Отключения Actuator без авторизации</td><td>Утечка чувствительных данных</td></tr>
+  <tr><td>5</td><td>Игнорирования исключений</td><td>Скрытые баги, сложная отладка</td></tr>
+  <tr><td>6</td><td>Создания бинов через <code>new</code></td><td>Нарушение DI, невозможно тестировать</td></tr>
+</table>
+
+<hr class="section-divider"/>
+
+<!-- ==================== SECTION 17 ==================== -->
+<h2 id="section17">17. Структура проекта</h2>
+
+<div class="card">
+<pre><code>src/
+├── main/
+│   ├── java/com/example/springboot/
+│   │   ├── SpringBootDemoApplication.java       // Точка входа
+│   │   ├── config/
+│   │   │   ├── ConditionalConfig.java           // Условные бины
+│   │   │   ├── CustomMetricsConfig.java         // Метрики Actuator
+│   │   │   ├── DemoDataInitializer.java         // Инициализация при старте
+│   │   │   └── WebConfig.java                   // Веб-конфигурация
+│   │   ├── controller/
+│   │   │   ├── DemoController.java              // REST API endpoints
+│   │   │   └── GlobalExceptionHandler.java      // Обработка ошибок
+│   │   ├── exception/
+│   │   │   ├── AppException.java                // Базовое исключение
+│   │   │   ├── BeanNotFoundException.java       // Бин не найден
+│   │   │   └── ConfigurationException.java      // Ошибка конфигурации
+│   │   ├── model/
+│   │   │   ├── ApiModels.java                   // DTO модели (ApiResponse, AppInfo и др.)
+│   │   │   └── AppProperties.java               // Конфигурационные свойства
+│   │   └── service/
+│   │       ├── AppInfoService.java              // Информация о приложении
+│   │       ├── BeanService.java                 // Инспекция бинов
+│   │       ├── ConditionalBeanService.java      // Условные бины
+│   │       ├── ConfigurationService.java        // Чтение конфигурации
+│   │       └── ProfileService.java              // Управление профилями
+│   └── resources/
+│       └── application.yaml                     // Конфигурация (все профили)
+└── test/
+    └── java/com/example/springboot/
+        ├── Section1_ApplicationStartupTest.java
+        ├── Section2_ConfigurationPropertiesTest.java
+        ├── Section3_ProfilesTest.java
+        ├── Section4_BeanInspectionTest.java
+        ├── Section5_ConditionalBeansTest.java
+        ├── Section6_DependencyInjectionTest.java
+        ├── Section7_EnvironmentTest.java
+        ├── Section8_RestControllerTest.java
+        └── Section9_ExceptionHandlingTest.java</code></pre>
+</div>
+
+<hr class="section-divider"/>
+
+<h2>Вывод</h2>
+<p>
+  Spring Boot делает создание production-ready приложений простым и предсказуемым.
+  Auto-configuration берёт на себя рутину, <code>@ConfigurationProperties</code> обеспечивает типобезопасную конфигурацию,
+  профили позволяют гибко управлять окружениями, а Actuator предоставляет инструменты мониторинга из коробки.
+  Этот проект демонстрирует все ключевые концепции фреймворка на практических примерах с полным покрытием тестами.
+</p>
+
 </body>
 </html>
