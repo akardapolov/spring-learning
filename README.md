@@ -209,9 +209,3 @@ mvn -pl 08-spring-security spring-boot:run
 cd 04-hibernate
 mvn spring-boot:run
 ```
-
-## Примечание
-
-Сейчас не все модули содержат полноценное Spring Boot приложение.
-Для модулей-заглушек доступны структура, `pom.xml` и HTML-документация.  
-Команды `spring-boot:run` будут работать после добавления основного класса приложения с `@SpringBootApplication`.

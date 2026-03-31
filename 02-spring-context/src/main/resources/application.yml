@@ -1,3 +1,6 @@
+server:
+  port: 8886
+
 spring:
   application:
     name: spring-context-demo
