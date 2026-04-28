@@ -148,19 +148,13 @@ mvn clean install
 
 ### Сборка конкретного модуля
 
-Пример для Hibernate:
+Пример для Servlets:
 
 ```bash
-mvn -pl 04-hibernate clean install
+mvn -pl 01-servlets clean install
 ```
 
-Если позже появятся зависимости между модулями, можно использовать:
-
-```bash
-mvn -pl 04-hibernate -am clean install
-```
-
-### Запуск конкретного модуля из корня проекта
+### Сборка и запуск конкретного модуля из корня проекта
 
 #### 1. Основы Web (Servlets & Tomcat)
 ```bash
