@@ -1,0 +1,1252 @@
+<!-- filename: index.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spring Learning Project</title>
+  <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    html, body {
+        height: 100%;
+    }
+
+    :root {
+        --sidebar-width: 280px;
+        --header-height: 60px;
+
+        --bg-app:       #f0f2f5;
+        --bg-sidebar:   #ffffff;
+        --bg-content:   #f0f2f5;
+        --bg-card:      #ffffff;
+        --bg-dark:      #f7f8fa;
+        --bg-hover:     #f0f4ff;
+        --bg-active:    #e8efff;
+        --bg-code:      #f4f6f9;
+
+        --accent-green:  #2e7d32;
+        --accent-blue:   #1565c0;
+        --accent-orange: #e65100;
+        --accent-red:    #c62828;
+        --accent-purple: #6a1b9a;
+        --accent-teal:   #00695c;
+        --accent-spring: #6db33f;
+
+        --text-primary:  #2c3e50;
+        --text-bright:   #1a202c;
+        --text-muted:    #8896a7;
+        --text-code:     #c7254e;
+
+        --border:        #dde3ec;
+        --shadow-sm:     0 1px 4px rgba(0,0,0,0.08);
+        --shadow-md:     0 4px 16px rgba(0,0,0,0.10);
+        --shadow-lg:     0 8px 32px rgba(0,0,0,0.13);
+
+        --sidebar-transition: 0.28s cubic-bezier(.4,0,.2,1);
+    }
+
+    body {
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        background: var(--bg-app);
+        color: var(--text-primary);
+        height: 100%;
+        min-height: 100vh;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* ═══ HEADER ═══ */
+    header {
+        height: var(--header-height);
+        background: var(--bg-sidebar);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        padding: 0 20px;
+        gap: 14px;
+        flex-shrink: 0;
+        z-index: 100;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .burger-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 7px;
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        transition: background 0.18s;
+        flex-shrink: 0;
+    }
+    .burger-btn:hover { background: var(--bg-hover); }
+    .burger-btn span {
+        display: block;
+        width: 22px;
+        height: 2px;
+        background: var(--text-muted);
+        border-radius: 2px;
+        transition: all 0.3s ease;
+    }
+    .burger-btn.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); background: var(--accent-spring); }
+    .burger-btn.open span:nth-child(2) { opacity: 0; }
+    .burger-btn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); background: var(--accent-spring); }
+
+    .header-logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    .logo-icon {
+        width: 34px;
+        height: 34px;
+        background: linear-gradient(135deg, #6db33f, #4a8f2a);
+        border-radius: 9px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 17px;
+        flex-shrink: 0;
+        box-shadow: 0 2px 8px rgba(109,179,63,0.25);
+    }
+    .logo-text {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text-bright);
+        letter-spacing: 0.2px;
+        white-space: nowrap;
+    }
+    .logo-text span { color: var(--accent-spring); }
+
+    .header-breadcrumb {
+        margin-left: auto;
+        font-size: 13px;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+    }
+    .header-breadcrumb .sep { opacity: 0.5; }
+    .header-breadcrumb .current {
+        color: var(--accent-spring);
+        font-weight: 600;
+    }
+
+    /* ═══ LAYOUT ═══ */
+    .layout {
+        display: flex;
+        flex: 1;
+        overflow: hidden;
+        min-width: 0;
+        min-height: 0;
+    }
+
+    /* ═══ SIDEBAR ═══ */
+    .sidebar {
+        width: var(--sidebar-width);
+        min-width: var(--sidebar-width);
+        background: var(--bg-sidebar);
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        flex-shrink: 0;
+        transition: width var(--sidebar-transition),
+                    min-width var(--sidebar-transition);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        z-index: 50;
+    }
+    .sidebar.collapsed {
+        width: 0;
+        min-width: 0;
+    }
+    .sidebar-inner {
+        width: var(--sidebar-width);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        min-height: 0;
+    }
+
+    .sidebar-search {
+        padding: 14px 12px 10px;
+        flex-shrink: 0;
+        border-bottom: 1px solid var(--border);
+    }
+    .search-wrap { position: relative; }
+    .search-wrap svg {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+        color: var(--text-muted);
+    }
+    .sidebar-search input {
+        width: 100%;
+        background: var(--bg-dark);
+        border: 1px solid var(--border);
+        border-radius: 7px;
+        padding: 7px 10px 7px 34px;
+        color: var(--text-primary);
+        font-size: 13px;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .sidebar-search input:focus {
+        border-color: var(--accent-spring);
+        box-shadow: 0 0 0 3px rgba(109,179,63,0.12);
+    }
+    .sidebar-search input::placeholder { color: var(--text-muted); }
+
+    .sidebar-nav {
+        flex: 1;
+        overflow-y: auto;
+        padding: 6px 8px 20px;
+    }
+    .sidebar-nav::-webkit-scrollbar { width: 4px; }
+    .sidebar-nav::-webkit-scrollbar-track { background: transparent; }
+    .sidebar-nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .nav-section-label {
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        color: var(--text-muted);
+        padding: 14px 10px 5px;
+        user-select: none;
+    }
+
+    .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 10px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.15s, color 0.15s;
+        user-select: none;
+        margin-bottom: 2px;
+        position: relative;
+        border: 1px solid transparent;
+    }
+    .nav-item:hover { background: var(--bg-hover); border-color: var(--border); }
+    .nav-item.active { background: var(--bg-active); border-color: #c3d8a0; }
+    .nav-item.active::before {
+        content: '';
+        position: absolute;
+        left: -1px; top: 6px; bottom: 6px;
+        width: 3px;
+        background: var(--accent-spring);
+        border-radius: 0 3px 3px 0;
+    }
+    .nav-item.search-hidden { display: none; }
+
+    .nav-item-icon { font-size: 16px; flex-shrink: 0; width: 22px; text-align: center; }
+    .nav-item-text { flex: 1; min-width: 0; }
+    .nav-item-title {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-bright);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .nav-item.active .nav-item-title { color: var(--accent-green); font-weight: 600; }
+    .nav-item-sub {
+        font-size: 11px;
+        color: var(--text-muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-top: 1px;
+    }
+
+    .nav-badge {
+        font-size: 10px;
+        font-weight: 700;
+        padding: 2px 7px;
+        border-radius: 10px;
+        flex-shrink: 0;
+        border: 1px solid transparent;
+    }
+    .badge-overview { background: #f0f2f5; color: var(--text-muted); border-color: var(--border); }
+    .badge-01 { background: #fff3e0; color: #e65100; border-color: #ffcc80; }
+    .badge-02 { background: #e8f5e9; color: #2e7d32; border-color: #a5d6a7; }
+    .badge-03 { background: #e3f2fd; color: #1565c0; border-color: #90caf9; }
+    .badge-04 { background: #fce4ec; color: #c62828; border-color: #f48fb1; }
+    .badge-05 { background: #f3e5f5; color: #6a1b9a; border-color: #ce93d8; }
+    .badge-06 { background: #e0f2f1; color: #00695c; border-color: #80cbc4; }
+    .badge-07 { background: #fff8e1; color: #e65100; border-color: #ffe082; }
+    .badge-08 { background: #fce4ec; color: #880e4f; border-color: #f48fb1; }
+
+    .sidebar-footer {
+        flex-shrink: 0;
+        border-top: 1px solid var(--border);
+        padding: 10px 14px;
+        font-size: 11px;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .kbd {
+        display: inline-flex;
+        align-items: center;
+        background: var(--bg-dark);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 1px 5px;
+        font-size: 10px;
+        font-family: monospace;
+        color: var(--text-muted);
+    }
+
+    /* ═══ MAIN ═══ */
+    .main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        background: var(--bg-content);
+        min-width: 0;
+        min-height: 0;
+    }
+
+    .content-scroll {
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
+        min-width: 0;
+        min-height: 0;
+        scrollbar-gutter: stable;
+        overscroll-behavior: contain;
+    }
+    .content-scroll::-webkit-scrollbar { width: 7px; }
+    .content-scroll::-webkit-scrollbar-track { background: transparent; }
+    .content-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    .content-scroll::-webkit-scrollbar-thumb:hover { background: #b0bec5; }
+
+    /* ═══ OVERVIEW ═══ */
+    .overview-wrap {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 36px 40px 60px;
+        width: 100%;
+    }
+
+    .overview-hero {
+        background: linear-gradient(135deg, #f1f8e9 0%, #e3f2fd 100%);
+        border: 1px solid #c8e6c9;
+        border-radius: 16px;
+        padding: 32px 36px;
+        margin-bottom: 36px;
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        box-shadow: var(--shadow-sm);
+    }
+    .hero-logo {
+        width: 72px; height: 72px;
+        background: linear-gradient(135deg, #6db33f, #4a8f2a);
+        border-radius: 18px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 36px; flex-shrink: 0;
+        box-shadow: 0 6px 20px rgba(109,179,63,0.3);
+    }
+    .hero-text h1 { font-size: 26px; font-weight: 800; color: var(--text-bright); margin-bottom: 6px; }
+    .hero-text h1 span { color: var(--accent-spring); }
+    .hero-text p { font-size: 14px; color: #546e7a; line-height: 1.65; max-width: 560px; }
+
+    .section-heading {
+        font-size: 17px; font-weight: 700; color: var(--text-bright);
+        margin: 36px 0 16px;
+        display: flex; align-items: center; gap: 10px;
+    }
+    .section-heading::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    .modules-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(272px, 1fr));
+        gap: 16px; margin-bottom: 8px;
+    }
+    .module-card {
+        background: var(--bg-card); border: 1px solid var(--border);
+        border-radius: 12px; padding: 18px 20px 16px;
+        cursor: pointer;
+        transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+        position: relative; overflow: hidden;
+    }
+    .module-card::after {
+        content: ''; position: absolute;
+        top: 0; left: 0; right: 0; height: 3px;
+        background: var(--card-color, var(--accent-spring));
+        border-radius: 12px 12px 0 0;
+    }
+    .module-card:hover { border-color: var(--card-color, var(--accent-spring)); transform: translateY(-3px); box-shadow: var(--shadow-md); }
+    .module-card-header { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 13px; }
+    .module-card-num {
+        font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 5px;
+        flex-shrink: 0; margin-top: 2px;
+        background: var(--card-bg, #f0f2f5);
+        color: var(--card-color, var(--text-muted));
+        border: 1px solid var(--card-border, var(--border));
+    }
+    .module-card-title { font-size: 14px; font-weight: 700; color: var(--text-bright); line-height: 1.4; }
+    .module-card-topics { list-style: none; display: flex; flex-wrap: wrap; gap: 5px; }
+    .module-card-topics li {
+        font-size: 11px; background: var(--bg-dark); border: 1px solid var(--border);
+        border-radius: 4px; padding: 2px 8px; color: var(--text-muted); font-weight: 500;
+    }
+
+    .info-block {
+        background: var(--bg-card); border: 1px solid var(--border);
+        border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: var(--shadow-sm);
+    }
+    .info-block h3 { font-size: 14px; font-weight: 700; color: var(--text-bright); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+
+    .file-tree {
+        font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+        font-size: 13px; line-height: 2;
+        background: var(--bg-code); border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px;
+    }
+    .ft-root { color: var(--accent-spring); font-weight: 700; }
+    .ft-dir  { color: var(--accent-blue); }
+    .ft-file { color: var(--text-muted); }
+
+    .steps { display: flex; flex-direction: column; gap: 10px; }
+    .step {
+        display: flex; align-items: flex-start; gap: 14px;
+        padding: 14px 16px; background: var(--bg-dark); border-radius: 8px; border: 1px solid var(--border);
+    }
+    .step-num {
+        width: 28px; height: 28px; background: #f1f8e9; border: 2px solid #a5d6a7; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 12px; font-weight: 800; color: var(--accent-green); flex-shrink: 0;
+    }
+    .step-text { font-size: 13px; line-height: 1.65; padding-top: 4px; color: var(--text-primary); }
+    .step-text strong { color: var(--text-bright); }
+    .step-text code {
+        background: var(--bg-code); border: 1px solid var(--border); border-radius: 4px;
+        padding: 1px 6px; font-size: 12px; color: var(--text-code);
+        font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    }
+
+    .cmd-list { display: flex; flex-direction: column; gap: 8px; }
+    .cmd-item {
+        background: var(--bg-code); border: 1px solid var(--border); border-radius: 8px;
+        padding: 11px 14px; display: flex; align-items: center; gap: 12px; transition: border-color 0.15s;
+    }
+    .cmd-item:hover { border-color: #b0c4de; }
+    .cmd-label { font-size: 12px; color: var(--text-muted); min-width: 130px; flex-shrink: 0; font-weight: 500; }
+    .cmd-code { font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace; font-size: 12.5px; color: var(--accent-green); flex: 1; }
+    .cmd-copy {
+        background: #fff; border: 1px solid var(--border); border-radius: 5px;
+        padding: 4px 10px; color: var(--text-muted); font-size: 11px;
+        cursor: pointer; transition: all 0.18s; flex-shrink: 0; font-weight: 500;
+    }
+    .cmd-copy:hover { border-color: var(--accent-spring); color: var(--accent-spring); background: #f1f8e9; }
+    .cmd-copy.copied { border-color: var(--accent-spring); color: var(--accent-spring); background: #f1f8e9; }
+
+    .table-scroll { overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); }
+    .oop-table { width: 100%; border-collapse: collapse; font-size: 12.5px; min-width: 680px; }
+    .oop-table th {
+        background: var(--bg-dark); color: var(--text-muted); font-size: 11px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 0.7px; padding: 10px 14px; text-align: left;
+        border-bottom: 2px solid var(--border); white-space: nowrap;
+    }
+    .oop-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--text-primary); line-height: 1.5; vertical-align: top; }
+    .oop-table tbody tr:last-child td { border-bottom: none; }
+    .oop-table tbody tr:hover td { background: var(--bg-hover); }
+    .oop-table td:first-child { color: var(--text-bright); font-weight: 600; white-space: nowrap; }
+    .oop-table code {
+        background: var(--bg-code); border: 1px solid var(--border); border-radius: 3px;
+        padding: 1px 5px; font-size: 11px; color: var(--text-code);
+        font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    }
+    .yes  { color: #2e7d32; font-weight: 700; }
+    .part { color: #e65100; font-weight: 600; }
+
+    /* ═══ MODULE PANEL ═══ */
+    .module-toolbar {
+        height: 44px; background: var(--bg-card); border-bottom: 1px solid var(--border);
+        display: flex; align-items: center; padding: 0 20px; gap: 12px;
+        flex-shrink: 0; box-shadow: var(--shadow-sm);
+    }
+    .module-toolbar-info { font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+    .module-toolbar-info .mod-name { color: var(--text-bright); font-weight: 600; }
+    .toolbar-actions { margin-left: auto; display: flex; gap: 8px; }
+    .toolbar-btn {
+        background: #fff; border: 1px solid var(--border); border-radius: 6px;
+        padding: 5px 12px; color: var(--text-muted); font-size: 12px;
+        cursor: pointer; display: flex; align-items: center; gap: 5px;
+        transition: all 0.18s; text-decoration: none; font-weight: 500;
+    }
+    .toolbar-btn:hover { border-color: var(--accent-spring); color: var(--accent-spring); background: #f1f8e9; }
+
+    #mainArea {
+        min-width: 0;
+        min-height: 0;
+    }
+
+    #moduleContent {
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
+        background: #fff;
+        min-height: 0;
+        min-width: 0;
+        scrollbar-gutter: stable;
+        overflow-anchor: none;
+    }
+    #moduleContent::-webkit-scrollbar { width: 7px; }
+    #moduleContent::-webkit-scrollbar-track { background: transparent; }
+    #moduleContent::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    .shadow-host {
+        display: block;
+        width: 100%;
+        min-height: 0;
+        height: auto;
+    }
+
+    .state-box {
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        min-height: 400px; gap: 16px; color: var(--text-muted); padding: 40px; text-align: center;
+    }
+    .state-box .state-icon { font-size: 48px; }
+    .state-box h3 { font-size: 17px; color: var(--text-primary); font-weight: 600; }
+    .state-box p  { font-size: 13px; line-height: 1.6; max-width: 420px; }
+    .state-box code {
+        background: var(--bg-code); border: 1px solid var(--border); border-radius: 4px;
+        padding: 1px 6px; font-size: 12px; color: var(--text-code);
+    }
+    .state-box .open-link {
+        margin-top: 8px; display: inline-flex; align-items: center; gap: 6px;
+        background: var(--accent-spring); color: #fff; padding: 9px 20px;
+        border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 600; transition: background 0.18s;
+    }
+    .state-box .open-link:hover { background: #5a9e32; }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 768px) {
+        .sidebar {
+            position: fixed; top: var(--header-height); left: 0; bottom: 0; z-index: 200;
+            width: var(--sidebar-width) !important; min-width: var(--sidebar-width) !important;
+            box-shadow: var(--shadow-lg); transform: translateX(0);
+            transition: transform var(--sidebar-transition);
+        }
+        .sidebar.collapsed { transform: translateX(-100%); width: var(--sidebar-width) !important; min-width: var(--sidebar-width) !important; }
+        .sidebar-overlay { display: block; position: fixed; inset: var(--header-height) 0 0 0; background: rgba(44,62,80,0.35); z-index: 199; backdrop-filter: blur(2px); }
+        .overview-wrap { padding: 20px 16px 40px; }
+        .modules-grid { grid-template-columns: 1fr; }
+        .header-breadcrumb { display: none; }
+        .overview-hero { flex-direction: column; text-align: center; padding: 24px 20px; }
+    }
+    .sidebar-overlay { display: none; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════ HEADER ═══════════════ -->
+<header>
+  <button class="burger-btn open" id="burgerBtn" aria-label="Toggle sidebar">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="header-logo" onclick="showOverview()">
+    <div class="logo-icon">🌿</div>
+    <div class="logo-text">Spring <span>Learning</span></div>
+  </div>
+  <div class="header-breadcrumb">
+    <span>Документация</span>
+    <span class="sep">›</span>
+    <span class="current" id="breadcrumbCurrent">Общая информация</span>
+  </div>
+</header>
+
+<div class="layout">
+
+  <div class="sidebar-overlay hidden" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+  <!-- ═══════════════ SIDEBAR ═══════════════ -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-inner">
+      <div class="sidebar-search">
+        <div class="search-wrap">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text" id="searchInput" placeholder="Поиск… (нажмите /)" oninput="filterNav(this.value)">
+        </div>
+      </div>
+
+      <div class="sidebar-nav">
+        <div class="nav-section-label">Обзор</div>
+        <div class="nav-item active" id="nav-overview"
+             data-search="общая информация обзор проект readme"
+             onclick="showOverview()">
+          <span class="nav-item-icon">🏠</span>
+          <div class="nav-item-text">
+            <div class="nav-item-title">Общая информация</div>
+            <div class="nav-item-sub">О проекте, структура, команды</div>
+          </div>
+          <span class="nav-badge badge-overview">README</span>
+        </div>
+
+        <div class="nav-section-label">Модули курса</div>
+
+        <div class="nav-item" id="nav-01" data-search="сервлеты servlets tomcat http фильтры сессии lifecycle"
+             onclick="loadModule('01-servlets','Servlets &amp; Tomcat','01')">
+          <span class="nav-item-icon">🌐</span>
+          <div class="nav-item-text">
+            <div class="nav-item-title">Servlets &amp; Tomcat</div>
+            <div class="nav-item-sub">HTTP, Servlet API, Filters</div>
+          </div>
+          <span class="nav-badge badge-01">01</span>
+        </div>
+
+        <div class="nav-item" id="nav-02" data-search="spring context ioc di dependency injection bean aop proxy"
+             onclick="loadModule('02-spring-context','Spring Context','02')">
+          <span class="nav-item-icon">⚙️</span>
+          <div class="nav-item-text">
+            <div class="nav-item-title">Spring Context</div>
+            <div class="nav-item-sub">IoC, DI, Beans, AOP</div>
+          </div>
+          <span class="nav-badge badge-02">02</span>
+        </div>
+
+        <div class="nav-item" id="nav-03" data-search="spring boot автоконфигурация стартеры actuator yaml conditional"
+             onclick="loadModule('03-spring-boot','Spring Boot','03')">
+          <span class="nav-item-icon">🚀</span>
+          <div class="nav-item-text">
+            <div class="nav-item-title">Spring Boot</div>
+            <div class="nav-item-sub">Auto-config, Starters, Actuator</div>
+          </div>
+          <span class="nav-badge badge-03">03</span>
+        </div>
+
+        <div class="nav-item" id="nav-04" data-search="hibernate orm entity jpa n+1 lazy eager кэш cache mapping"
+             onclick="loadModule('04-hibernate','Hibernate','04')">
+          <span class="nav-item-icon">🗄️</span>
+          <div class="nav-item-text">
+            <div class="nav-item-title">Hibernate</div>
+            <div class="nav-item-sub">ORM, Entity Lifecycle, Cache</div>
+          </div>
+          <span class="nav-badge badge-04">04</span>
+        </div>
+
+        <div class="nav-item" id="nav-05" data-search="spring data jpa repository query pageable projection specification"
+             onclick="loadModule('05-spring-data-jpa','Spring Data JPA','05')">
+          <span class="nav-item-icon">📊</span>
+          <div class="nav-item-text">
+            <div class="nav-item-title">Spring Data JPA</div>
+            <div class="nav-item-sub">Repository, @Query, Pageable</div>
+          </div>
+          <span class="nav-badge badge-05">05</span>
+        </div>
+
+        <div class="nav-item" id="nav-06" data-search="spring data jdbc ddd aggregate domain driven design events"
+             onclick="loadModule('06-spring-data-jdbc','Spring Data JDBC','06')">
+          <span class="nav-item-icon">🔌</span>
+          <div class="nav-item-text">
+            <div class="nav-item-title">Spring Data JDBC</div>
+            <div class="nav-item-sub">DDD, Aggregates, Mapping</div>
+          </div>
+          <span class="nav-badge badge-06">06</span>
+        </div>
+
+        <div class="nav-item" id="nav-07" data-search="spring rest api restcontroller jackson validation responseentity advice"
+             onclick="loadModule('07-spring-rest','Spring REST','07')">
+          <span class="nav-item-icon">🔗</span>
+          <div class="nav-item-text">
+            <div class="nav-item-title">Spring REST</div>
+            <div class="nav-item-sub">REST API, Jackson, Validation</div>
+          </div>
+          <span class="nav-badge badge-07">07</span>
+        </div>
+
+        <div class="nav-item" id="nav-08" data-search="spring security jwt аутентификация авторизация cors csrf пароль userdetails"
+             onclick="loadModule('08-spring-security','Spring Security','08')">
+          <span class="nav-item-icon">🔐</span>
+          <div class="nav-item-text">
+            <div class="nav-item-title">Spring Security</div>
+            <div class="nav-item-sub">Auth, JWT, CORS, CSRF</div>
+          </div>
+          <span class="nav-badge badge-08">08</span>
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <span class="kbd">Ctrl B</span> сайдбар &nbsp;·&nbsp;
+        <span class="kbd">/</span> поиск &nbsp;·&nbsp;
+        <span class="kbd">Esc</span> сброс
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══════════════ MAIN ═══════════════ -->
+  <main class="main" id="mainArea">
+
+    <!-- OVERVIEW PANEL -->
+    <div class="content-scroll" id="overviewPanel">
+      <div class="overview-wrap">
+
+        <div class="overview-hero">
+          <div class="hero-logo">🌿</div>
+          <div class="hero-text">
+            <h1>Spring <span>Learning</span> Project</h1>
+            <p>Учебный проект, разбитый на модули для последовательного изучения
+              экосистемы Spring и связанных технологий. Каждый модуль — отдельный
+              проект с документацией и примерами кода.</p>
+          </div>
+        </div>
+
+        <div class="section-heading">📚 Содержание курса</div>
+        <div class="modules-grid">
+          <div class="module-card" style="--card-color:#e65100;--card-bg:#fff3e0;--card-border:#ffcc80"
+               onclick="loadModule('01-servlets','Servlets &amp; Tomcat','01')">
+            <div class="module-card-header"><span class="module-card-num">01</span><div class="module-card-title">Основы Web<br>Servlets &amp; Tomcat</div></div>
+            <ul class="module-card-topics"><li>HTTP lifecycle</li><li>Servlet API</li><li>Filters</li><li>Listeners</li><li>Session</li></ul>
+          </div>
+          <div class="module-card" style="--card-color:#2e7d32;--card-bg:#e8f5e9;--card-border:#a5d6a7"
+               onclick="loadModule('02-spring-context','Spring Context','02')">
+            <div class="module-card-header"><span class="module-card-num">02</span><div class="module-card-title">Spring Context<br>Core</div></div>
+            <ul class="module-card-topics"><li>IoC / DI</li><li>Bean Lifecycle</li><li>Scopes</li><li>AOP</li><li>ApplicationContext</li></ul>
+          </div>
+          <div class="module-card" style="--card-color:#1565c0;--card-bg:#e3f2fd;--card-border:#90caf9"
+               onclick="loadModule('03-spring-boot','Spring Boot','03')">
+            <div class="module-card-header"><span class="module-card-num">03</span><div class="module-card-title">Spring Boot</div></div>
+            <ul class="module-card-topics"><li>Auto-config</li><li>Starters</li><li>@Conditional</li><li>Actuator</li><li>YAML</li></ul>
+          </div>
+          <div class="module-card" style="--card-color:#c62828;--card-bg:#fce4ec;--card-border:#f48fb1"
+               onclick="loadModule('04-hibernate','Hibernate','04')">
+            <div class="module-card-header"><span class="module-card-num">04</span><div class="module-card-title">Hibernate</div></div>
+            <ul class="module-card-topics"><li>ORM</li><li>Entity Lifecycle</li><li>N+1</li><li>LAZY/EAGER</li><li>Cache L1/L2</li></ul>
+          </div>
+          <div class="module-card" style="--card-color:#6a1b9a;--card-bg:#f3e5f5;--card-border:#ce93d8"
+               onclick="loadModule('05-spring-data-jpa','Spring Data JPA','05')">
+            <div class="module-card-header"><span class="module-card-num">05</span><div class="module-card-title">Spring Data JPA</div></div>
+            <ul class="module-card-topics"><li>Repository</li><li>@Query</li><li>Pageable</li><li>Projections</li><li>Specifications</li></ul>
+          </div>
+          <div class="module-card" style="--card-color:#00695c;--card-bg:#e0f2f1;--card-border:#80cbc4"
+               onclick="loadModule('06-spring-data-jdbc','Spring Data JDBC','06')">
+            <div class="module-card-header"><span class="module-card-num">06</span><div class="module-card-title">Spring Data JDBC</div></div>
+            <ul class="module-card-topics"><li>vs JPA</li><li>DDD</li><li>Aggregates</li><li>Mapping</li><li>Events</li></ul>
+          </div>
+          <div class="module-card" style="--card-color:#e65100;--card-bg:#fff8e1;--card-border:#ffe082"
+               onclick="loadModule('07-spring-rest','Spring REST','07')">
+            <div class="module-card-header"><span class="module-card-num">07</span><div class="module-card-title">Spring REST</div></div>
+            <ul class="module-card-topics"><li>REST</li><li>@RestController</li><li>Jackson</li><li>Validation</li><li>ControllerAdvice</li></ul>
+          </div>
+          <div class="module-card" style="--card-color:#880e4f;--card-bg:#fce4ec;--card-border:#f48fb1"
+               onclick="loadModule('08-spring-security','Spring Security','08')">
+            <div class="module-card-header"><span class="module-card-num">08</span><div class="module-card-title">Spring Security</div></div>
+            <ul class="module-card-topics"><li>Filter Chain</li><li>JWT</li><li>UserDetails</li><li>@PreAuthorize</li><li>CORS/CSRF</li></ul>
+          </div>
+        </div>
+
+        <div class="section-heading">📁 Структура проекта</div>
+        <div class="info-block">
+          <h3>⚙️ Maven Multi-Module Project</h3>
+          <div class="file-tree">
+            <span class="ft-root">spring/</span><br>
+            ├─ <span class="ft-file">pom.xml</span><br>
+            ├─ <span class="ft-file">README.md</span><br>
+            ├─ <span class="ft-file">.gitignore</span><br>
+            ├─ <span class="ft-dir">01-servlets/</span><br>
+            ├─ <span class="ft-dir">02-spring-context/</span><br>
+            ├─ <span class="ft-dir">03-spring-boot/</span><br>
+            ├─ <span class="ft-dir">04-hibernate/</span><br>
+            ├─ <span class="ft-dir">05-spring-data-jpa/</span><br>
+            ├─ <span class="ft-dir">06-spring-data-jdbc/</span><br>
+            ├─ <span class="ft-dir">07-spring-rest/</span><br>
+            └─ <span class="ft-dir">08-spring-security/</span>
+          </div>
+        </div>
+
+        <div class="section-heading">🚀 Как использовать</div>
+        <div class="info-block">
+          <h3>📖 Порядок работы с модулем</h3>
+          <div class="steps">
+            <div class="step"><div class="step-num">1</div><div class="step-text">Выберите нужный модуль в левом меню или кликните карточку выше.</div></div>
+            <div class="step"><div class="step-num">2</div><div class="step-text">Изучите теорию — содержимое <code>index.html</code> модуля отображается прямо на этой странице.</div></div>
+            <div class="step"><div class="step-num">3</div><div class="step-text">При наличии исполняемого приложения запустите модуль через Maven и протестируйте доступные <strong>endpoint'ы</strong>.</div></div>
+          </div>
+        </div>
+
+        <div class="section-heading">🔧 Сборка и запуск</div>
+        <div class="info-block">
+          <h3>📦 Maven-команды</h3>
+          <div class="cmd-list">
+            <div class="cmd-item"><span class="cmd-label">Весь проект</span><code class="cmd-code">mvn clean install</code><button class="cmd-copy" onclick="copyCmd(this,'mvn clean install')">copy</button></div>
+            <div class="cmd-item"><span class="cmd-label">01 Servlets</span><code class="cmd-code">mvn -pl 01-servlets spring-boot:run</code><button class="cmd-copy" onclick="copyCmd(this,'mvn -pl 01-servlets spring-boot:run')">copy</button></div>
+            <div class="cmd-item"><span class="cmd-label">02 Spring Context</span><code class="cmd-code">mvn -pl 02-spring-context spring-boot:run</code><button class="cmd-copy" onclick="copyCmd(this,'mvn -pl 02-spring-context spring-boot:run')">copy</button></div>
+            <div class="cmd-item"><span class="cmd-label">03 Spring Boot</span><code class="cmd-code">mvn -pl 03-spring-boot spring-boot:run</code><button class="cmd-copy" onclick="copyCmd(this,'mvn -pl 03-spring-boot spring-boot:run')">copy</button></div>
+            <div class="cmd-item"><span class="cmd-label">04 Hibernate</span><code class="cmd-code">mvn -pl 04-hibernate spring-boot:run</code><button class="cmd-copy" onclick="copyCmd(this,'mvn -pl 04-hibernate spring-boot:run')">copy</button></div>
+            <div class="cmd-item"><span class="cmd-label">05 Spring Data JPA</span><code class="cmd-code">mvn -pl 05-spring-data-jpa spring-boot:run</code><button class="cmd-copy" onclick="copyCmd(this,'mvn -pl 05-spring-data-jpa spring-boot:run')">copy</button></div>
+            <div class="cmd-item"><span class="cmd-label">06 Spring Data JDBC</span><code class="cmd-code">mvn -pl 06-spring-data-jdbc spring-boot:run</code><button class="cmd-copy" onclick="copyCmd(this,'mvn -pl 06-spring-data-jdbc spring-boot:run')">copy</button></div>
+            <div class="cmd-item"><span class="cmd-label">07 Spring REST</span><code class="cmd-code">mvn -pl 07-spring-rest spring-boot:run</code><button class="cmd-copy" onclick="copyCmd(this,'mvn -pl 07-spring-rest spring-boot:run')">copy</button></div>
+            <div class="cmd-item"><span class="cmd-label">08 Spring Security</span><code class="cmd-code">mvn -pl 08-spring-security spring-boot:run</code><button class="cmd-copy" onclick="copyCmd(this,'mvn -pl 08-spring-security spring-boot:run')">copy</button></div>
+            <div class="cmd-item"><span class="cmd-label">Из папки модуля</span><code class="cmd-code">cd 04-hibernate &amp;&amp; mvn spring-boot:run</code><button class="cmd-copy" onclick="copyCmd(this,'cd 04-hibernate && mvn spring-boot:run')">copy</button></div>
+          </div>
+        </div>
+
+        <div class="section-heading">🧩 ООП и паттерны в Spring</div>
+        <div class="info-block">
+          <h3>📋 Сравнительная таблица подходов</h3>
+          <div class="table-scroll">
+            <table class="oop-table">
+              <thead><tr><th>Подход / Паттерн</th><th>Суть</th><th>Плюсы</th><th>Минусы</th><th>В Spring</th></tr></thead>
+              <tbody>
+              <tr><td>Наследование</td><td>Подкласс переопределяет методы через <code>extends</code></td><td>Просто, встроено в язык</td><td>Жёсткая связность, нельзя с <code>final</code></td><td><span class="part">Ограниченно</span></td></tr>
+              <tr><td>Композиция</td><td>Класс содержит экземпляр другого и использует его</td><td>Гибче наследования, слабее связность</td><td>Больше шаблонного кода</td><td><span class="yes">✓ Широко</span></td></tr>
+              <tr><td>Делегирование</td><td>Объект передаёт выполнение другому объекту</td><td>Гибко, хорошо с интерфейсами</td><td>Много однотипного кода</td><td><span class="yes">✓ Широко</span></td></tr>
+              <tr><td>Wrapper / Обёртка</td><td>Оборачивает объект, повторяя его интерфейс</td><td>Не меняет исходный класс</td><td>Много boilerplate</td><td><span class="yes">✓ Да</span></td></tr>
+              <tr><td>Декоратор</td><td>Добавляет поведение до/после вызова, тот же интерфейс</td><td>Хорошо расширяется цепочкой</td><td>Усложняет цепочку вызовов</td><td><span class="yes">✓ Да</span></td></tr>
+              <tr><td>Стратегия (Strategy)</td><td>Поведение выносится в объект и подставляется через DI</td><td>Очень гибко, легко тестировать</td><td>Нужно заранее проектировать</td><td><span class="yes">✓ Очень широко</span></td></tr>
+              <tr><td>Шаблонный метод</td><td>Базовый класс задаёт алгоритм, шаги переопределяются</td><td>Удобно для переиспользования</td><td>Основан на наследовании</td><td><span class="yes">✓ <code>*Template</code></span></td></tr>
+              <tr><td>Dynamic Proxy (JDK)</td><td>Прокси для интерфейса перехватывает вызовы методов</td><td>Без изменения кода</td><td>Только для интерфейсов</td><td><span class="yes">✓ Spring AOP</span></td></tr>
+              <tr><td>CGLIB / ByteBuddy</td><td>Подкласс целевого класса переопределяет методы</td><td>Проксирует классы без интерфейса</td><td>Не работает с <code>final</code></td><td><span class="yes">✓ Широко</span></td></tr>
+              <tr><td>AOP</td><td>Вынесение сквозной логики в аспекты</td><td>Убирает дублирование</td><td>Поведение менее очевидно</td><td><span class="yes">✓ Ключевая фича</span></td></tr>
+              <tr><td>Interceptor / Filter</td><td>Встраивание логики до/после обработки</td><td>Middleware-подход</td><td>Нужно знать порядок цепочки</td><td><span class="yes">✓ HandlerInterceptor</span></td></tr>
+              <tr><td>Listener / Observer</td><td>Подписчики реагируют на события</td><td>Слабая связность</td><td>Поведение распределено</td><td><span class="yes">✓ ApplicationListener</span></td></tr>
+              <tr><td>Лямбды / Callbacks</td><td>Поведение передаётся как функция</td><td>Кратко, меньше классов</td><td>Не для сложного состояния</td><td><span class="part">Общий стиль Java</span></td></tr>
+              <tr><td>Bytecode instrumentation</td><td>Изменение байткода на лету</td><td>Очень мощно</td><td>Сложно, низкоуровнево</td><td><span class="part">Сторонние инструменты</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /overviewPanel -->
+
+    <!-- MODULE PANEL -->
+    <div id="modulePanel" class="hidden"
+         style="flex:1; display:flex; flex-direction:column; overflow:hidden; min-height:0; min-width:0;">
+      <div class="module-toolbar">
+        <div class="module-toolbar-info">
+          <span>📄</span>
+          <span>Модуль:</span>
+          <span class="mod-name" id="toolbarModName">—</span>
+        </div>
+        <div class="toolbar-actions">
+          <a class="toolbar-btn" id="openFileBtn" href="#" target="_blank">↗ Открыть файл</a>
+        </div>
+      </div>
+      <div id="moduleContent"></div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  /* ═══════════════════════════════════════════════════
+     STATE
+  ═══════════════════════════════════════════════════ */
+  let sidebarOpen   = true;
+  let currentModule = null;
+
+  const MODULES = {
+      '01': { dir: '01-servlets',         name: 'Servlets & Tomcat'  },
+      '02': { dir: '02-spring-context',   name: 'Spring Context'     },
+      '03': { dir: '03-spring-boot',      name: 'Spring Boot'        },
+      '04': { dir: '04-hibernate',        name: 'Hibernate'          },
+      '05': { dir: '05-spring-data-jpa',  name: 'Spring Data JPA'    },
+      '06': { dir: '06-spring-data-jdbc', name: 'Spring Data JDBC'   },
+      '07': { dir: '07-spring-rest',      name: 'Spring REST'        },
+      '08': { dir: '08-spring-security',  name: 'Spring Security'    },
+  };
+
+  /* Mermaid CDN fallback URLs */
+  const MERMAID_CDN_URLS = [
+      'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js',
+      'https://unpkg.com/mermaid@10/dist/mermaid.min.js'
+  ];
+
+  let mermaidLoadPromise = null;
+
+  /* ═══════════════════════════════════════════════════
+     DOM REFS
+  ═══════════════════════════════════════════════════ */
+  const burgerBtn      = document.getElementById('burgerBtn');
+  const sidebar        = document.getElementById('sidebar');
+  const sidebarOverlay = document.getElementById('sidebarOverlay');
+  const overviewPanel  = document.getElementById('overviewPanel');
+  const modulePanel    = document.getElementById('modulePanel');
+  const moduleContent  = document.getElementById('moduleContent');
+  const toolbarModName = document.getElementById('toolbarModName');
+  const openFileBtn    = document.getElementById('openFileBtn');
+  const breadcrumb     = document.getElementById('breadcrumbCurrent');
+  const searchInput    = document.getElementById('searchInput');
+
+  /* ═══════════════════════════════════════════════════
+     SIDEBAR
+  ═══════════════════════════════════════════════════ */
+  burgerBtn.addEventListener('click', toggleSidebar);
+
+  function toggleSidebar() { sidebarOpen = !sidebarOpen; applySidebar(); }
+  function closeSidebar()   { sidebarOpen = false;        applySidebar(); }
+
+  function applySidebar() {
+      burgerBtn.classList.toggle('open', sidebarOpen);
+      sidebar.classList.toggle('collapsed', !sidebarOpen);
+      if (window.innerWidth <= 768) {
+          sidebarOverlay.classList.toggle('hidden', !sidebarOpen);
+      }
+  }
+
+  /* ═══════════════════════════════════════════════════
+     NAVIGATION HELPERS
+  ═══════════════════════════════════════════════════ */
+  function setActiveNav(id) {
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      const el = document.getElementById('nav-' + id);
+      if (el) el.classList.add('active');
+  }
+
+  function setBreadcrumb(name) { breadcrumb.textContent = name; }
+
+  /* replaceState не генерирует hashchange — безопасно */
+  function setHash(hash) { history.replaceState(null, '', '#' + hash); }
+
+  /* ═══════════════════════════════════════════════════
+     MERMAID LOADER
+  ═══════════════════════════════════════════════════ */
+  async function ensureMermaidLoaded() {
+      if (window.mermaid) return window.mermaid;
+
+      if (!mermaidLoadPromise) {
+          mermaidLoadPromise = new Promise((resolve, reject) => {
+              let index = 0;
+
+              const loadNext = () => {
+                  if (index >= MERMAID_CDN_URLS.length) {
+                      reject(new Error('Не удалось загрузить Mermaid с CDN'));
+                      return;
+                  }
+
+                  const script = document.createElement('script');
+                  script.src = MERMAID_CDN_URLS[index++];
+                  script.async = true;
+
+                  script.onload = () => {
+                      if (window.mermaid) resolve(window.mermaid);
+                      else reject(new Error('Mermaid загружен, но глобальный объект window.mermaid не найден'));
+                  };
+
+                  script.onerror = () => {
+                      script.remove();
+                      loadNext();
+                  };
+
+                  document.head.appendChild(script);
+              };
+
+              loadNext();
+          });
+      }
+
+      return mermaidLoadPromise;
+  }
+
+  /* ═══════════════════════════════════════════════════
+     SHOW OVERVIEW
+  ═══════════════════════════════════════════════════ */
+  function showOverview() {
+      currentModule = null;
+
+      overviewPanel.classList.remove('hidden');
+
+      modulePanel.classList.add('hidden');
+
+      moduleContent.innerHTML = '';
+
+      setActiveNav('overview');
+      setBreadcrumb('Общая информация');
+      setHash('overview');
+
+      if (window.innerWidth <= 768 && sidebarOpen) closeSidebar();
+  }
+
+  /* ═══════════════════════════════════════════════════
+     LOAD MODULE
+  ═══════════════════════════════════════════════════ */
+  function loadModule(dir, name, num) {
+      currentModule = num;
+
+      overviewPanel.classList.add('hidden');
+      modulePanel.classList.remove('hidden');
+
+      toolbarModName.textContent = name;
+      setActiveNav(num);
+      setBreadcrumb(name);
+      setHash(num);
+
+      const filePath = `./${dir}/src/main/resources/static/index.html`;
+      openFileBtn.href = filePath;
+
+      moduleContent.innerHTML = `
+          <div class="state-box">
+              <div class="state-icon">⏳</div>
+              <h3>Загрузка…</h3>
+              <p>Читаем <code>${filePath}</code></p>
+          </div>`;
+
+      fetch(filePath)
+          .then(res => { if (!res.ok) throw new Error(`HTTP ${res.status}`); return res.text(); })
+          .then(html => renderModuleHtml(html, filePath, num))
+          .catch(err  => renderModuleError(filePath, err));
+
+      if (window.innerWidth <= 768 && sidebarOpen) closeSidebar();
+  }
+
+  /* ═══════════════════════════════════════════════════
+     RENDER MODULE HTML
+  ═══════════════════════════════════════════════════ */
+  function renderModuleHtml(html, filePath, moduleNum) {
+      moduleContent.innerHTML = '';
+
+      const host = document.createElement('div');
+      host.className = 'shadow-host';
+      moduleContent.appendChild(host);
+
+      const root = host.attachShadow ? host.attachShadow({ mode: 'open' }) : host;
+      root.innerHTML = html;
+
+      if (host.attachShadow) {
+          const resetStyle = document.createElement('style');
+          resetStyle.textContent = `
+              :host {
+                  display: block;
+                  width: 100%;
+                  min-height: 0;
+                  height: auto;
+              }
+
+              html, body {
+                  margin: 0 !important;
+                  padding: 0 !important;
+                  width: 100% !important;
+                  height: auto !important;
+                  min-height: 0 !important;
+                  overflow: visible !important;
+              }
+          `;
+          root.appendChild(resetStyle);
+      }
+
+      /* ── Перехват якорных ссылок внутри shadow DOM/обычного контейнера ── */
+      root.addEventListener('click', e => {
+          const a = e.target.closest('a');
+          if (!a) return;
+
+          const href = a.getAttribute('href');
+          if (!href) return;
+
+          if (href.startsWith('#')) {
+              e.preventDefault();
+              const targetId = href.slice(1);
+              const target = root.getElementById?.(targetId)
+                          || root.querySelector?.(`[name="${targetId}"]`);
+              if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              return;
+          }
+
+          if (href.startsWith('http') || href.startsWith('mailto:') || href.startsWith('//')) return;
+
+          e.preventDefault();
+          window.open(new URL(href, location.href).href, '_blank');
+      });
+
+      /* ── Рендер Mermaid диаграмм ── */
+      initMermaidInRoot(root);
+
+      moduleContent.scrollTop = 0;
+  }
+
+  /* ═══════════════════════════════════════════════════
+     MERMAID IN SHADOW DOM / ROOT
+     ─────────────────────────────────────────────────
+     1. Загружаем Mermaid, если он ещё не подключен
+     2. Ищем элементы .mermaid внутри root
+     3. Рендерим каждый блок через mermaid.render()
+     4. Вставляем SVG напрямую
+  ═══════════════════════════════════════════════════ */
+  async function initMermaidInRoot(root) {
+      try {
+          await ensureMermaidLoaded();
+      } catch (err) {
+          console.warn('[Mermaid] Либруа не загружена:', err);
+          return;
+      }
+
+      if (typeof window.mermaid === 'undefined') return;
+
+      const diagrams = Array.from(root.querySelectorAll('.mermaid'));
+      if (diagrams.length === 0) return;
+
+      try {
+          window.mermaid.initialize({
+              startOnLoad: false,
+              theme: 'default',
+              securityLevel: 'loose',
+          });
+      } catch (_) {
+          /* уже инициализирован — не критично */
+      }
+
+      await renderMermaidDiagrams(diagrams);
+  }
+
+  async function renderMermaidDiagrams(diagrams) {
+      for (let i = 0; i < diagrams.length; i++) {
+          const el = diagrams[i];
+
+          let source = el.getAttribute('data-mermaid-source');
+          if (!source) {
+              source = el.textContent.trim();
+              el.setAttribute('data-mermaid-source', source);
+          }
+          if (!source) continue;
+
+          const id = `mermaid-diagram-${Date.now()}-${i}`;
+
+          try {
+              const { svg, bindFunctions } = await window.mermaid.render(id, source);
+
+              el.innerHTML = svg;
+
+              if (typeof bindFunctions === 'function') bindFunctions(el);
+
+              cleanupMermaidTempNodes(id);
+
+          } catch (err) {
+              console.warn(`[Mermaid] Ошибка рендера диаграммы #${i}:`, err);
+              el.innerHTML = `
+                  <div style="
+                      background:#fff3cd;border:1px solid #ffc107;
+                      border-radius:6px;padding:12px;font-size:13px;
+                      color:#856404;font-family:monospace;white-space:pre-wrap;
+                  ">⚠️ Ошибка рендера диаграммы:\n${err.message || err}\n\nИсходник:\n${source}</div>`;
+          }
+      }
+  }
+
+  function cleanupMermaidTempNodes(id) {
+      [id, `d${id}`].forEach(nodeId => {
+          const node = document.getElementById(nodeId);
+          if (node) node.remove();
+      });
+  }
+
+  /* ═══════════════════════════════════════════════════
+     RENDER ERROR
+     ═══════════════════════════════════════════════════ */
+  function renderModuleError(filePath, err) {
+      const isFile = location.protocol === 'file:';
+      moduleContent.innerHTML = `
+          <div class="state-box">
+              <div class="state-icon">📄</div>
+              <h3>Не удалось загрузить документацию</h3>
+              <p>
+                  ${isFile ? 'Браузер заблокировал запрос из-за политики <b>CORS / file://</b>.<br>' : ''}
+                  Файл: <code>${filePath}</code><br><br>
+                  Откройте файл напрямую или запустите проект через встроенный сервер IDEA / Live Server.<br><br>
+                  <small style="opacity:.6">${err}</small>
+              </p>
+              <a class="open-link" href="${filePath}" target="_blank">↗ Открыть файл напрямую</a>
+          </div>`;
+  }
+
+  /* ═══════════════════════════════════════════════════
+     HASH ROUTING
+     ═══════════════════════════════════════════════════ */
+  window.addEventListener('hashchange', () => {
+      const raw = location.hash.replace('#', '').trim();
+      if (!raw || raw === 'overview') {
+          showOverview();
+      } else if (MODULES[raw]) {
+          const mod = MODULES[raw];
+          loadModule(mod.dir, mod.name, raw);
+      }
+  });
+
+  /* ═══════════════════════════════════════════════════
+     SEARCH
+     ═══════════════════════════════════════════════════ */
+  function filterNav(query) {
+      const q = query.toLowerCase().trim();
+      document.querySelectorAll('.nav-item').forEach(item => {
+          if (!q) { item.classList.remove('search-hidden'); return; }
+          const text = (item.dataset.search || '') + ' ' + item.textContent.toLowerCase();
+          item.classList.toggle('search-hidden', !text.includes(q));
+      });
+  }
+
+  /* ═══════════════════════════════════════════════════
+     COPY COMMAND
+     ═══════════════════════════════════════════════════ */
+  function copyCmd(btn, text) {
+      const ok = () => {
+          btn.textContent = '✓ скопировано';
+          btn.classList.add('copied');
+          setTimeout(() => { btn.textContent = 'copy'; btn.classList.remove('copied'); }, 1600);
+      };
+      if (navigator.clipboard?.writeText) {
+          navigator.clipboard.writeText(text).then(ok).catch(() => fallbackCopy(text, ok));
+      } else {
+          fallbackCopy(text, ok);
+      }
+  }
+  function fallbackCopy(text, cb) {
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
+      document.body.appendChild(ta); ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta); cb();
+  }
+
+  /* ═══════════════════════════════════════════════════
+     KEYBOARD SHORTCUTS
+     ═══════════════════════════════════════════════════ */
+  document.addEventListener('keydown', e => {
+      const tag = document.activeElement.tagName;
+      if ((e.ctrlKey || e.metaKey) && e.key === 'b') { e.preventDefault(); toggleSidebar(); return; }
+      if (e.key === '/' && tag !== 'INPUT' && tag !== 'TEXTAREA') { e.preventDefault(); searchInput.focus(); return; }
+      if (e.key === 'Escape') {
+          if (searchInput.value) { searchInput.value = ''; filterNav(''); }
+          else if (window.innerWidth <= 768 && sidebarOpen) closeSidebar();
+      }
+  });
+
+  /* ═══════════════════════════════════════════════════
+     INIT
+     ═══════════════════════════════════════════════════ */
+  (function init() {
+      if (window.innerWidth <= 768) { sidebarOpen = false; applySidebar(); }
+
+      const raw = location.hash.replace('#', '').trim();
+      if (raw && MODULES[raw]) {
+          const mod = MODULES[raw];
+          loadModule(mod.dir, mod.name, raw);
+      } else {
+          showOverview();
+      }
+  })();
+</script>
+</body>
+</html>
