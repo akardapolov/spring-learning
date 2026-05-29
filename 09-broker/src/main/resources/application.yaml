@@ -1,0 +1,15 @@
+server:
+  port: 8893
+
+spring:
+  application:
+    name: broker-demo
+
+  activemq:
+    broker-url: tcp://localhost:61616
+    in-memory: false
+
+logging:
+  level:
+    com.example.broker: DEBUG
+    org.apache.activemq: DEBUG

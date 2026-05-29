@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Message Broker Demo — ActiveMQ Classic</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>mermaid.initialize({startOnLoad: true, theme: 'default'});</script>
+  <style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 20px;
+        line-height: 1.7;
+        color: #333;
+        background: #fafafa;
+    }
+    h1 {
+        color: #2c3e50;
+        border-bottom: 3px solid #3498db;
+        padding-bottom: 10px;
+    }
+    h2 {
+        color: #2980b9;
+        margin-top: 50px;
+        border-left: 4px solid #3498db;
+        padding-left: 12px;
+    }
+    h3 {
+        color: #27ae60;
+        margin-top: 28px;
+    }
+    h4 {
+        color: #8e44ad;
+        margin-top: 20px;
+    }
+    pre {
+        background: #2d2d2d;
+        color: #f8f8f2;
+        padding: 16px;
+        border-radius: 6px;
+        overflow-x: auto;
+        font-size: 14px;
+    }
+    code {
+        background: #ecf0f1;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 14px;
+    }
+    pre code {
+        background: none;
+        padding: 0;
+    }
+    .mermaid {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        margin: 16px 0;
+        overflow-x: auto;
+    }
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 12px 0;
+        background: white;
+    }
+    th, td {
+        border: 1px solid #bdc3c7;
+        padding: 10px;
+        text-align: left;
+        vertical-align: top;
+    }
+    th {
+        background: #3498db;
+        color: white;
+    }
+    a {
+        color: #2980b9;
+    }
+    .endpoint {
+        background: #e8f6f3;
+        padding: 10px;
+        border-radius: 6px;
+        border-left: 4px solid #1abc9c;
+        margin: 10px 0;
+    }
+    .port-info {
+        background: #fef9e7;
+        padding: 10px;
+        border-radius: 6px;
+        border-left: 4px solid #f1c40f;
+        margin: 10px 0;
+    }
+    .note {
+        background: #eaf2f8;
+        padding: 10px;
+        border-radius: 6px;
+        border-left: 4px solid #3498db;
+        margin: 10px 0;
+    }
+    ul, ol {
+        margin: 8px 0;
+        padding-left: 24px;
+    }
+    li {
+        margin: 4px 0;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Message Broker Demo — ActiveMQ Classic</h1>
+
+<p>
+  Демонстрация работы с брокером сообщений <strong>ActiveMQ Classic</strong> в <strong>embedded-режиме</strong> через Spring JMS.
+</p>
+
+<div class="port-info">
+  <strong>Приложение:</strong> <code>http://localhost:8893</code><br>
+  <strong>Брокер JMS:</strong> <code>tcp://localhost:61616</code> (embedded ActiveMQ Classic)
+</div>
+
+---
+
+<h2>Оглавление</h2>
+
+<ol>
+  <li><a href="#message-broker">Что такое Message Broker</a></li>
+  <li><a href="#activemq">ActiveMQ Classic</a></li>
+  <li><a href="#queue-vs-topic">Queue vs Topic</a></li>
+  <li><a href="#producer-consumer">Producer / Consumer паттерн</a></li>
+  <li><a href="#spring-jms">Spring JMS</a></li>
+  <li><a href="#embedded-vs-standalone">Embedded vs Standalone</a></li>
+  <li><a href="#structure">Структура проекта</a></li>
+  <li><a href="#endpoints">Endpoint'ы API</a></li>
+  <li><a href="#testing">Тестирование через curl</a></li>
+  <li><a href="#glossary">Глоссарий терминов</a></li>
+</ol>
+
+---
+
+<h2 id="message-broker">1. Что такое Message Broker</h2>
+
+<p>
+  <strong>Message Broker</strong> (брокер сообщений) — это программный компонент, который принимает сообщения от <strong>producer'ов</strong>, временно хранит их и передаёт <strong>consumer'ам</strong>.
+</p>
+
+<p>
+  Брокер позволяет сервисам обмениваться данными <strong>асинхронно</strong> — отправитель не ждёт, пока получатель обработает сообщение.
+</p>
+
+<div class="mermaid">
+flowchart LR
+    A[Producer] --"отправляет сообщение"--> B["Message Broker"]
+    B --"передаёт сообщение"--> C[Consumer]
+</div>
+
+<p><strong>Когда используется:</strong></p>
+<ul>
+  <li>Асинхронная обработка задач</li>
+  <li>Отделение тяжёлых операций от основного потока</li>
+  <li>Микросервисная коммуникация</li>
+  <li>Буферизация при пиковых нагрузках</li>
+  <li>Надёжная доставка сообщений</li>
+</ul>
+
+---
+
+<h2 id="activemq">2. ActiveMQ Classic</h2>
+
+<p>
+  <strong>Apache ActiveMQ Classic</strong> — зрелый и надёжный брокер сообщений с богатой экосистемой.
+</p>
+
+<p><strong>Ключевые особенности:</strong></p>
+<ul>
+  <li>Поддержка протоколов: JMS, OpenWire, STOMP, AMQP</li>
+  <li>Embedded режим (внутри JVM)</li>
+  <li>Jakarta JMS — Spring Boot 3.x</li>
+  <li>Простота настройки и эксплуатации</li>
+  <li>TCP-коннектор для доступа внешних сервисов</li>
+</ul>
+
+<div class="mermaid">
+flowchart TB
+    subgraph ActiveMQ["Apache ActiveMQ Classic"]
+        Q["Queue\n(demo-queue)"]
+        T["Topic\n(demo-topic)"]
+    end
+    P1["Producer"] -->|"JMS Template"| Q
+    P1 -->|"JMS Template"| T
+    Q -->|"@JmsListener"| C1["Consumer"]
+    T -->|"@JmsListener"| C2["Consumer"]
+</div>
+
+---
+
+<h2 id="queue-vs-topic">3. Queue vs Topic</h2>
+
+<table>
+  <tr>
+    <th>Характеристика</th>
+    <th>Queue (Point-to-Point)</th>
+    <th>Topic (Pub/Sub)</th>
+  </tr>
+  <tr>
+    <td><strong>Модель</strong></td>
+    <td>Одно сообщение = один consumer</td>
+    <td>Одно сообщение = все subscribers</td>
+  </tr>
+  <tr>
+    <td><strong>Доставка</strong></td>
+    <td>Гарантированно один раз одному получателю</td>
+    <td>Каждому подписчику</td>
+  </tr>
+  <tr>
+    <td><strong>Когда использовать</strong></td>
+    <td>Задачи, обработка заказов, email-рассылки</td>
+    <td>Уведомления, события, логи</td>
+  </tr>
+  <tr>
+    <td><strong>Spring JMS</strong></td>
+    <td><code>jmsTemplate.convertAndSend("queue", msg)</code></td>
+    <td><code>jmsTemplate.setPubSubDomain(true)</code></td>
+  </tr>
+</table>
+
+<div class="mermaid">
+flowchart LR
+    subgraph Queue["Queue (Point-to-Point)"]
+        Q1["Producer"] --"msg1"--> Q2["Queue"]
+        Q2 --"msg1"--> Q3["Consumer A"]
+        Q2 --"msg2"--> Q4["Consumer B"]
+    end
+
+    subgraph Topic["Topic (Pub/Sub)"]
+        T1["Producer"] --"msg1"--> T2["Topic"]
+        T2 --"msg1"--> T3["Consumer A"]
+        T2 --"msg1"--> T4["Consumer B"]
+        T2 --"msg1"--> T5["Consumer C"]
+    end
+</div>
+
+---
+
+<h2 id="producer-consumer">4. Producer / Consumer паттерн</h2>
+
+<p>
+  <strong>Producer</strong> создаёт и отправляет сообщения в брокер.<br>
+  <strong>Consumer</strong> получает и обрабатывает сообщения из брокера.
+</p>
+
+<p>Компоненты Spring JMS:</p>
+<ul>
+  <li><code>JmsTemplate</code> — для отправки сообщений (Producer)</li>
+  <li><code>@JmsListener</code> — для получения сообщений (Consumer)</li>
+</ul>
+
+<div class="mermaid">
+sequenceDiagram
+    participant P as Producer (JmsTemplate)
+    participant B as Broker (ActiveMQ)
+    participant C as Consumer (@JmsListener)
+
+    P->>B: convertAndSend("demo-queue", "hello")
+    B->>B: сохранить в очередь
+    C->>B: poll / push
+    B-->>C: доставить сообщение
+    C->>C: обработать сообщение
+</div>
+
+---
+
+<h2 id="spring-jms">5. Spring JMS</h2>
+
+<p>Spring JMS упрощает работу с брокерами через:</p>
+
+<h3>@EnableJms</h3>
+<p>Включает поддержку JMS-листенеров:</p>
+<pre><code>@Configuration
+@EnableJms
+public class JmsConfig {
+}</code></pre>
+
+<h3>JmsTemplate</h3>
+<p>Шаблон для отправки сообщений:</p>
+<pre><code>@Service
+public class MessageProducer {
+    private final JmsTemplate jmsTemplate;
+
+    public void sendToQueue(String destination, String message) {
+        jmsTemplate.convertAndSend(destination, message);
+    }
+}</code></pre>
+
+<h3>@JmsListener</h3>
+<p>Аннотация для получения сообщений:</p>
+<pre><code>@Component
+public class MessageConsumer {
+    @JmsListener(destination = "demo-queue")
+    public void receiveQueue(String message) {
+        log.info("Received: {}", message);
+    }
+}</code></pre>
+
+<h3>Pub/Sub (Topic)</h3>
+<p>Для работы с топиками нужен отдельный <code>containerFactory</code>:</p>
+<pre><code>@Bean
+public JmsListenerContainerFactory<?> topicFactory(ConnectionFactory cf) {
+    DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
+    factory.setConnectionFactory(cf);
+    factory.setPubSubDomain(true);
+    return factory;
+}
+
+@JmsListener(destination = "demo-topic", containerFactory = "topicFactory")
+public void receiveTopic(String message) {
+    log.info("[TOPIC] Received: {}", message);
+}</code></pre>
+
+---
+
+<h2 id="embedded-vs-standalone">6. Embedded vs Standalone</h2>
+
+<table>
+  <tr>
+    <th>Характеристика</th>
+    <th>Embedded</th>
+    <th>Standalone</th>
+  </tr>
+  <tr>
+    <td><strong>Где работает</strong></td>
+    <td>Внутри JVM приложения</td>
+    <td>Отдельный процесс / Docker</td>
+  </tr>
+  <tr>
+    <td><strong>Зависимость</strong></td>
+    <td><code>activemq-broker</code></td>
+    <td>Только клиент (<code>activemq-client</code>)</td>
+  </tr>
+  <tr>
+    <td><strong>Использование</strong></td>
+    <td>Тесты, демо, CI/CD</td>
+    <td>Production, staging</td>
+  </tr>
+  <tr>
+    <td><strong>Преимущества</strong></td>
+    <td>Быстрый старт, нет внешних зависимостей</td>
+    <td>Масштабируемость, HA, кластеризация</td>
+  </tr>
+</table>
+
+---
+
+<h2 id="structure">7. Структура проекта</h2>
+
+<pre><code>09-broker/
+├── pom.xml
+├── README.md
+└── src
+    ├── main
+    │   ├── java/com/example/broker
+    │   │   ├── config
+    │   │   │   └── JmsConfig.java
+    │   │   ├── controller
+    │   │   │   └── MessageController.java
+    │   │   ├── exception
+    │   │   │   └── GlobalExceptionHandler.java
+    │   │   ├── model
+    │   │   │   └── MessageRequest.java
+    │   │   ├── service
+    │   │   │   ├── MessageConsumer.java
+    │   │   │   └── MessageProducer.java
+    │   │   └── BrokerApplication.java
+    │   └── resources
+    │       ├── static
+    │       │   └── index.html
+    │       └── application.yaml
+    └── test
+        └── java/com/example/broker
+            └── BrokerApplicationTest.java
+</code></pre>
+
+---
+
+<h2 id="endpoints">8. Endpoint'ы API</h2>
+
+<div class="endpoint">
+  <strong>POST /api/messages/queue</strong><br>
+  Отправить сообщение в очередь <code>demo-queue</code>
+</div>
+
+<div class="endpoint">
+  <strong>POST /api/messages/topic</strong><br>
+  Отправить сообщение в топик <code>demo-topic</code>
+</div>
+
+<div class="endpoint">
+  <strong>GET /api/messages/status</strong><br>
+  Статус брокера (UP / DOWN)
+</div>
+
+<div class="endpoint">
+  <strong>GET /api/messages/info</strong><br>
+  Информация о брокере (порт, очереди, топики)
+</div>
+
+---
+
+<h2 id="testing">9. Тестирование через curl</h2>
+
+<h3>Отправка в очередь</h3>
+<pre><code>curl -X POST http://localhost:8893/api/messages/queue \
+  -H "Content-Type: application/json" \
+  -d '{"content":"hello queue"}'</code></pre>
+
+<p>Ожидаемый ответ:</p>
+<pre><code>{
+  "status": "sent",
+  "destination": "demo-queue",
+  "message": "hello queue"
+}</code></pre>
+
+<h3>Отправка в топик</h3>
+<pre><code>curl -X POST http://localhost:8893/api/messages/topic \
+  -H "Content-Type: application/json" \
+  -d '{"content":"hello topic"}'</code></pre>
+
+<h3>Проверка статуса</h3>
+<pre><code>curl http://localhost:8893/api/messages/status</code></pre>
+
+<h3>Информация о брокере</h3>
+<pre><code>curl http://localhost:8893/api/messages/info</code></pre>
+
+---
+
+<h2 id="glossary">10. Глоссарий терминов</h2>
+
+<table>
+  <tr>
+    <th>Термин</th>
+    <th>Описание</th>
+  </tr>
+  <tr>
+    <td><strong>Message Broker</strong></td>
+    <td>Промежуточный компонент для асинхронной передачи сообщений между сервисами</td>
+  </tr>
+  <tr>
+    <td><strong>Queue</strong></td>
+    <td>Очередь сообщений (point-to-point). Одно сообщение получает ровно один consumer</td>
+  </tr>
+  <tr>
+    <td><strong>Topic</strong></td>
+    <td>Топик сообщений (publish/subscribe). Одно сообщение получают все подписчики</td>
+  </tr>
+  <tr>
+    <td><strong>Producer</strong></td>
+    <td>Компонент, который создаёт и отправляет сообщения в брокер</td>
+  </tr>
+  <tr>
+    <td><strong>Consumer</strong></td>
+    <td>Компонент, который получает и обрабатывает сообщения из брокера</td>
+  </tr>
+  <tr>
+    <td><strong>JMS</strong></td>
+    <td>Java Message Service — стандартный API для работы с брокерами в Java</td>
+  </tr>
+  <tr>
+    <td><strong>JmsTemplate</strong></td>
+    <td>Spring-шаблон для отправки JMS-сообщений</td>
+  </tr>
+  <tr>
+    <td><strong>@JmsListener</strong></td>
+    <td>Spring-аннотация для создания JMS-consumer'а</td>
+  </tr>
+  <tr>
+    <td><strong>ActiveMQ Classic</strong></td>
+    <td>Зрелый брокер сообщений от Apache с поддержкой множества протоколов</td>
+  </tr>
+  <tr>
+    <td><strong>Embedded</strong></td>
+    <td>Режим, при котором брокер работает внутри JVM приложения</td>
+  </tr>
+</table>
+
+</body>
+</html>

@@ -108,6 +108,19 @@
 * Endpoint'ы API
 * 🔗 [Документация модуля](./08-spring-security/src/main/resources/static/index.html)
 
+### 9. Message Broker (ActiveMQ Classic)
+Асинхронная коммуникация между сервисами через брокер сообщений.
+* Что такое Message Broker и зачем он нужен
+* ActiveMQ Classic: архитектура и возможности
+* JMS API: Queue vs Topic
+* Producer и Consumer паттерны
+* Spring JMS: JmsTemplate и @JmsListener
+* Embedded брокер с TCP-доступом для внешних сервисов
+* Глоссарий терминов
+* Структура проекта
+* Endpoint'ы API
+* 🔗 [Документация модуля](./09-broker/src/main/resources/static/index.html)
+
 ## Структура проекта
 
 Проект организован как **Maven multi-module project**.
@@ -124,7 +137,8 @@ spring/
 ├─ 05-spring-data-jpa/
 ├─ 06-spring-data-jdbc/
 ├─ 07-spring-rest/
-└─ 08-spring-security/
+├─ 08-spring-security/
+└─ 09-broker/
 ```
 
 ## Как использовать
@@ -200,6 +214,11 @@ mvn -pl 07-spring-rest spring-boot:run
 #### 8. Spring Security
 ```bash
 mvn -pl 08-spring-security spring-boot:run
+```
+
+#### 9. Message Broker
+```bash
+mvn -pl 09-broker spring-boot:run
 ```
 
 ### Запуск из папки модуля

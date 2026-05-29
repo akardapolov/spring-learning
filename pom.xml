@@ -34,5 +34,6 @@
     <module>06-spring-data-jdbc</module>
     <module>07-spring-rest</module>
     <module>08-spring-security</module>
+    <module>09-broker</module>
   </modules>
 </project>
